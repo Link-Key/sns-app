@@ -2,7 +2,7 @@ import React from 'react'
 import styled from '@emotion/styled/macro'
 
 const HamburgerContainer = styled('div')`
-  background: white;
+  background: transparent;
 
   button {
     &:focus {
@@ -49,7 +49,7 @@ const HamburgerContainer = styled('div')`
   .hamburger-inner::after {
     width: 30px;
     height: 1px;
-    background-color: #000;
+    background-color: white;
     border-radius: 4px;
     position: absolute;
     transition-property: transform;
@@ -113,7 +113,7 @@ const HamburgerContainer = styled('div')`
   .hamburger--collapse-r.is-active .hamburger-inner,
   .hamburger--collapse-r.is-active .hamburger-inner::after,
   .hamburger--collapse-r.is-active .hamburger-inner::before {
-    background: #000;
+    background-color: white;
   }
 `
 

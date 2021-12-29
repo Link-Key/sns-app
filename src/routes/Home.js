@@ -35,6 +35,7 @@ const HeroTop = styled('div')`
   justify-content: space-around;
   flex-wrap: wrap;
   font-size: 16px;
+  flex-direction: row-reverse;
   ${mq.small`
     flex-wrap: nowrap;
     flex-direction: row-reverse;
@@ -47,6 +48,7 @@ const HeroTop = styled('div')`
     justify-content: space-between;
     font-size: 16px;
   `}
+  z-index:100;
 `
 
 const NoAccounts = styled(NoAccountsDefault)`
@@ -191,9 +193,8 @@ const Search = styled(SearchDefault)`
 
   input {
     width: 100%;
-    border-radius: 0px;
+    border-radius: 16px 0 0 16px;
     ${mq.medium`
-      border-radius: 16px 0 0 16px;
       font-size: 28px;
     `}
   }
