@@ -6,6 +6,7 @@ import { hasNonAscii } from '../../utils/utils'
 
 const MainContainer = styled('main')`
   margin-top: 50px;
+  padding-bottom: 20px;
 
   ${p =>
     p.hasNonAscii

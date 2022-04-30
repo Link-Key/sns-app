@@ -404,6 +404,7 @@ function getCTA({
             onClick={async () => {
               await Promise.all([refetchIsMigrated()])
               history.push(`/address/${account}`)
+              window.location.reload()
             }}
           >
             <Pencil />

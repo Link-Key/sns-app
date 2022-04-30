@@ -66,7 +66,9 @@ const Info = styled(DefaultInfo)`
 `
 
 const EditButton = styled(Button)`
-  width: 130px;
+  width: 100px;
+  height: 35px;
+  padding: 6px 16px;
 `
 
 const WarningMessage = styled('span')`
