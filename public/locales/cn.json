@@ -186,6 +186,7 @@
       "warning": "点击“注册”进入第 3 步",
       "suspend": "暂停注册"
     },
+    "notOpen": "暂未开放3位数一下的域名!",
     "favourite": "* 您可以收藏喜欢的域名，以便于浏览器关闭以后重新查看这个域名。",
     "increaseRegistrationPeriod": "注册数量每新增10000，注册费上调50%。",
     "notifications": {
