@@ -4,8 +4,8 @@ const PolygonscanIcon = () => (
   <svg
     xmlns="http://www.w3.org/2000/svg"
     xmlnsXlink="http://www.w3.org/1999/xlink"
-    width="25"
-    height="25"
+    width="32"
+    height="32"
     viewBox="0 0 125 125"
   >
     <defs>
