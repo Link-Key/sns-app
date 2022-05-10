@@ -1,7 +1,7 @@
 {
   "address": {
     "etherscanButton": "Polygonscanで確認",
-    "openseaButton": "Openseaで確認",
+    "openseaButton": "Raibleで確認",
     "filter": {
       "controller": "コントローラー",
       "registrant": "登録者"

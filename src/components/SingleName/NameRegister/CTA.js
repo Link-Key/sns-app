@@ -21,6 +21,7 @@ import { useAccount } from '../../QueryAccount'
 import { Modal, Button, Select, message } from 'antd'
 import getSNS, { getSNSAddress, getSNSIERC20 } from 'apollo/mutations/sns'
 import { UnknowErrMsgComponent } from 'components/UnknowErrMsg'
+import messageMention from 'utils/messageMention'
 
 const CTAContainer = styled('div')`
   display: flex;
@@ -191,78 +192,90 @@ function getCTA({
                 <SnsButton
                   data-testid="request-register-button"
                   onClick={async () => {
-                    Modal.info({
-                      style: { top: '20vh' },
-                      title: (
-                        <div style={{ textAlign: 'center', fontWeight: '700' }}>
-                          {t('c.selectCoins')}
-                        </div>
-                      ),
-                      content: (
-                        <ChooseCoinsBtn>
-                          <Button
-                            danger
-                            shape="round"
-                            block
-                            size="large"
-                            onClick={() => {
-                              Promise.resolve()
-                                .then(() => {
-                                  const obj = {
-                                    ...coinsValueObj,
-                                    coinsType: 'key'
-                                  }
-                                  setCoinsValue(obj)
-                                  return obj
-                                })
-                                .then(async obj => {
-                                  setCoinsValue({ ...obj, coinsType: 'key' })
-                                  try {
-                                    await getApproveOfKey(mutate)
-                                  } catch (e) {
-                                    console.log('getApproveOfKey:', e)
-                                  }
-                                  // mutate()
-                                })
-                              Modal.destroyAll()
-                            }}
+                    if (label.length > 3) {
+                      Modal.info({
+                        style: { top: '20vh' },
+                        title: (
+                          <div
+                            style={{ textAlign: 'center', fontWeight: '700' }}
                           >
-                            {keyPrice} Key
-                          </Button>
-                          <Button
-                            danger
-                            shape="round"
-                            block
-                            size="large"
-                            onClick={() => {
-                              Promise.resolve()
-                                .then(() => {
-                                  const obj = {
-                                    ...coinsValueObj,
-                                    coinsType: 'matic'
-                                  }
-                                  setCoinsValue(obj)
-                                  return obj
-                                })
-                                .then(obj => {
-                                  setCoinsValue({ ...obj, coinsType: 'matic' })
-                                  mutate()
-                                })
-                              Modal.destroyAll()
-                            }}
-                          >
-                            {maticPrice} Matic
-                          </Button>
-                        </ChooseCoinsBtn>
-                      ),
-                      icon: null,
-                      okButtonProps: {
-                        danger: true,
-                        shape: 'round',
-                        hidden: true
-                      },
-                      closable: true
-                    })
+                            {t('c.selectCoins')}
+                          </div>
+                        ),
+                        content: (
+                          <ChooseCoinsBtn>
+                            <Button
+                              danger
+                              shape="round"
+                              block
+                              size="large"
+                              onClick={() => {
+                                Promise.resolve()
+                                  .then(() => {
+                                    const obj = {
+                                      ...coinsValueObj,
+                                      coinsType: 'key'
+                                    }
+                                    setCoinsValue(obj)
+                                    return obj
+                                  })
+                                  .then(async obj => {
+                                    setCoinsValue({ ...obj, coinsType: 'key' })
+                                    try {
+                                      await getApproveOfKey(mutate)
+                                    } catch (e) {
+                                      console.log('getApproveOfKey:', e)
+                                    }
+                                    // mutate()
+                                  })
+                                Modal.destroyAll()
+                              }}
+                            >
+                              {keyPrice} Key
+                            </Button>
+                            <Button
+                              danger
+                              shape="round"
+                              block
+                              size="large"
+                              onClick={() => {
+                                Promise.resolve()
+                                  .then(() => {
+                                    const obj = {
+                                      ...coinsValueObj,
+                                      coinsType: 'matic'
+                                    }
+                                    setCoinsValue(obj)
+                                    return obj
+                                  })
+                                  .then(obj => {
+                                    setCoinsValue({
+                                      ...obj,
+                                      coinsType: 'matic'
+                                    })
+                                    mutate()
+                                  })
+                                Modal.destroyAll()
+                              }}
+                            >
+                              {maticPrice} Matic
+                            </Button>
+                          </ChooseCoinsBtn>
+                        ),
+                        icon: null,
+                        okButtonProps: {
+                          danger: true,
+                          shape: 'round',
+                          hidden: true
+                        },
+                        closable: true
+                      })
+                    } else {
+                      messageMention({
+                        content: t('register.notOpen'),
+                        type: 'error'
+                      })
+                    }
                   }}
                 >
                   {t('register.buttons.request')}
@@ -404,6 +417,7 @@ function getCTA({
             onClick={async () => {
               await Promise.all([refetchIsMigrated()])
               history.push(`/address/${account}`)
+              window.location.reload()
             }}
           >
             <Pencil />

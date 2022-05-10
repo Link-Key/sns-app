@@ -57,7 +57,7 @@ const Header = styled('header')`
 
 const SearchHeader = styled(Search)`
   background-color: transparent;
-  margin-top: 50px;
+  margin-top: 60px;
   width: 100%;
   padding: 5px 20px 0px;
   ${mq.medium`

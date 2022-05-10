@@ -29,6 +29,7 @@ const TabLink = styled(Link)`
 `
 
 const TabContainer = styled('div')`
+  height: 40px;
   display: inline-flex;
   justify-content: flex-start;
   border: 2px solid #dfdfdf;
@@ -37,6 +38,7 @@ const TabContainer = styled('div')`
   margin-top: 20px;
 
   ${mq.small`
+    height:auto;
     margin-right: 0;
     margin: 0;
     margin-left: 20px;

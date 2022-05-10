@@ -68,13 +68,15 @@ export default function DomainList({
   //   console.log('snsNameInfo', snsNameInfo)
   //   console.log('snsNameInfo', snsNameInfo.singleName.name)
   // }
-  if ((!domains || domains.length === 0) && !hasName(snsNameInfo)) {
-    return (
-      <NoDomainsContainer>
-        <h2>This address does not own any names</h2>
-      </NoDomainsContainer>
-    )
-  }
+  console.log('domains:', domains)
+  console.log('snsNameInfo:', snsNameInfo)
+  // if ((!domains || domains.length === 0) && !hasName(snsNameInfo)) {
+  //   return (
+  //     <NoDomainsContainer>
+  //       <h2>This address does not own any names</h2>
+  //     </NoDomainsContainer>
+  //   )
+  // }
   return (
     <DomainsContainer>
       {domains.map(d => {
@@ -105,19 +107,31 @@ export default function DomainList({
           name={snsNameInfo.singleName.name}
           owner={address}
           domain={snsNameInfo}
-          // expiryDate={d?.expiryDate}
           labelName={snsNameInfo.label}
           labelhash={snsNameInfo.labelhash}
-          // parent={snsNameInfo.parent.name}
           checkedBoxes={activeFilter === 'registrant' ? checkedBoxes : null}
           setCheckedBoxes={
             activeFilter === 'registrant' ? setCheckedBoxes : null
           }
           setSelectAll={setSelectAll}
           showBlockies={showBlockies}
-          // isFavourite={isFavourite}
         />
-      ) : null}
+      ) : (
+        <DomainItem
+          // key={snsNameInfo.singleName.name}
+          // name={snsNameInfo.singleName.name}
+          owner={address}
+          domain={snsNameInfo}
+          // labelName={snsNameInfo.label}
+          // labelhash={snsNameInfo.labelhash}
+          checkedBoxes={activeFilter === 'registrant' ? checkedBoxes : null}
+          setCheckedBoxes={
+            activeFilter === 'registrant' ? setCheckedBoxes : null
+          }
+          setSelectAll={setSelectAll}
+          showBlockies={showBlockies}
+        />
+      )}
     </DomainsContainer>
   )
 }

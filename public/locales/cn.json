@@ -1,7 +1,7 @@
 {
   "address": {
     "etherscanButton": "在 Polygonscan 上查看",
-    "openseaButton": "在 Opensea 上查看域名",
+    "openseaButton": "在 Raible 上查看域名",
     "filter": {
       "controller": "管理员",
       "registrant": "注册人"
@@ -186,6 +186,7 @@
       "warning": "点击“注册”进入第 3 步",
       "suspend": "暂停注册"
     },
+    "notOpen": "暂未开放3位数一下的域名!",
     "favourite": "* 您可以收藏喜欢的域名，以便于浏览器关闭以后重新查看这个域名。",
     "increaseRegistrationPeriod": "注册数量每新增100，注册费上调0.3Matic或0.45KEY。",
     "notifications": {

@@ -21,7 +21,6 @@ import messageMention from 'utils/messageMention'
 import { getAirdropData } from '../../api/reqList'
 import { Card, Row, Col, Typography, Button, Modal } from 'antd'
 import getSNS, { getSNSWithdraw } from 'apollo/mutations/sns'
-import OpenseaIcon from 'components/Icons/OpenseaIcon'
 import { H2, Title } from 'components/Typography/Basic'
 import { InfoCircleOutlined } from '@ant-design/icons'
 import TooltipAnt from 'utils/tooltipAnt'
@@ -112,8 +111,8 @@ const BlockTextWrapper = styled('div')`
 `
 
 const ButtonWrapper = styled(Button)`
-  min-width: 127px;
-  height: 46px;
+  min-width: 100px;
+  height: 35px;
   font-weight: 700;
   &:hover {
     box-shadow: 0 10px 21px 0 rgb(161 175 184 / 89%);
@@ -128,8 +127,16 @@ const ButtonWrapper = styled(Button)`
 const ButtonAndIcon = styled('div')`
   display: flex;
   .ant-btn-round {
-    height: 46px;
+    top: 5px;
+    height: 35px;
   }
+  ${mq.small`
+    .ant-btn-round {
+      top:0px;
+      height: 46px;
+      width:130px;
+    }
+  `}
 `
 
 const BlockText = styled(H2)`
