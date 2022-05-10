@@ -192,7 +192,7 @@
       "suspend": "Suspend register"
     },
     "favourite": "* Favorite the name for easy access in case you close out of your browser.",
-    "increaseRegistrationPeriod": "The registration fee will be increased by 50% for every 10,000 new registrations.",
+    "increaseRegistrationPeriod": "For every 100 new registrations, the registration fee will increase by 0.3Matic or 0.45KEY.",
     "notifications": {
       "ready": "is ready to be registered"
     },

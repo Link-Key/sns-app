@@ -189,7 +189,7 @@
       "suspend": "登録の一時停止"
     },
     "favourite": "* ブラウザを閉じた時にアクセスしやすいよう名前をお気に入りに登録する",
-    "increaseRegistrationPeriod": "登録けんすー件数が10000けん件ふえる増えるごとにとーろく登録りょー料が50%あがる上がる",
+    "increaseRegistrationPeriod": "新規登録100件ごとに、登録料は0.\u200B\u200B3Maticまたは0.45KEYずつ増加します。",
     "notifications": {
       "ready": "は登録の準備ができています"
     },

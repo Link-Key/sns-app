@@ -187,7 +187,7 @@
       "suspend": "暂停注册"
     },
     "favourite": "* 您可以收藏喜欢的域名，以便于浏览器关闭以后重新查看这个域名。",
-    "increaseRegistrationPeriod": "注册数量每新增10000，注册费上调50%。",
+    "increaseRegistrationPeriod": "注册数量每新增100，注册费上调0.3Matic或0.45KEY。",
     "notifications": {
       "ready": "已经可以正式注册了"
     },
