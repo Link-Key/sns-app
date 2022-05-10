@@ -1,7 +1,7 @@
 {
   "address": {
     "etherscanButton": "在 Polygonscan 上查看",
-    "openseaButton": "在 Opensea 上查看域名",
+    "openseaButton": "在 Raible 上查看域名",
     "filter": {
       "controller": "管理员",
       "registrant": "注册人"

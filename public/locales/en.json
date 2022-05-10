@@ -1,7 +1,7 @@
 {
   "address": {
     "etherscanButton": "View on Polygonscan",
-    "openseaButton": "View on Opensea",
+    "openseaButton": "View on Raible",
     "filter": {
       "controller": "Controller",
       "registrant": "Registrant"

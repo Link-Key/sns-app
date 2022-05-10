@@ -11,7 +11,7 @@ import { Title } from '../Typography/Basic'
 import TopBar from '../Basic/TopBar'
 import DefaultFavourite from '../AddFavourite/Favourite'
 import SharedIcon from 'components/Icons/SharedIcon'
-import OpenseaIcon from 'components/Icons/OpenseaIcon'
+import RaribleIcon from 'components/Icons/RaribleIcon'
 import NameDetails from './NameDetails'
 import DNSNameRegister from './DNSNameRegister'
 import ShortName from './ShortName'
@@ -198,10 +198,10 @@ function Name({ details: domain, name, pathname, type, refetch }) {
           {tokenIdState ? (
             <TooltipAnt title={t('address.openseaButton')}>
               <OpenseaIconContainer
-                href={`https://opensea.io/assets/matic/0x19ad2b1f012349645c3173ea63f98948a2b43d27/${tokenIdState}`}
+                href={`https://rarible.com/token/polygon/0x19ad2b1f012349645c3173ea63f98948a2b43d27:${tokenIdState}?tab=details`}
                 target="_blank"
               >
-                <OpenseaIcon />
+                <RaribleIcon />
               </OpenseaIconContainer>
             </TooltipAnt>
           ) : (

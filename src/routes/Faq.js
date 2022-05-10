@@ -154,10 +154,10 @@ function Faq() {
           of opensea
         </Section>
 
-        <Section question="I cannot see the names I registered on Opensea nor on my wallet">
-          This occasionally happens when Opensea is under a heavy load. You may
+        <Section question="I cannot see the names I registered on Raible nor on my wallet">
+          This occasionally happens when Raible is under a heavy load. You may
           also not find your name under the NFT section of your wallet, as many
-          wallets fetch metadata from Opensea.
+          wallets fetch metadata from Raible.
           <br />
           As long as you can see your registered name under "My Account" on our
           site or your ETH address under the name section, your name is
