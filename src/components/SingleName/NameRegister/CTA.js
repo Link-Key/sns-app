@@ -97,6 +97,13 @@ function getCTA({
     })
   })
 
+  const [lowbPrice, setLowbPrice] = useState(async () => {
+    const sns = getSNS()
+    sns.getLowbCoinsPrice().then(price => {
+      setLowbPrice(new EthVal(`${price || 0}`).toEth().toFixed(3))
+    })
+  })
+
   const maticPrice = new EthVal(`${price || 0}`).toEth().toFixed(3)
 
   useEffect(() => {
@@ -107,16 +114,16 @@ function getCTA({
   const getApproveOfKey = async mutate => {
     const sns = getSNS()
     const keyAddress = await sns.getKeyCoinsAddress()
-    const keyCoins = await sns.getKeyCoinsPrice()
+    const keyPrice = await sns.getKeyCoinsPrice()
 
     // get IERC20 contract instance object
-    const snsIERC20 = await getSNSIERC20(keyAddress)
+    const IERC20 = await getSNSIERC20(keyAddress)
 
     // get sns address
     const snsAddress = await getSNSAddress()
 
     // Authorization to SNS
-    await snsIERC20.approve(snsAddress, keyCoins)
+    await IERC20.approve(snsAddress, keyPrice)
 
     message.loading({
       key: 1,
@@ -135,7 +142,75 @@ function getCTA({
         try {
           count += 1
           // query authorization sns key price
-          allowancePrice = await snsIERC20.allowance(account, snsAddress)
+          allowancePrice = await IERC20.allowance(account, snsAddress)
+          const price = new EthVal(`${allowancePrice || 0}`).toEth().toFixed(3)
+          if (price > 0) {
+            clearInterval(timer)
+            // destroy message mention
+            message.destroy(1)
+            // mint nft of key
+            mutate()
+          }
+        } catch (e) {
+          console.log('allowance:', e)
+          clearInterval(timer)
+          message.error({
+            key: 2,
+            content: <UnknowErrMsgComponent />,
+            duration: 3,
+            style: { marginTop: '20vh' }
+          })
+          // destroy message mention
+          message.destroy(1)
+        }
+        if (count === 20) {
+          clearInterval(timer)
+          message.error({
+            key: 3,
+            content: t('z.transferBusy'),
+            duration: 3,
+            style: { marginTop: '20vh' }
+          })
+          // destroy message mention
+          message.destroy(1)
+        }
+      }, 3000)
+    }, 0)
+  }
+
+  // use key coins register operation
+  const getApproveOfLowb = async mutate => {
+    const sns = getSNS()
+    const lowbAddress = await sns.getLowbCoinsAddress()
+    const lowbPrice = await sns.getLowbCoinsPrice()
+
+    // get IERC20 contract instance object
+    const IERC20 = await getSNSIERC20(lowbAddress)
+
+    // get sns address
+    const snsAddress = await getSNSAddress()
+
+    // Authorization to SNS
+    await IERC20.approve(snsAddress, lowbPrice)
+
+    message.loading({
+      key: 1,
+      content: t('z.transferSending'),
+      duration: 0,
+      style: { marginTop: '20vh' }
+    })
+
+    // Query if the authorization is successful
+    // Query every three seconds, query ten times
+    setTimeout(async () => {
+      let timer,
+        count = 0,
+        allowancePrice
+      timer = setInterval(async () => {
+        try {
+          count += 1
+          // query authorization sns key price
+          allowancePrice = await IERC20.allowance(account, snsAddress)
           const price = new EthVal(`${allowancePrice || 0}`).toEth().toFixed(3)
           if (price > 0) {
             clearInterval(timer)
@@ -200,6 +275,35 @@ function getCTA({
                       ),
                       content: (
                         <ChooseCoinsBtn>
+                          <Button
+                            danger
+                            shape="round"
+                            block
+                            size="large"
+                            onClick={() => {
+                              Promise.resolve()
+                                .then(() => {
+                                  const obj = {
+                                    ...coinsValueObj,
+                                    coinsType: 'lowb'
+                                  }
+                                  setCoinsValue(obj)
+                                  return obj
+                                })
+                                .then(async obj => {
+                                  setCoinsValue({ ...obj, coinsType: 'lowb' })
+                                  try {
+                                    await getApproveOfLowb(mutate)
+                                  } catch (e) {
+                                    console.log('getApproveOfLowb:', e)
+                                  }
+                                  // mutate()
+                                })
+                              Modal.destroyAll()
+                            }}
+                          >
+                            {lowbPrice} Lowb
+                          </Button>
                           <Button
                             danger
                             shape="round"
