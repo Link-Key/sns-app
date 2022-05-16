@@ -289,6 +289,35 @@ function getCTA({
                                   .then(() => {
                                     const obj = {
                                       ...coinsValueObj,
+                                      coinsType: 'lowb'
+                                    }
+                                    setCoinsValue(obj)
+                                    return obj
+                                  })
+                                  .then(async obj => {
+                                    setCoinsValue({ ...obj, coinsType: 'lowb' })
+                                    try {
+                                      await getApproveOfLowb(mutate)
+                                    } catch (e) {
+                                      console.log('getApproveOfLowb:', e)
+                                    }
+                                    // mutate()
+                                  })
+                                Modal.destroyAll()
+                              }}
+                            >
+                              {lowbPrice} Lowb
+                            </Button>
+                            <Button
+                              danger
+                              shape="round"
+                              block
+                              size="large"
+                              onClick={() => {
+                                Promise.resolve()
+                                  .then(() => {
+                                    const obj = {
+                                      ...coinsValueObj,
                                       coinsType: 'key'
                                     }
                                     setCoinsValue(obj)
@@ -351,107 +380,6 @@ function getCTA({
                         type: 'error'
                       })
                     }
-                    Modal.info({
-                      style: { top: '20vh' },
-                      title: (
-                        <div style={{ textAlign: 'center', fontWeight: '700' }}>
-                          {t('c.selectCoins')}
-                        </div>
-                      ),
-                      content: (
-                        <ChooseCoinsBtn>
-                          <Button
-                            danger
-                            shape="round"
-                            block
-                            size="large"
-                            onClick={() => {
-                              Promise.resolve()
-                                .then(() => {
-                                  const obj = {
-                                    ...coinsValueObj,
-                                    coinsType: 'lowb'
-                                  }
-                                  setCoinsValue(obj)
-                                  return obj
-                                })
-                                .then(async obj => {
-                                  setCoinsValue({ ...obj, coinsType: 'lowb' })
-                                  try {
-                                    await getApproveOfLowb(mutate)
-                                  } catch (e) {
-                                    console.log('getApproveOfLowb:', e)
-                                  }
-                                  // mutate()
-                                })
-                              Modal.destroyAll()
-                            }}
-                          >
-                            {lowbPrice} Lowb
-                          </Button>
-                          <Button
-                            danger
-                            shape="round"
-                            block
-                            size="large"
-                            onClick={() => {
-                              Promise.resolve()
-                                .then(() => {
-                                  const obj = {
-                                    ...coinsValueObj,
-                                    coinsType: 'key'
-                                  }
-                                  setCoinsValue(obj)
-                                  return obj
-                                })
-                                .then(async obj => {
-                                  setCoinsValue({ ...obj, coinsType: 'key' })
-                                  try {
-                                    await getApproveOfKey(mutate)
-                                  } catch (e) {
-                                    console.log('getApproveOfKey:', e)
-                                  }
-                                  // mutate()
-                                })
-                              Modal.destroyAll()
-                            }}
-                          >
-                            {keyPrice} Key
-                          </Button>
-                          <Button
-                            danger
-                            shape="round"
-                            block
-                            size="large"
-                            onClick={() => {
-                              Promise.resolve()
-                                .then(() => {
-                                  const obj = {
-                                    ...coinsValueObj,
-                                    coinsType: 'matic'
-                                  }
-                                  setCoinsValue(obj)
-                                  return obj
-                                })
-                                .then(obj => {
-                                  setCoinsValue({ ...obj, coinsType: 'matic' })
-                                  mutate()
-                                })
-                              Modal.destroyAll()
-                            }}
-                          >
-                            {maticPrice} Matic
-                          </Button>
-                        </ChooseCoinsBtn>
-                      ),
-                      icon: null,
-                      okButtonProps: {
-                        danger: true,
-                        shape: 'round',
-                        hidden: true
-                      },
-                      closable: true
-                    })
                   }}
                 >
                   {t('register.buttons.request')}
