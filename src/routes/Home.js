@@ -18,7 +18,7 @@ import DiscordIcon from '../assets/D.png'
 import TelegramIcon from '../assets/tg.png'
 import TwitterIcon from '../assets/t.png'
 import GithubIcon from '../assets/github.png'
-import OpenseaIcon from '../assets/opensea-white.svg'
+import raribleIcon from '../assets/raribleIcon.png'
 import { aboutPageURL } from '../utils/utils'
 import { connectProvider, disconnectProvider } from '../utils/providerUtils'
 import { gql } from '@apollo/client'
@@ -384,7 +384,7 @@ export default ({ match }) => {
   const DiscordUrl = 'https://discord.com/invite/UMNRQryyts'
   const GithubUrl = 'https://github.com/Link-Key'
   const LinkkeyUrl = 'https://linkkey.io'
-  const OpenseaUrl = 'https://opensea.io/collection/snskey'
+  const RaribleUrl = 'https://rarible.com/sns2021/items'
 
   const {
     data: { accounts }
@@ -486,11 +486,8 @@ export default ({ match }) => {
             <a href={DiscordUrl}>
               <img src={DiscordIcon} alt="discord" />
             </a>
-            {/*<a href={GithubUrl}>*/}
-            {/*  <img src={GithubIcon} alt="github" />*/}
-            {/*</a>*/}
-            <a href={OpenseaUrl}>
-              <img src={OpenseaIcon} alt="opensea" />
+            <a href={RaribleUrl}>
+              <img src={raribleIcon} alt="rarible" />
             </a>
           </SocialIconLarge>
 

@@ -52,7 +52,7 @@ import getSNS from 'apollo/mutations/sns'
 import * as PropTypes from 'prop-types'
 import PolygonscanIcon from 'components/Icons/PolygonscanIcon'
 import { Tooltip } from 'antd'
-import OpenseaIcon from 'components/Icons/OpenseaIcon'
+import RaribleIcon from 'components/Icons/RaribleIcon'
 import TooltipAnt from 'utils/tooltipAnt'
 
 const DEFAULT_RESULTS_PER_PAGE = 25
@@ -453,7 +453,7 @@ export default function Address({
               <LinkList>
                 {tokenIdState ? (
                   <OpenseaLink tokenId={tokenIdState}>
-                    <OpenseaIcon />
+                    <RaribleIcon />
                   </OpenseaLink>
                 ) : (
                   ''

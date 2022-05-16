@@ -20106,10 +20106,10 @@ snapdragon@^0.8.1:
     source-map-resolve "^0.5.0"
     use "^3.1.0"
 
-sns-app-contract-api@^1.1.8:
-  version "1.1.8"
-  resolved "https://registry.yarnpkg.com/sns-app-contract-api/-/sns-app-contract-api-1.1.8.tgz#eb5583e9eaa1fbbcb61854245735bbd356430306"
-  integrity sha512-7SVXyX//NPzRXRPQKfEHW5HG0bDrfmekqaOcJQmJiQ0Yn5bCWHsyj2hHdDDgKHqlsubHTfT9OmYzA2pzw0Pghg==
+sns-app-contract-api@^1.1.9:
+  version "1.1.9"
+  resolved "https://registry.yarnpkg.com/sns-app-contract-api/-/sns-app-contract-api-1.1.9.tgz#d1f88c8f6889474ac98ae42c4478fca7dc7685e1"
+  integrity sha512-bqW88W7a38vlRIRMCZLx+tHJe5voiZJrZuIShpKBpprA/myRNPRil6EYvoknyhHGt4SrUawNm1mStLVB1Je7cQ==
   dependencies:
     "@0xproject/utils" "^2.0.2"
     "@babel/plugin-proposal-class-properties" "^7.8.3"
@@ -22255,10 +22255,8 @@ watchpack@^1.7.4:
   resolved "https://registry.yarnpkg.com/watchpack/-/watchpack-1.7.5.tgz#1267e6c55e0b9b5be44c2023aed5437a2c26c453"
   integrity sha512-9P3MWk6SrKjHsGkLT2KHXdQ/9SNkyoJbabxnKOoJepsvJjJG8uYTR3yTPxPQvNDI3w4Nz1xnE0TLHK4RIVe/MQ==
   dependencies:
-    chokidar "^3.4.1"
     graceful-fs "^4.1.2"
     neo-async "^2.5.0"
-    watchpack-chokidar2 "^2.0.1"
   optionalDependencies:
     chokidar "^3.4.1"
     watchpack-chokidar2 "^2.0.1"
