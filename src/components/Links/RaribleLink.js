@@ -3,7 +3,7 @@ import styled from '@emotion/styled/macro'
 import { gql } from '@apollo/client'
 import { useQuery } from '@apollo/client'
 
-const OpenseaLinkContainer = styled('a')`
+const RaribleLinkContainer = styled('a')`
   display: inline-block;
   align-items: center;
   text-overflow: ellipsis;
@@ -28,24 +28,24 @@ export const GET_OPENSEA_LINK = gql`
   }
 `
 
-const OpenseaLink = ({ children, className, tokenId }) => {
+const RaribleLink = ({ children, className, tokenId }) => {
   const {
     data: { network }
   } = useQuery(GET_OPENSEA_LINK)
   const subdomain = network?.toLowerCase() === 'main' ? '' : `${network}.`
 
   return (
-    <OpenseaLinkContainer
+    <RaribleLinkContainer
       data-testid="ether-scan-link-container"
       target="_blank"
       rel="noopener"
-      href={`https://opensea.io/assets/matic/0x19ad2b1f012349645c3173ea63f98948a2b43d27/${tokenId}`}
+      href={`https://rarible.com/token/polygon/0x19ad2b1f012349645c3173ea63f98948a2b43d27:${tokenId}?tab=details`}
       className={className}
     >
       {children}
       {/*<ExternalLinkIcon />*/}
-    </OpenseaLinkContainer>
+    </RaribleLinkContainer>
   )
 }
 
-export default OpenseaLink
+export default RaribleLink

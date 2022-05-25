@@ -12,6 +12,7 @@ import TopBar from '../Basic/TopBar'
 import DefaultFavourite from '../AddFavourite/Favourite'
 import SharedIcon from 'components/Icons/SharedIcon'
 import RaribleIcon from 'components/Icons/RaribleIcon'
+import OpenseaIcon from 'components/Icons/OpenseaIcon'
 import NameDetails from './NameDetails'
 import DNSNameRegister from './DNSNameRegister'
 import ShortName from './ShortName'
@@ -39,6 +40,14 @@ const RightBar = styled('div')`
 const Favourite = styled(DefaultFavourite)``
 
 const OpenseaIconContainer = styled('a')`
+  cursor: pointer;
+  line-height: 0px;
+  margin-right: 10px;
+  &:hover {
+    transform: scale(1.1);
+  }
+`
+const RaribleIconContainer = styled('a')`
   cursor: pointer;
   line-height: 0px;
   margin-right: 10px;
@@ -198,11 +207,23 @@ function Name({ details: domain, name, pathname, type, refetch }) {
           {tokenIdState ? (
             <TooltipAnt title={t('address.openseaButton')}>
               <OpenseaIconContainer
+                href={`https://opensea.io/assets/matic/0x19ad2b1f012349645c3173ea63f98948a2b43d27/${tokenIdState}`}
+                target="_blank"
+              >
+                <OpenseaIcon />
+              </OpenseaIconContainer>
+            </TooltipAnt>
+          ) : (
+            ''
+          )}
+          {tokenIdState ? (
+            <TooltipAnt title={t('address.raribleButton')}>
+              <RaribleIconContainer
                 href={`https://rarible.com/token/polygon/0x19ad2b1f012349645c3173ea63f98948a2b43d27:${tokenIdState}?tab=details`}
                 target="_blank"
               >
                 <RaribleIcon />
-              </OpenseaIconContainer>
+              </RaribleIconContainer>
             </TooltipAnt>
           ) : (
             ''

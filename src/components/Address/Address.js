@@ -23,6 +23,7 @@ import DefaultTopBar from '../Basic/TopBar'
 import { Title as DefaultTitle } from '../Typography/Basic'
 import DefaultEtherScanLink from '../Links/EtherScanLink'
 import DefaultOpenseaLink from '../Links/OpenseaLink'
+import DefaultRaribleLink from '../Links/RaribleLink'
 import {
   getEtherScanAddr,
   filterNormalised,
@@ -53,6 +54,7 @@ import * as PropTypes from 'prop-types'
 import PolygonscanIcon from 'components/Icons/PolygonscanIcon'
 import { Tooltip } from 'antd'
 import RaribleIcon from 'components/Icons/RaribleIcon'
+import OpenseaIcon from 'components/Icons/OpenseaIcon'
 import TooltipAnt from 'utils/tooltipAnt'
 
 const DEFAULT_RESULTS_PER_PAGE = 25
@@ -81,6 +83,7 @@ const Title = styled(DefaultTitle)`
 
 const GoToIconWrapper = styled('div')`
   display: flex;
+  align-items: center;
 `
 
 const EtherScanLink = styled(DefaultEtherScanLink)`
@@ -103,6 +106,20 @@ const TooltipTitleWrapper = styled('div')`
 `
 
 const OpenseaLink = styled(DefaultOpenseaLink)`
+  margin-left: 10px;
+  svg {
+    opacity: 1;
+    transition: 0.1s;
+  }
+  &:hover {
+    transform: scale(1.1);
+  }
+  &:active {
+    transform: scale(1.2);
+  }
+`
+
+const RaribleLink = styled(DefaultRaribleLink)`
   margin-left: 10px;
   svg {
     opacity: 1;
@@ -449,11 +466,22 @@ export default function Address({
                 )}
               </LinkList>
             </TooltipAnt>
+            <TooltipAnt title={t('address.raribleButton')}>
+              <LinkList>
+                {tokenIdState ? (
+                  <RaribleLink tokenId={tokenIdState}>
+                    <RaribleIcon />
+                  </RaribleLink>
+                ) : (
+                  ''
+                )}
+              </LinkList>
+            </TooltipAnt>
             <TooltipAnt title={t('address.openseaButton')}>
               <LinkList>
                 {tokenIdState ? (
                   <OpenseaLink tokenId={tokenIdState}>
-                    <RaribleIcon />
+                    <OpenseaIcon />
                   </OpenseaLink>
                 ) : (
                   ''

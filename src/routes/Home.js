@@ -19,6 +19,7 @@ import TelegramIcon from '../assets/tg.png'
 import TwitterIcon from '../assets/t.png'
 import GithubIcon from '../assets/github.png'
 import raribleIcon from '../assets/raribleIcon.png'
+import openseIcon from '../assets/opensea-white.svg'
 import { aboutPageURL } from '../utils/utils'
 import { connectProvider, disconnectProvider } from '../utils/providerUtils'
 import { gql } from '@apollo/client'
@@ -384,6 +385,7 @@ export default ({ match }) => {
   const DiscordUrl = 'https://discord.com/invite/UMNRQryyts'
   const GithubUrl = 'https://github.com/Link-Key'
   const LinkkeyUrl = 'https://linkkey.io'
+  const OpenseaUrl = 'https://opensea.io/collection/snskey'
   const RaribleUrl = 'https://rarible.com/sns2021/items'
 
   const {
@@ -477,17 +479,20 @@ export default ({ match }) => {
           </PermanentRegistrarLogo>
           <Search />
           <SocialIconLarge>
-            <a href={TwitterUrl}>
+            <a href={TwitterUrl} target="_blank">
               <img src={TwitterIcon} alt="twitter" />
             </a>
-            <a href={TelegramUrl}>
+            <a href={TelegramUrl} target="_blank">
               <img src={TelegramIcon} alt="telegram" />
             </a>
-            <a href={DiscordUrl}>
+            <a href={DiscordUrl} target="_blank">
               <img src={DiscordIcon} alt="discord" />
             </a>
-            <a href={RaribleUrl}>
+            <a href={RaribleUrl} target="_blank">
               <img src={raribleIcon} alt="rarible" />
+            </a>
+            <a href={OpenseaUrl} target="_blank">
+              <img src={openseIcon} alt="rarible" />
             </a>
           </SocialIconLarge>
 
