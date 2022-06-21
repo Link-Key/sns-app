@@ -1,0 +1,55 @@
+# This is a basic workflow to help you get started with Actions
+
+name: CI
+
+# Controls when the workflow will run
+on:
+  # Triggers the workflow on push or pull request events but only for the "sns-dev" branch
+  push:
+    branches: [ "sns-dev" ]
+  pull_request:
+    branches: [ "sns-dev" ]
+
+  # Allows you to run this workflow manually from the Actions tab
+  workflow_dispatch:
+
+# A workflow run is made up of one or more jobs that can run sequentially or in parallel
+jobs:
+  # This workflow contains a single job called "build"
+  build:
+    # The type of runner that the job will run on
+    runs-on: ubuntu-latest
+
+    # Steps represent a sequence of tasks that will be executed as part of the job
+    steps:
+      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
+      - uses: actions/checkout@v3
+
+      # 使用 node:14
+      - name: use Node.js 14
+        uses: actions/setup-node@v1
+        with:
+          node-version: 14
+      # yarn install and build
+      - name: yarn install and build
+        run: |
+          npm install --global yarn 
+          yarn install
+          yarn build:nonCache
+        env:
+          CI: false
+      # Deploy to hola filepath
+      # 1. ssh-keygen -m PEM -t rsa -b 4096
+      # 2. id_rsa to github action
+      # 2. cat id_rsa.pub >> authorized_keys
+      - name: Deploy front-end
+        uses: easingthemes/ssh-deploy@main
+        env:
+          SSH_PRIVATE_KEY: ${{ secrets.ACCESS_TOKEN }}
+          ARGS: "-rltgoDzvO --delete"
+          SOURCE: "build/"
+          REMOTE_HOST: '43.128.81.172'
+          REMOTE_USER:  root
+          REMOTE_PORT: '22'
+          TARGET: '/home/ubuntu/sns-app/build/'
+          EXCLUDE: "/node_modules/"
