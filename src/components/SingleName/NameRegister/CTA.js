@@ -105,6 +105,15 @@ function getCTA({
     })
   })
 
+  const [usdcPrice, setUsdcPrice] = useState(async () => {
+    const sns = getSNS()
+    sns.getUsdcCoinsPrice().then(price => {
+      // console.log('usdcPrice',new EthVal(`${price || 0}`).toEth().toFixed())
+      let newprice = new EthVal(`${price || 0}`).scaleUp(6).toNumber()
+      setUsdcPrice(newprice)
+    })
+  })
+
   const maticPrice = new EthVal(`${price || 0}`).toEth().toFixed(3)
 
   useEffect(() => {
@@ -179,7 +188,7 @@ function getCTA({
     }, 0)
   }
 
-  // use key coins register operation
+  // use lowb coins register operation
   const getApproveOfLowb = async mutate => {
     const sns = getSNS()
     const lowbAddress = await sns.getLowbCoinsAddress()
@@ -247,6 +256,75 @@ function getCTA({
     }, 0)
   }
 
+  // use usdc coins register operation
+  const getApproveOfUsdc = async mutate => {
+    const sns = getSNS()
+    const usdcAddress = await sns.getUsdcCoinsAddress()
+    const usdcPrice = await sns.getUsdcCoinsPrice()
+
+    // get IERC20 contract instance object
+    const IERC20 = await getSNSIERC20(usdcAddress)
+
+    // get sns address
+    const snsAddress = await getSNSAddress()
+
+    // Authorization to SNS
+    await IERC20.approve(snsAddress, usdcPrice)
+
+    message.loading({
+      key: 1,
+      content: t('z.transferSending'),
+      duration: 0,
+      style: { marginTop: '20vh' }
+    })
+
+    // Query if the authorization is successful
+    // Query every three seconds, query ten times
+    setTimeout(async () => {
+      let timer,
+        count = 0,
+        allowancePrice
+      timer = setInterval(async () => {
+        try {
+          count += 1
+          // query authorization sns key price
+          allowancePrice = await IERC20.allowance(account, snsAddress)
+          const price = new EthVal(`${allowancePrice || 0}`).toNumber()
+          console.log('allowancePrice', price)
+          if (price > 0) {
+            clearInterval(timer)
+            // destroy message mention
+            message.destroy(1)
+            // mint nft of key
+            mutate()
+          }
+        } catch (e) {
+          console.log('allowance:', e)
+          clearInterval(timer)
+          message.error({
+            key: 2,
+            content: <UnknowErrMsgComponent />,
+            duration: 3,
+            style: { marginTop: '20vh' }
+          })
+          // destroy message mention
+          message.destroy(1)
+        }
+        if (count === 20) {
+          clearInterval(timer)
+          message.error({
+            key: 3,
+            content: t('z.transferBusy'),
+            duration: 3,
+            style: { marginTop: '20vh' }
+          })
+          // destroy message mention
+          message.destroy(1)
+        }
+      }, 3000)
+    }, 0)
+  }
+
   switch (step) {
     case 'PRICE_DECISION':
       return (
@@ -279,6 +357,35 @@ function getCTA({
                         ),
                         content: (
                           <ChooseCoinsBtn>
+                            <Button
+                              danger
+                              shape="round"
+                              block
+                              size="large"
+                              onClick={() => {
+                                Promise.resolve()
+                                  .then(() => {
+                                    const obj = {
+                                      ...coinsValueObj,
+                                      coinsType: 'usdc'
+                                    }
+                                    setCoinsValue(obj)
+                                    return obj
+                                  })
+                                  .then(async obj => {
+                                    setCoinsValue({ ...obj, coinsType: 'usdc' })
+                                    try {
+                                      await getApproveOfUsdc(mutate)
+                                    } catch (e) {
+                                      console.log('getApproveOfUsdc:', e)
+                                    }
+                                    // mutate()
+                                  })
+                                Modal.destroyAll()
+                              }}
+                            >
+                              {usdcPrice} USDC
+                            </Button>
                             <Button
                               danger
                               shape="round"

@@ -66,6 +66,9 @@ const resolvers = {
       } else if (coinsType === 'lowb') {
         const tx = await sns.mintByMoreCoins(label, 2)
         return sendHelper(tx)
+      } else if (coinsType === 'usdc') {
+        const tx = await sns.mintByMoreCoins(label, 3)
+        return sendHelper(tx)
       } else {
         const tx = await sns.registry(label)
         return sendHelper(tx)
