@@ -49,7 +49,7 @@ jobs:
           ARGS: "-rltgoDzvO --delete"
           SOURCE: "build/"
           REMOTE_HOST: '43.128.81.172'
-          REMOTE_USER:  root
+          REMOTE_USER:  ubuntu
           REMOTE_PORT: '22'
           TARGET: '/home/ubuntu/sns-app/build/'
           EXCLUDE: "/node_modules/"
