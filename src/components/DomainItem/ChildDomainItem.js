@@ -342,10 +342,11 @@ export default function ChildDomainItem({ name, owner, isMigrated, refetch }) {
     const keyAddress = await sns.getKeyCoinsAddress()
     const IERC20 = await getSNSIERC20(keyAddress)
 
+    // console.log('inviterInstance',inviterInstance.registryAddress)
     //get inviter contract address
     //test
     // const inviterAdd = '0xC4FD81B29BD4EE39E232622867D4864ad503aC4a'
-    const inviterAdd = '0x1Be596e965e2566d2f211fea6b09898d0956c04E'
+    const inviterAdd = inviterInstance.registryAddress
     // Authorization to SNS
     await IERC20.approve(inviterAdd, inviterPrice)
 
