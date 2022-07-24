@@ -53,3 +53,21 @@
 .ant-message-loading .anticon {
   color: #ea6060 !important;
 }
+
+.ant-select-dropdown {
+  border-radius: 16px !important;
+}
+
+.ant-select-item-option:not(.ant-select-item-option-disabled) {
+  border-radius: 50px !important;
+}
+
+.ant-select-item-option-selected:not(.ant-select-item-option-disabled) {
+  border-radius: 50px !important;
+  background-color: #ff787526 !important;
+}
+
+.ant-select-item-option-active:not(.ant-select-item-option-disabled) {
+  border-radius: 50px !important;
+  background-color: #ff787526 !important;
+}
