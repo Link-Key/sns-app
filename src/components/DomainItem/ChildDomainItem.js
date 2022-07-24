@@ -63,7 +63,7 @@ const BlockTextWrapper = styled('div')`
 `
 
 const ButtonWrapper = styled(Button)`
-  max-width: 100px !important;
+  min-width: 100px !important;
   height: 35px !important;
   font-weight: 700;
   &:hover {
@@ -516,15 +516,19 @@ export default function ChildDomainItem({ name, owner, isMigrated, refetch }) {
 
           <Col flex="1 1 400px">
             <InviteContainer bodyStyle={{ padding: '0 10px' }}>
-              <BlockText>邀请人总收益(KEY):{inviteIncome}</BlockText>
-              <BlockText>邀请次数:{inviteCount}</BlockText>
+              <BlockText>
+                {t('invite.totalIncome')}(KEY):{inviteIncome}
+              </BlockText>
+              <BlockText>
+                {t('invite.count')}:{inviteCount}
+              </BlockText>
               <ButtonWrapper
                 danger
                 shape="round"
                 type="primary"
                 onClick={handleInvite}
               >
-                {isInvite ? '邀请列表' : '成为邀请人'}
+                {isInvite ? `${t('invite.list')}` : `${t('invite.become')}`}
               </ButtonWrapper>
             </InviteContainer>
           </Col>
@@ -553,7 +557,7 @@ export default function ChildDomainItem({ name, owner, isMigrated, refetch }) {
         <Paragraph>{t('blockMsg.withdrawRuleContent3')}</Paragraph>
       </ModalWrapper>
       <ModalWrapper
-        title="邀请人列表"
+        title={t('invite.modalTitle')}
         visible={inviteVisible}
         onCancel={() => setInviteVisible(false)}
         style={{ top: '20vh' }}
@@ -570,11 +574,11 @@ export default function ChildDomainItem({ name, owner, isMigrated, refetch }) {
           renderItem={item => (
             <List.Item>
               <Card style={{ borderRadius: '16px' }}>
-                <div>交易哈希</div>
-                <div>交易时间</div>
-                <div>返佣金额</div>
+                <div>{t('invite.hash')} :</div>
+                <div>{t('invite.date')} :</div>
+                <div>{t('invite.balance')} :</div>
                 <Button danger shape="round" block>
-                  交易详情
+                  {t('invite.details')}
                 </Button>
               </Card>
             </List.Item>

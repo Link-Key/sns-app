@@ -398,14 +398,12 @@ export const handleQueryAllowance = (IERC20, account, address, mutateFn) => {
         // query authorization sns key price
         allowancePrice = await IERC20.allowance(account, address)
         const price = new EthVal(`${allowancePrice || 0}`).toEth().toFixed(3)
-        console.log('price:', price)
         if (price > 0) {
           clearInterval(timer)
           // destroy message mention
           message.destroy(1)
           // mint nft of key
           mutateFn()
-          console.log('执行了')
         }
       } catch (e) {
         console.log('allowance:', e)
