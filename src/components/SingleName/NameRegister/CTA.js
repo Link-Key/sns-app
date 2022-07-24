@@ -455,15 +455,13 @@ function getCTA({
                                     <Input
                                       size="middle"
                                       status="error"
-                                      placeholder="输入xxx.key (选填)"
+                                      placeholder={t('invite.inp')}
                                     />
                                   </Form.Item>
                                 )
                               }
                             </Form.Item>
-                            <p>
-                              注：用KEY支付时输入xxx.key邀请码，可享9折注册优惠
-                            </p>
+                            <p>{t('invite.note')}</p>
                             <Form.Item>
                               <Button
                                 danger
