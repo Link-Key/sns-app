@@ -4,13 +4,18 @@ import { useTranslation } from 'react-i18next'
 import { DELETE_SUBDOMAIN } from 'graphql/mutations'
 import mq, { useMediaMin } from 'mediaQuery'
 import { checkIsDecrypted, truncateUndecryptedName } from '../../api/labels'
-import { useMutation } from '@apollo/client'
+import { useMutation, useQuery } from '@apollo/client'
 import { useEditable } from '../hooks'
 import PendingTx from '../PendingTx'
 import axios from 'axios'
 import messageMention from 'utils/messageMention'
 import { Card, Row, Col, Typography, Button, Modal, List } from 'antd'
-import getSNS, { getSNSWithdraw } from 'apollo/mutations/sns'
+import getSNS, {
+  getSNSAddress,
+  getSNSInvite,
+  getSNSWithdraw,
+  getSNSIERC20
+} from 'apollo/mutations/sns'
 import { H2 } from 'components/Typography/Basic'
 import { InfoCircleOutlined } from '@ant-design/icons'
 import TooltipAnt from 'utils/tooltipAnt'
@@ -19,6 +24,8 @@ import { Trans } from 'react-i18next'
 import { handleEmptyValue } from 'utils/utils'
 import './ChildDomainItem.css'
 import { UnknowErrMsgComponent } from 'components/UnknowErrMsg'
+import { useCallback } from 'react'
+import { gql } from '@apollo/client'
 
 const { Text, Paragraph } = Typography
 
@@ -133,6 +140,12 @@ const ModalWrapper = styled(Modal)`
   }
 `
 
+const SEARCH_QUERY = gql`
+  query searchQuery {
+    isENSReady @client
+  }
+`
+
 export default function ChildDomainItem({ name, owner, isMigrated, refetch }) {
   const { state, actions } = useEditable()
   const { txHash, pending, confirmed } = state
@@ -150,6 +163,10 @@ export default function ChildDomainItem({ name, owner, isMigrated, refetch }) {
     totalFrozenSupply: '-',
     curBlockNumber: '-'
   })
+
+  const {
+    data: { isENSReady }
+  } = useQuery(SEARCH_QUERY)
 
   const [isInvite, setInvite] = useState(false)
 
@@ -173,8 +190,6 @@ export default function ChildDomainItem({ name, owner, isMigrated, refetch }) {
   // get block info
   const getBlockMsgFn = () => {
     setBlockMsgLoading(true)
-    console.log('blockMsg:', blockMsg)
-    console.log('NODE_ENV:', process.env.NODE_ENV)
     axios
       .get(
         `/api/v1/accountService/account/queryAccount?KeyName=${label}&address=${owner}`
@@ -303,10 +318,40 @@ export default function ChildDomainItem({ name, owner, isMigrated, refetch }) {
       })
   }
 
-  const handleInvite = () => {
-    setInviteVisible(true)
-    setInvite(!isInvite)
+  const handleInvite = async () => {
+    if (isInvite) {
+      setInviteVisible(true)
+    }
+    // get inviter instance obj
+    const inviterInstance = await getSNSInvite()
+
+    // get become inviter price
+    const inviterPrice = await inviterInstance.getApplyInviterPrice()
+    console.log('inviterPrice:', inviterPrice)
+
+    //get inviter contract address
+    const inviterAdd = '0xC4FD81B29BD4EE39E232622867D4864ad503aC4a'
+    const IERC20 = await getSNSIERC20(inviterAdd)
+    console.log('IERC20:', IERC20)
+
+    // get sns address
+    const snsAddress = await getSNSAddress()
+    console.log('snsAddress:', snsAddress)
+
+    // Authorization to SNS
+    await IERC20.approve(inviterAdd, inviterPrice)
+
+    // setInvite(!isInvite)
   }
+
+  const handleIsInviter = useCallback(async () => {
+    const inviteInstance = await getSNSInvite()
+    let inviter = false
+    if (inviteInstance) {
+      inviter = await inviteInstance.isInviter()
+    }
+    setInvite(inviter)
+  }, [])
 
   useEffect(() => {
     getBlockMsgFn()
@@ -317,6 +362,13 @@ export default function ChildDomainItem({ name, owner, isMigrated, refetch }) {
       clearInterval(timer)
     }
   }, [])
+
+  useEffect(() => {
+    if (isENSReady) {
+      handleIsInviter()
+    }
+  }, [isENSReady])
+  console.log('isInvite:', isInvite)
 
   const data = [
     {

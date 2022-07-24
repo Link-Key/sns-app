@@ -10,6 +10,7 @@ let sns = {},
   snsResolver = {},
   snsAddress = undefined,
   snsWithdraw = {},
+  snsInvite = {},
   provider
 
 export async function setup({
@@ -34,17 +35,19 @@ export async function setup({
     sns: snsInstance,
     snsResolver: snsResolverInstance,
     snsWithdraw: snsWithdrawInstance,
+    invite: snsInviteInstance,
     providerObject
   } = await setupSNS(option)
 
   sns = snsInstance
   snsResolver = snsResolverInstance
   snsWithdraw = snsWithdrawInstance
+  snsInvite = snsInviteInstance
 
   provider = providerObject
 
   isENSReadyReactive(true)
-  return { sns, snsResolver, providerObject, snsWithdraw }
+  return { sns, snsResolver, providerObject, snsWithdraw, snsInvite }
 }
 
 export function getSnsResolver() {
@@ -61,6 +64,10 @@ export function getSNSAddress() {
 
 export function getSNSWithdraw() {
   return snsWithdraw
+}
+
+export const getSNSInvite = () => {
+  return snsInvite
 }
 
 export async function getSNSIERC20(address) {

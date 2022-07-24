@@ -6,6 +6,7 @@ import EthVal from 'ethval'
 
 import modeNames from '../modes'
 import { sendHelper } from '../resolverUtils'
+import { emptyAddress } from 'sns-app-contract-api'
 
 const defaults = {}
 
@@ -13,7 +14,7 @@ const resolvers = {
   Query: {
     async getRentPrice(_) {
       const sns = getSNS()
-      return sns.getRegisteredPrice()
+      return sns.getRegisteredPrice(emptyAddress)
     },
     async getRentPrices(_, { labels, duration }) {
       const registrar = getRegistrar()

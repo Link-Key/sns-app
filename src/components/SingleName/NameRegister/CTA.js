@@ -22,6 +22,7 @@ import { Modal, Button, Select, message, Radio, Input, Form } from 'antd'
 import getSNS, { getSNSAddress, getSNSIERC20 } from 'apollo/mutations/sns'
 import { UnknowErrMsgComponent } from 'components/UnknowErrMsg'
 import messageMention from 'utils/messageMention'
+import { emptyAddress } from 'sns-app-contract-api'
 
 const CTAContainer = styled('div')`
   display: flex;
@@ -104,22 +105,21 @@ function getCTA({
 
   const [keyPrice, setKeyPrice] = useState(async () => {
     const sns = getSNS()
-    sns.getKeyCoinsPrice().then(price => {
+    sns.getKeyCoinsPrice(emptyAddress).then(price => {
       setKeyPrice(new EthVal(`${price || 0}`).toEth().toFixed(3))
     })
   })
 
   const [lowbPrice, setLowbPrice] = useState(async () => {
     const sns = getSNS()
-    sns.getLowbCoinsPrice().then(price => {
+    sns.getLowbCoinsPrice(emptyAddress).then(price => {
       setLowbPrice(new EthVal(`${price || 0}`).toEth().toFixed(3))
     })
   })
 
   const [usdcPrice, setUsdcPrice] = useState(async () => {
     const sns = getSNS()
-    sns.getUsdcCoinsPrice().then(price => {
-      // console.log('usdcPrice',new EthVal(`${price || 0}`).toEth().toFixed())
+    sns.getUsdcCoinsPrice(emptyAddress).then(price => {
       let newprice = new EthVal(`${price || 0}`).scaleUp(6).toNumber()
       setUsdcPrice(newprice)
     })
@@ -128,11 +128,14 @@ function getCTA({
   const maticPrice = new EthVal(`${price || 0}`).toEth().toFixed(3)
 
   // use key coins register operation
-  const getApproveOfKey = async mutate => {
+  const getApproveOfKey = async (mutate, inviteName) => {
     const sns = getSNS()
     const keyAddress = await sns.getKeyCoinsAddress()
-    const keyPrice = await sns.getKeyCoinsPrice()
-
+    let inviteAdd = emptyAddress
+    if (inviteName) {
+      inviteAdd = await sns.getResolverOwner(inviteName)
+    }
+    const keyPrice = await sns.getKeyCoinsPrice(inviteAdd)
     // get IERC20 contract instance object
     const IERC20 = await getSNSIERC20(keyAddress)
 
@@ -336,7 +339,7 @@ function getCTA({
     switch (coinForm.getFieldsValue().coins) {
       case 'key':
         try {
-          await getApproveOfKey(mutate)
+          await getApproveOfKey(mutate, coinForm.getFieldsValue().inviteName)
         } catch (error) {
           console.log('getApproveOfKeyError:', error)
         }
@@ -360,11 +363,12 @@ function getCTA({
         break
       default:
         try {
-          await getApproveOfKey(mutate)
+          await getApproveOfKey(mutate, coinForm.getFieldsValue().inviteName)
         } catch (error) {
           console.log('getApproveOfKeyError:', error)
         }
     }
+    coinForm.resetFields()
     Modal.destroyAll()
   }
 
@@ -475,7 +479,10 @@ function getCTA({
                         okButtonProps: {
                           hidden: true
                         },
-                        closable: true
+                        closable: true,
+                        onCancel: () => {
+                          coinForm.resetFields()
+                        }
                       })
                     } else {
                       messageMention({
