@@ -213,6 +213,13 @@ export const aboutPageURL = () => {
   return `https://www.linkkey.io`
 }
 
+export const docsPageURL = () => {
+  // const lang = window.localStorage.getItem('language') || ''
+
+  // return `https://ens.domains/${lang === 'en' ? '' : lang}`
+  return `https://docs.linkkey.tech`
+}
+
 export function isRecordEmpty(value) {
   return value === emptyAddress || value === ''
 }

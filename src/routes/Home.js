@@ -20,7 +20,7 @@ import TwitterIcon from '../assets/t.png'
 import GithubIcon from '../assets/github.png'
 import raribleIcon from '../assets/raribleIcon.png'
 import openseIcon from '../assets/opensea-white.svg'
-import { aboutPageURL } from '../utils/utils'
+import { aboutPageURL, docsPageURL } from '../utils/utils'
 import { connectProvider, disconnectProvider } from '../utils/providerUtils'
 import { gql } from '@apollo/client'
 import {
@@ -412,7 +412,7 @@ export default ({ match }) => {
                   {t('c.mynames')}
                 </NavLink>
               )}
-              <NavLink to="/regisertProcess">{t('c.registProcess')}</NavLink>
+              <ExternalLink href={docsPageURL()}>{t('c.docs')}</ExternalLink>
               <NavLink to="/faq">{t('c.faq')}</NavLink>
               <ExternalLink href={aboutPageURL()}>
                 {t('c.linkkey')}

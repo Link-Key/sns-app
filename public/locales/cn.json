@@ -52,6 +52,7 @@
     "migrate": "迁移",
     "mynames": "我的账户",
     "registProcess": "注册流程",
+    "docs": "文档",
     "network": "网络",
     "otheraddresses": "其他地址",
     "parent": "父域名",
@@ -470,5 +471,5 @@
     "balance":"返佣金额",
     "details":"交易详情"
   }
-  
+
 }
