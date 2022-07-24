@@ -474,6 +474,8 @@
     "hash":"Transaction Hash",
     "date":"Transaction Date",
     "balance":"Rebate amount",
-    "details":"Transaction Details"
+    "details":"Transaction Details",
+    "note":"Note: Enter xxx.key invitation code when you pay with KEY to enjoy 10% discount on registration (invalid invitation code will not be able to enjoy the discount)",
+    "inp":"Input xxx.key (optional)"
   }
 }

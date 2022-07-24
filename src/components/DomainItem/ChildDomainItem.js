@@ -85,6 +85,8 @@ const BlockText = styled(H2)`
   font-size: 15px;
   color: #000;
   text-align: left;
+  margin: 0;
+  padding-top: 2px;
 `
 
 const TextContainer = styled(Text)`
@@ -561,7 +563,7 @@ export default function ChildDomainItem({ name, owner, isMigrated, refetch }) {
         onCancel={() => setInviteVisible(false)}
         style={{ top: '20vh' }}
         bodyStyle={{
-          height: '100px',
+          height: '400px',
           overflow: 'auto'
         }}
         className="NoticeModalBody"
@@ -570,7 +572,6 @@ export default function ChildDomainItem({ name, owner, isMigrated, refetch }) {
         <List
           grid={{ gutter: 16, column: 1 }}
           dataSource={data}
-          hidden={true}
           renderItem={item => (
             <List.Item>
               <Card style={{ borderRadius: '16px' }}>
