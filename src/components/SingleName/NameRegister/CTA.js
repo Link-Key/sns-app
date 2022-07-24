@@ -472,7 +472,7 @@ function getCTA({
                                   handleSelectCoinsRegister(mutate)
                                 }
                               >
-                                确认
+                                {t('c.register')}
                               </Button>
                             </Form.Item>
                           </SelectRegisterForm>

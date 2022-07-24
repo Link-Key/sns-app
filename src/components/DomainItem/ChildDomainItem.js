@@ -78,6 +78,7 @@ const ButtonWrapper = styled(Button)`
 
 const ButtonAndIcon = styled('div')`
   display: flex;
+  justify-content: center;
   align-items: center;
 `
 
@@ -121,7 +122,7 @@ const InviteContainer = styled(Card)`
   .ant-card-body {
     display: flex;
     flex-direction: column;
-    gap: 10px;
+    /* gap: 10px; */
   }
   .title {
     margin: 0 auto;
@@ -464,32 +465,12 @@ export default function ChildDomainItem({ name, owner, isMigrated, refetch }) {
                     {t('blockMsg.availableAmount')}:
                     {handleEmptyValue(blockMsg.availableAmountRound)}
                   </BlockText>
-                  <ButtonAndIcon>
-                    <Loading loading={withdrawLoading}>
-                      <ButtonWrapper
-                        disabled={
-                          handleEmptyValue(blockMsg.availableAmountRound) !==
-                            '-' && blockMsg.availableAmountRound !== '0'
-                            ? false
-                            : true
-                        }
-                        type="primary"
-                        shape="round"
-                        size="small"
-                        danger
-                        onClick={() => {
-                          callWithdraw()
-                        }}
-                      >
-                        {t('blockMsg.withdraw')}
-                      </ButtonWrapper>
-                    </Loading>
-                    <TooltipAnt title={t('blockMsg.withdrawRule')}>
-                      <InfoCircleOutlinedContainer
-                        onClick={() => setRuleVisible(true)}
-                      />
-                    </TooltipAnt>
-                  </ButtonAndIcon>
+
+                  <TooltipAnt title={t('blockMsg.withdrawRule')}>
+                    <InfoCircleOutlinedContainer
+                      onClick={() => setRuleVisible(true)}
+                    />
+                  </TooltipAnt>
                 </BlockTextWrapper>
                 <BlockText>
                   {t('blockMsg.keyAmount')}:
@@ -511,18 +492,42 @@ export default function ChildDomainItem({ name, owner, isMigrated, refetch }) {
                 <h4 style={{ color: '#ddd' }}>
                   * {t('blockMsg.EstimatedTimeOfAirdrop')}
                 </h4>
+
+                <ButtonAndIcon>
+                  <Loading loading={withdrawLoading}>
+                    <ButtonWrapper
+                      disabled={
+                        handleEmptyValue(blockMsg.availableAmountRound) !==
+                          '-' && blockMsg.availableAmountRound !== '0'
+                          ? false
+                          : true
+                      }
+                      type="primary"
+                      shape="round"
+                      size="small"
+                      danger
+                      onClick={() => {
+                        callWithdraw()
+                      }}
+                    >
+                      {t('blockMsg.withdraw')}
+                    </ButtonWrapper>
+                  </Loading>
+                </ButtonAndIcon>
               </BlockMsgContainer>
             </Loading>
           </Col>
 
           <Col flex="1 1 400px">
             <InviteContainer bodyStyle={{ padding: '0 10px' }}>
-              <BlockText>
-                {t('invite.totalIncome')}(KEY):{inviteIncome}
-              </BlockText>
-              <BlockText>
-                {t('invite.count')}:{inviteCount}
-              </BlockText>
+              <div style={{ height: '175px' }}>
+                <BlockText>
+                  {t('invite.totalIncome')}(KEY):{inviteIncome}
+                </BlockText>
+                <BlockText>
+                  {t('invite.count')}:{inviteCount}
+                </BlockText>
+              </div>
               <ButtonWrapper
                 danger
                 shape="round"
