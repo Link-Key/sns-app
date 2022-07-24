@@ -9,7 +9,7 @@ import { useEditable } from '../hooks'
 import PendingTx from '../PendingTx'
 import axios from 'axios'
 import messageMention from 'utils/messageMention'
-import { Card, Row, Col, Typography, Button, Modal, List } from 'antd'
+import { Card, Row, Col, Typography, Button, Modal, List, message } from 'antd'
 import getSNS, {
   getSNSAddress,
   getSNSInvite,
@@ -323,7 +323,7 @@ export default function ChildDomainItem({ name, owner, isMigrated, refetch }) {
 
   const handleAddInviter = inviterInstance => {
     inviterInstance.addInviter().then(resp => {
-      console.log('addInviter:', resp)
+      setInvite(true)
       messageMention({ type: 'success', content: '成功' })
     })
   }
@@ -334,7 +334,6 @@ export default function ChildDomainItem({ name, owner, isMigrated, refetch }) {
 
     // get become inviter price
     const inviterPrice = await inviterInstance.getApplyInviterPrice()
-    console.log('inviterPrice:', inviterPrice)
 
     const sns = getSNS()
     const keyAddress = await sns.getKeyCoinsAddress()
@@ -562,7 +561,7 @@ export default function ChildDomainItem({ name, owner, isMigrated, refetch }) {
         onCancel={() => setInviteVisible(false)}
         style={{ top: '20vh' }}
         bodyStyle={{
-          height: '400px',
+          height: '100px',
           overflow: 'auto'
         }}
         className="NoticeModalBody"
@@ -571,6 +570,7 @@ export default function ChildDomainItem({ name, owner, isMigrated, refetch }) {
         <List
           grid={{ gutter: 16, column: 1 }}
           dataSource={data}
+          hidden={true}
           renderItem={item => (
             <List.Item>
               <Card style={{ borderRadius: '16px' }}>
