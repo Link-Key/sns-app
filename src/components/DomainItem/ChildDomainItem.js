@@ -21,11 +21,12 @@ import { InfoCircleOutlined } from '@ant-design/icons'
 import TooltipAnt from 'utils/tooltipAnt'
 import Loading from 'components/Loading/Loading'
 import { Trans } from 'react-i18next'
-import { handleEmptyValue } from 'utils/utils'
+import { handleEmptyValue, handleQueryAllowance } from 'utils/utils'
 import './ChildDomainItem.css'
 import { UnknowErrMsgComponent } from 'components/UnknowErrMsg'
 import { useCallback } from 'react'
 import { gql } from '@apollo/client'
+import EthVal from 'ethval'
 
 const { Text, Paragraph } = Typography
 
@@ -163,6 +164,8 @@ export default function ChildDomainItem({ name, owner, isMigrated, refetch }) {
     totalFrozenSupply: '-',
     curBlockNumber: '-'
   })
+  const [inviteCount, setInviteCount] = useState(0)
+  const [inviteIncome, setInviteIncome] = useState(0)
 
   const {
     data: { isENSReady }
@@ -318,10 +321,14 @@ export default function ChildDomainItem({ name, owner, isMigrated, refetch }) {
       })
   }
 
-  const handleInvite = async () => {
-    if (isInvite) {
-      setInviteVisible(true)
-    }
+  const handleAddInviter = inviterInstance => {
+    inviterInstance.addInviter().then(resp => {
+      console.log('addInviter:', resp)
+      messageMention({ type: 'success', content: '成功' })
+    })
+  }
+
+  const becomeInviter = async () => {
     // get inviter instance obj
     const inviterInstance = await getSNSInvite()
 
@@ -329,29 +336,62 @@ export default function ChildDomainItem({ name, owner, isMigrated, refetch }) {
     const inviterPrice = await inviterInstance.getApplyInviterPrice()
     console.log('inviterPrice:', inviterPrice)
 
+    const sns = getSNS()
+    const keyAddress = await sns.getKeyCoinsAddress()
+    const IERC20 = await getSNSIERC20(keyAddress)
+
     //get inviter contract address
     const inviterAdd = '0xC4FD81B29BD4EE39E232622867D4864ad503aC4a'
-    const IERC20 = await getSNSIERC20(inviterAdd)
-    console.log('IERC20:', IERC20)
-
-    // get sns address
-    const snsAddress = await getSNSAddress()
-    console.log('snsAddress:', snsAddress)
-
     // Authorization to SNS
     await IERC20.approve(inviterAdd, inviterPrice)
 
-    // setInvite(!isInvite)
+    message.loading({
+      key: 1,
+      content: t('z.transferSending'),
+      duration: 0,
+      style: { marginTop: '20vh' }
+    })
+
+    // Query if the authorization is successful
+    handleQueryAllowance(
+      IERC20,
+      owner,
+      inviterAdd,
+      handleAddInviter(inviterInstance)
+    )
   }
 
-  const handleIsInviter = useCallback(async () => {
-    const inviteInstance = await getSNSInvite()
+  const handleInvite = async () => {
+    if (isInvite) {
+      setInviteVisible(true)
+      return
+    }
+    try {
+      await becomeInviter()
+    } catch (error) {
+      console.log('becomeInviter:', error)
+    }
+  }
+
+  const handleIsInviter = useCallback(async inviteInstance => {
     let inviter = false
     if (inviteInstance) {
       inviter = await inviteInstance.isInviter()
     }
     setInvite(inviter)
   }, [])
+
+  const getInviteCountFn = async inviteInstance => {
+    const resp = await inviteInstance.getInviteCount()
+    const count = parseInt(resp._hex, 16)
+    setInviteCount(count)
+  }
+
+  const getInviteIncomeFn = async inviteInstance => {
+    const resp = await inviteInstance.getInviterIncome()
+    const income = new EthVal(`${resp._hex || 0}`).toEth().toFixed(3)
+    setInviteIncome(income)
+  }
 
   useEffect(() => {
     getBlockMsgFn()
@@ -365,10 +405,12 @@ export default function ChildDomainItem({ name, owner, isMigrated, refetch }) {
 
   useEffect(() => {
     if (isENSReady) {
-      handleIsInviter()
+      const inviteInstance = getSNSInvite()
+      handleIsInviter(inviteInstance)
+      getInviteCountFn(inviteInstance)
+      getInviteIncomeFn(inviteInstance)
     }
   }, [isENSReady])
-  console.log('isInvite:', isInvite)
 
   const data = [
     {
@@ -474,8 +516,8 @@ export default function ChildDomainItem({ name, owner, isMigrated, refetch }) {
 
           <Col flex="1 1 400px">
             <InviteContainer bodyStyle={{ padding: '0 10px' }}>
-              <BlockText>邀请人总收益(KEY):</BlockText>
-              <BlockText>邀请次数:</BlockText>
+              <BlockText>邀请人总收益(KEY):{inviteIncome}</BlockText>
+              <BlockText>邀请次数:{inviteCount}</BlockText>
               <ButtonWrapper
                 danger
                 shape="round"

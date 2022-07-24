@@ -23,6 +23,7 @@ import getSNS, { getSNSAddress, getSNSIERC20 } from 'apollo/mutations/sns'
 import { UnknowErrMsgComponent } from 'components/UnknowErrMsg'
 import messageMention from 'utils/messageMention'
 import { emptyAddress } from 'sns-app-contract-api'
+import { handleQueryAllowance } from 'utils/utils'
 
 const CTAContainer = styled('div')`
   display: flex;
@@ -134,6 +135,7 @@ function getCTA({
     let inviteAdd = emptyAddress
     if (inviteName) {
       inviteAdd = await sns.getResolverOwner(inviteName)
+      setCoinsValue({ ...coinsValueObj, invite: inviteAdd })
     }
     const keyPrice = await sns.getKeyCoinsPrice(inviteAdd)
     // get IERC20 contract instance object
@@ -154,6 +156,7 @@ function getCTA({
 
     // Query if the authorization is successful
     // Query every three seconds, query ten times
+    // handleQueryAllowance(IERC20, account, snsAddress, mutate)
     setTimeout(async () => {
       let timer,
         count = 0,
@@ -389,7 +392,8 @@ function getCTA({
           variables={{
             ownerAddress: account,
             label,
-            coinsType: coinsValueObj.coinsType
+            coinsType: coinsValueObj.coinsType,
+            invite: coinsValueObj.invite
           }}
           onCompleted={data => {
             const txHash = Object.values(data)[0]

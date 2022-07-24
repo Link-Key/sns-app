@@ -337,36 +337,29 @@ export default function Address({
 
   let snsNameInfo = getSNSNameInfo(address)
 
-  const [tokenIdState, setTokenId] = useState(() => {
+  const [tokenIdState, setTokenId] = useState()
+
+  const handleTokenIdState = () => {
     const sns = getSNS()
     let tokenId = ''
     try {
       sns.getNameOfOwner(address).then(resp => {
         sns.getTokenIdOfName(resp).then(res => {
           tokenId = parseInt(res._hex, 16)
-          setTokenId(tokenId)
+          return tokenId
         })
       })
     } finally {
       return tokenId
     }
-  })
-
-  // console.log('snsNameInfo-----', snsNameInfo)
-
-  // const { loading, data, error, refetch } = useDomains({
-  //   resultsPerPage,
-  //   domainType,
-  //   address: normalisedAddress,
-  //   sort: activeSort,
-  //   page,
-  //   expiryDate
-  // })
+  }
 
   const { data: { favourites } = [] } = useQuery(GET_FAVOURITES)
   useEffect(() => {
     if (isENSReady) {
       getEtherScanAddr().then(setEtherScanAddr)
+      const tokenId = handleTokenIdState()
+      console.log('tokenId:', tokenId)
     }
   }, [isENSReady])
 

@@ -58,11 +58,11 @@ const resolvers = {
     }
   },
   Mutation: {
-    async commit(_, { label, coinsType }) {
+    async commit(_, { label, coinsType, invite }) {
       // get sns instance object
       const sns = getSNS()
       if (coinsType === 'key') {
-        const tx = await sns.mintByMoreCoins(label, 1)
+        const tx = await sns.mintByMoreCoins(label, 1, invite)
         return sendHelper(tx)
       } else if (coinsType === 'lowb') {
         const tx = await sns.mintByMoreCoins(label, 2)
