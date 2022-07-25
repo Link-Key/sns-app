@@ -7,8 +7,8 @@ on:
   # Triggers the workflow on push or pull request events but only for the "sns-dev" branch
   push:
     branches: ['sns-dev']
-  pull_request:
-    branches: ['sns-dev']
+#   pull_request:
+#     branches: ['sns-dev']
 
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
