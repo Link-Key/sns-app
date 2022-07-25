@@ -24,6 +24,7 @@ import { UnknowErrMsgComponent } from 'components/UnknowErrMsg'
 import messageMention from 'utils/messageMention'
 import { emptyAddress } from 'sns-app-contract-api'
 import { handleQueryAllowance } from 'utils/utils'
+import mq from 'mediaQuery'
 
 const CTAContainer = styled('div')`
   display: flex;
@@ -72,6 +73,18 @@ const SelectRegisterForm = styled(Form)`
   .ant-select-selector {
     border-radius: 50px !important;
   }
+`
+
+const CompleteBtnWrapper = styled('div')`
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  align-items: flex-end;
+  ${mq.large`
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+  `}
 `
 
 const { Option } = Select
@@ -608,7 +621,7 @@ function getCTA({
       )
     default:
       return (
-        <>
+        <CompleteBtnWrapper>
           <AddToCalendar
             css={css`
               margin-right: 20px;
@@ -638,7 +651,7 @@ function getCTA({
             <Pencil />
             {t('register.buttons.setreverserecord')}
           </SnsButton>
-        </>
+        </CompleteBtnWrapper>
       )
   }
 }

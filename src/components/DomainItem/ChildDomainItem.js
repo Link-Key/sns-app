@@ -84,6 +84,7 @@ const ButtonAndIcon = styled('div')`
   display: flex;
   justify-content: center;
   align-items: center;
+  position: relative;
 `
 
 const BlockText = styled(H2)`
@@ -101,6 +102,10 @@ const TextContainer = styled(Text)`
 `
 
 const InfoCircleOutlinedContainer = styled(InfoCircleOutlined)`
+  position: absolute;
+  left: 0;
+  right: 0;
+  transform: translateX(70px);
   padding: 0 10px;
   font-size: 25px;
   color: #ea6060;
@@ -482,38 +487,34 @@ export default function ChildDomainItem({ name, owner, isMigrated, refetch }) {
                 size="default"
                 bodyStyle={{ padding: '0 10px' }}
               >
-                <BlockTextWrapper>
+                <div>
+                  <BlockTextWrapper>
+                    <BlockText>
+                      {t('blockMsg.availableAmount')}:
+                      {handleEmptyValue(blockMsg.availableAmountRound)}
+                    </BlockText>
+                  </BlockTextWrapper>
                   <BlockText>
-                    {t('blockMsg.availableAmount')}:
-                    {handleEmptyValue(blockMsg.availableAmountRound)}
+                    {t('blockMsg.keyAmount')}:
+                    <TextContainer
+                      ellipsis={true}
+                      style={{ backgroundColor: '#fff' }}
+                    >
+                      {handleEmptyValue(blockMsg.keyAmountRound)}
+                    </TextContainer>
                   </BlockText>
-
-                  <TooltipAnt title={t('blockMsg.withdrawRule')}>
-                    <InfoCircleOutlinedContainer
-                      onClick={() => setRuleVisible(true)}
-                    />
-                  </TooltipAnt>
-                </BlockTextWrapper>
-                <BlockText>
-                  {t('blockMsg.keyAmount')}:
-                  <TextContainer
-                    ellipsis={true}
-                    style={{ backgroundColor: '#fff' }}
-                  >
-                    {handleEmptyValue(blockMsg.keyAmountRound)}
-                  </TextContainer>
-                </BlockText>
-                <BlockText>
-                  {t('blockMsg.totalSupply')}:
-                  {handleEmptyValue(blockMsg.totalSupply)}
-                </BlockText>
-                <BlockText>
-                  {t('blockMsg.blockHeight')}:
-                  {handleEmptyValue(blockMsg.curBlockNumber)}
-                </BlockText>
-                <h4 style={{ color: '#ddd' }}>
-                  * {t('blockMsg.EstimatedTimeOfAirdrop')}
-                </h4>
+                  <BlockText>
+                    {t('blockMsg.totalSupply')}:
+                    {handleEmptyValue(blockMsg.totalSupply)}
+                  </BlockText>
+                  <BlockText>
+                    {t('blockMsg.blockHeight')}:
+                    {handleEmptyValue(blockMsg.curBlockNumber)}
+                  </BlockText>
+                  <h4 style={{ color: '#ddd' }}>
+                    * {t('blockMsg.EstimatedTimeOfAirdrop')}
+                  </h4>
+                </div>
 
                 <ButtonAndIcon>
                   <Loading loading={withdrawLoading}>
@@ -535,6 +536,12 @@ export default function ChildDomainItem({ name, owner, isMigrated, refetch }) {
                       {t('blockMsg.withdraw')}
                     </ButtonWrapper>
                   </Loading>
+
+                  <TooltipAnt title={t('blockMsg.withdrawRule')}>
+                    <InfoCircleOutlinedContainer
+                      onClick={() => setRuleVisible(true)}
+                    />
+                  </TooltipAnt>
                 </ButtonAndIcon>
               </BlockMsgContainer>
             </Loading>
