@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useCallback } from 'react'
 import { Link } from 'react-router-dom'
 import styled from '@emotion/styled/macro'
 import moment from 'moment'
@@ -18,10 +18,12 @@ import AddToCalendar from '../../Calendar/RenewalCalendar'
 import { ReactComponent as DefaultPencil } from '../../Icons/SmallPencil.svg'
 import { ReactComponent as DefaultOrangeExclamation } from '../../Icons/OrangeExclamation.svg'
 import { useAccount } from '../../QueryAccount'
-import { Modal, Button, Select, message } from 'antd'
+import { Modal, Button, Select, message, Radio, Input, Form } from 'antd'
 import getSNS, { getSNSAddress, getSNSIERC20 } from 'apollo/mutations/sns'
 import { UnknowErrMsgComponent } from 'components/UnknowErrMsg'
 import messageMention from 'utils/messageMention'
+import { emptyAddress } from 'sns-app-contract-api'
+import { handleQueryAllowance } from 'utils/utils'
 
 const CTAContainer = styled('div')`
   display: flex;
@@ -62,6 +64,16 @@ const ChooseCoinsBtn = styled('div')`
   }
 `
 
+const SelectRegisterForm = styled(Form)`
+  .ant-input {
+    border-radius: 50px !important;
+  }
+
+  .ant-select-selector {
+    border-radius: 50px !important;
+  }
+`
+
 const { Option } = Select
 
 function getCTA({
@@ -71,7 +83,6 @@ function getCTA({
   duration,
   label,
   hasSufficientBalance,
-  coinsValueRef,
   coinsValueObj,
   setCoinsValue,
   txHash,
@@ -91,24 +102,25 @@ function getCTA({
   account,
   isSuspendRegister
 }) {
+  const [coinForm] = Form.useForm()
+
   const [keyPrice, setKeyPrice] = useState(async () => {
     const sns = getSNS()
-    sns.getKeyCoinsPrice().then(price => {
+    sns.getKeyCoinsPrice(emptyAddress).then(price => {
       setKeyPrice(new EthVal(`${price || 0}`).toEth().toFixed(3))
     })
   })
 
   const [lowbPrice, setLowbPrice] = useState(async () => {
     const sns = getSNS()
-    sns.getLowbCoinsPrice().then(price => {
+    sns.getLowbCoinsPrice(emptyAddress).then(price => {
       setLowbPrice(new EthVal(`${price || 0}`).toEth().toFixed(3))
     })
   })
 
   const [usdcPrice, setUsdcPrice] = useState(async () => {
     const sns = getSNS()
-    sns.getUsdcCoinsPrice().then(price => {
-      // console.log('usdcPrice',new EthVal(`${price || 0}`).toEth().toFixed())
+    sns.getUsdcCoinsPrice(emptyAddress).then(price => {
       let newprice = new EthVal(`${price || 0}`).scaleUp(6).toNumber()
       setUsdcPrice(newprice)
     })
@@ -116,16 +128,16 @@ function getCTA({
 
   const maticPrice = new EthVal(`${price || 0}`).toEth().toFixed(3)
 
-  useEffect(() => {
-    coinsValueRef.current = { ...coinsValueObj }
-  }, [coinsValueObj])
-
   // use key coins register operation
-  const getApproveOfKey = async mutate => {
+  const getApproveOfKey = async (mutate, inviteName) => {
     const sns = getSNS()
     const keyAddress = await sns.getKeyCoinsAddress()
-    const keyPrice = await sns.getKeyCoinsPrice()
-
+    let inviteAdd = emptyAddress
+    if (inviteName) {
+      inviteAdd = await sns.getResolverOwner(inviteName)
+      setCoinsValue({ ...coinsValueObj, invite: inviteAdd })
+    }
+    const keyPrice = await sns.getKeyCoinsPrice(inviteAdd)
     // get IERC20 contract instance object
     const IERC20 = await getSNSIERC20(keyAddress)
 
@@ -144,6 +156,7 @@ function getCTA({
 
     // Query if the authorization is successful
     // Query every three seconds, query ten times
+    // handleQueryAllowance(IERC20, account, snsAddress, mutate)
     setTimeout(async () => {
       let timer,
         count = 0,
@@ -325,12 +338,63 @@ function getCTA({
     }, 0)
   }
 
+  const handleSelectCoinsRegister = async mutate => {
+    switch (coinForm.getFieldsValue().coins) {
+      case 'key':
+        try {
+          await getApproveOfKey(mutate, coinForm.getFieldsValue().inviteName)
+        } catch (error) {
+          console.log('getApproveOfKeyError:', error)
+        }
+        break
+      case 'matic':
+        mutate()
+        break
+      case 'usdc':
+        try {
+          await getApproveOfUsdc(mutate)
+        } catch (error) {
+          console.log('getApproveOfUsdcError:', error)
+        }
+        break
+      case 'lowb':
+        try {
+          await getApproveOfLowb(mutate)
+        } catch (error) {
+          console.log('getApproveOfLowbError:', error)
+        }
+        break
+      default:
+        try {
+          await getApproveOfKey(mutate, coinForm.getFieldsValue().inviteName)
+        } catch (error) {
+          console.log('getApproveOfKeyError:', error)
+        }
+    }
+    coinForm.resetFields()
+    Modal.destroyAll()
+  }
+
+  const changeCoins = value => {
+    coinForm.setFieldsValue({ coinsType: value })
+    setCoinsValue({ ...coinsValueObj, coinsType: value })
+  }
+
+  useEffect(() => {
+    console.log('coin:', coinsValueObj)
+  }, [coinsValueObj])
+
   switch (step) {
     case 'PRICE_DECISION':
       return (
         <Mutation
           mutation={COMMIT}
-          variables={{ ownerAddress: account, ...coinsValueObj }}
+          variables={{
+            ownerAddress: account,
+            label,
+            coinsType: coinsValueObj.coinsType,
+            invite: coinsValueObj.invite
+          }}
           onCompleted={data => {
             const txHash = Object.values(data)[0]
             setTxHash(txHash)
@@ -350,136 +414,77 @@ function getCTA({
                         style: { top: '20vh' },
                         title: (
                           <div
-                            style={{ textAlign: 'center', fontWeight: '700' }}
+                            style={{
+                              textAlign: 'center',
+                              fontWeight: '700',
+                              marginBottom: '10px'
+                            }}
                           >
                             {t('c.selectCoins')}
                           </div>
                         ),
                         content: (
-                          <ChooseCoinsBtn>
-                            <Button
-                              danger
-                              shape="round"
-                              block
-                              size="large"
-                              onClick={() => {
-                                Promise.resolve()
-                                  .then(() => {
-                                    const obj = {
-                                      ...coinsValueObj,
-                                      coinsType: 'usdc'
-                                    }
-                                    setCoinsValue(obj)
-                                    return obj
-                                  })
-                                  .then(async obj => {
-                                    setCoinsValue({ ...obj, coinsType: 'usdc' })
-                                    try {
-                                      await getApproveOfUsdc(mutate)
-                                    } catch (e) {
-                                      console.log('getApproveOfUsdc:', e)
-                                    }
-                                    // mutate()
-                                  })
-                                Modal.destroyAll()
-                              }}
+                          <SelectRegisterForm
+                            initialValues={{ coins: 'key', inviteName: '' }}
+                            form={coinForm}
+                          >
+                            <Form.Item name="coins">
+                              <Select
+                                status="error"
+                                defaultValue="key"
+                                size="middle"
+                                onChange={changeCoins}
+                              >
+                                <Option value="key">{keyPrice} Key</Option>
+                                <Option value="matic">
+                                  {maticPrice} Matic
+                                </Option>
+                                <Option value="usdc">{usdcPrice} USDC</Option>
+                                <Option value="lowb">{lowbPrice} Lowb</Option>
+                              </Select>
+                            </Form.Item>
+                            <Form.Item
+                              noStyle
+                              shouldUpdate={(prevValues, currentValues) =>
+                                prevValues.coins !== currentValues.coins
+                              }
                             >
-                              {usdcPrice} USDC
-                            </Button>
-                            <Button
-                              danger
-                              shape="round"
-                              block
-                              size="large"
-                              onClick={() => {
-                                Promise.resolve()
-                                  .then(() => {
-                                    const obj = {
-                                      ...coinsValueObj,
-                                      coinsType: 'lowb'
-                                    }
-                                    setCoinsValue(obj)
-                                    return obj
-                                  })
-                                  .then(async obj => {
-                                    setCoinsValue({ ...obj, coinsType: 'lowb' })
-                                    try {
-                                      await getApproveOfLowb(mutate)
-                                    } catch (e) {
-                                      console.log('getApproveOfLowb:', e)
-                                    }
-                                    // mutate()
-                                  })
-                                Modal.destroyAll()
-                              }}
-                            >
-                              {lowbPrice} Lowb
-                            </Button>
-                            <Button
-                              danger
-                              shape="round"
-                              block
-                              size="large"
-                              onClick={() => {
-                                Promise.resolve()
-                                  .then(() => {
-                                    const obj = {
-                                      ...coinsValueObj,
-                                      coinsType: 'key'
-                                    }
-                                    setCoinsValue(obj)
-                                    return obj
-                                  })
-                                  .then(async obj => {
-                                    setCoinsValue({ ...obj, coinsType: 'key' })
-                                    try {
-                                      await getApproveOfKey(mutate)
-                                    } catch (e) {
-                                      console.log('getApproveOfKey:', e)
-                                    }
-                                    // mutate()
-                                  })
-                                Modal.destroyAll()
-                              }}
-                            >
-                              {keyPrice} Key
-                            </Button>
-                            <Button
-                              danger
-                              shape="round"
-                              block
-                              size="large"
-                              onClick={() => {
-                                Promise.resolve()
-                                  .then(() => {
-                                    const obj = {
-                                      ...coinsValueObj,
-                                      coinsType: 'matic'
-                                    }
-                                    setCoinsValue(obj)
-                                    return obj
-                                  })
-                                  .then(obj => {
-                                    setCoinsValue({
-                                      ...obj,
-                                      coinsType: 'matic'
-                                    })
-                                    mutate()
-                                  })
-                                Modal.destroyAll()
-                              }}
-                            >
-                              {maticPrice} Matic
-                            </Button>
-                          </ChooseCoinsBtn>
+                              {({ getFieldValue }) =>
+                                getFieldValue('coins') !== 'key' ? null : (
+                                  <Form.Item name="inviteName">
+                                    <Input
+                                      size="middle"
+                                      status="error"
+                                      placeholder={t('invite.inp')}
+                                    />
+                                  </Form.Item>
+                                )
+                              }
+                            </Form.Item>
+                            <p>{t('invite.note')}</p>
+                            <Form.Item>
+                              <Button
+                                danger
+                                shape="round"
+                                block
+                                type="primary"
+                                onClick={() =>
+                                  handleSelectCoinsRegister(mutate)
+                                }
+                              >
+                                {t('c.register')}
+                              </Button>
+                            </Form.Item>
+                          </SelectRegisterForm>
                         ),
                         icon: null,
                         okButtonProps: {
-                          danger: true,
-                          shape: 'round',
                           hidden: true
                         },
-                        closable: true
+                        closable: true,
+                        onCancel: () => {
+                          coinForm.resetFields()
+                        }
                       })
                     } else {
                       messageMention({
@@ -666,9 +671,8 @@ const CTA = ({
   const [coinsValueObj, setCoinsValue] = useState({
     label,
     ownerAddress: account,
-    coinsType: ''
+    coinsType: 'key'
   })
-  const coinsValueRef = React.useRef()
 
   useEffect(() => {
     return () => {
@@ -689,7 +693,6 @@ const CTA = ({
         hasSufficientBalance,
         txHash,
         setTxHash,
-        coinsValueRef,
         coinsValueObj,
         setCoinsValue,
         setTimerRunning,

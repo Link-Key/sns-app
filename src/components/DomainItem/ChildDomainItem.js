@@ -1,34 +1,32 @@
 import React, { useEffect, useState } from 'react'
 import styled from '@emotion/styled/macro'
-import { Link } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { DELETE_SUBDOMAIN } from 'graphql/mutations'
-import { SingleNameBlockies } from '../Blockies'
-import Checkbox from '../Forms/Checkbox'
 import mq, { useMediaMin } from 'mediaQuery'
-import Tooltip from '../Tooltip/Tooltip'
-import DefaultOpenseaLink from 'components/Links/OpenseaLink'
-import QuestionMark from '../Icons/QuestionMark'
 import { checkIsDecrypted, truncateUndecryptedName } from '../../api/labels'
-import ExpiryDate from './ExpiryDate'
-import { useMutation } from '@apollo/client'
-import Bin from '../Forms/Bin'
+import { useMutation, useQuery } from '@apollo/client'
 import { useEditable } from '../hooks'
 import PendingTx from '../PendingTx'
-import AddFavourite from '../AddFavourite/AddFavourite'
 import axios from 'axios'
 import messageMention from 'utils/messageMention'
-import { getAirdropData } from '../../api/reqList'
-import { Card, Row, Col, Typography, Button, Modal } from 'antd'
-import getSNS, { getSNSWithdraw } from 'apollo/mutations/sns'
-import { H2, Title } from 'components/Typography/Basic'
+import { Card, Row, Col, Typography, Button, Modal, List, message } from 'antd'
+import getSNS, {
+  getSNSAddress,
+  getSNSInvite,
+  getSNSWithdraw,
+  getSNSIERC20
+} from 'apollo/mutations/sns'
+import { H2 } from 'components/Typography/Basic'
 import { InfoCircleOutlined } from '@ant-design/icons'
 import TooltipAnt from 'utils/tooltipAnt'
 import Loading from 'components/Loading/Loading'
 import { Trans } from 'react-i18next'
-import { handleEmptyValue } from 'utils/utils'
+import { handleEmptyValue, handleQueryAllowance } from 'utils/utils'
 import './ChildDomainItem.css'
 import { UnknowErrMsgComponent } from 'components/UnknowErrMsg'
+import { useCallback } from 'react'
+import { gql } from '@apollo/client'
+import EthVal from 'ethval'
 
 const { Text, Paragraph } = Typography
 
@@ -41,52 +39,6 @@ const ChildDomainItemContainer = styled('div')`
     border: none;
   }
   border-radius: 6px;
-`
-
-const DomainLink = styled(Link)`
-  width: 100%;
-  background-color: ${props => (props.warning ? 'hsla(37,91%,55%,0.1)' : '')};
-  color: #2b2b2b;
-  font-size: 22px;
-  font-weight: 100;
-
-  ${p =>
-    !p.showBlockies &&
-    mq.small`
-        grid-template-columns: 1fr minmax(150px, 450px) 35px 23px;
-        grid-template-rows: 50px/3;
-      `}
-
-  span {
-    align-self: center;
-  }
-
-  h5 {
-    font-weight: 100;
-  }
-
-  h3 {
-    display: inherit;
-    align-self: center;
-    margin: 0;
-    font-weight: 100;
-    font-size: 28px;
-  }
-
-  p {
-    grid-row-start: 2;
-    margin: 0;
-    align-self: center;
-
-    ${mq.small`
-      grid-row-start: auto;
-    `}
-  }
-`
-
-const OpenseaLink = styled(DefaultOpenseaLink)`
-  min-width: 165px;
-  margin-left: auto;
 `
 
 const BlockMsgContainer = styled(Card)`
@@ -111,8 +63,8 @@ const BlockTextWrapper = styled('div')`
 `
 
 const ButtonWrapper = styled(Button)`
-  min-width: 100px;
-  height: 35px;
+  min-width: 100px !important;
+  height: 35px !important;
   font-weight: 700;
   &:hover {
     box-shadow: 0 10px 21px 0 rgb(161 175 184 / 89%);
@@ -126,23 +78,16 @@ const ButtonWrapper = styled(Button)`
 
 const ButtonAndIcon = styled('div')`
   display: flex;
-  .ant-btn-round {
-    top: 5px;
-    height: 35px;
-  }
-  ${mq.small`
-    .ant-btn-round {
-      top:0px;
-      height: 46px;
-      width:130px;
-    }
-  `}
+  justify-content: center;
+  align-items: center;
 `
 
 const BlockText = styled(H2)`
   font-size: 15px;
   color: #000;
   text-align: left;
+  margin: 0;
+  padding-top: 2px;
 `
 
 const TextContainer = styled(Text)`
@@ -154,14 +99,13 @@ const TextContainer = styled(Text)`
 const InfoCircleOutlinedContainer = styled(InfoCircleOutlined)`
   padding: 0 10px;
   font-size: 25px;
-  line-height: 60px;
   color: #ea6060;
   &:hover {
     transform: scale(1.1);
   }
 `
 
-const DomainLinkContainer = styled(Card)`
+const InviteContainer = styled(Card)`
   width: 100%;
   height: 100%;
   min-width: 300px;
@@ -169,38 +113,51 @@ const DomainLinkContainer = styled(Card)`
   border-radius: 14px;
   box-shadow: rgba(0, 0, 0, 0.16) 0px 1px 4px;
   color: #2b2b2b;
+
   :hover {
     box-shadow: rgba(0, 0, 0, 0.3) 0px 5px 10px;
     transition: all 0.5s;
   }
+
+  .ant-card-body {
+    display: flex;
+    flex-direction: column;
+    /* gap: 10px; */
+  }
+  .title {
+    margin: 0 auto;
+    font-size: 20px;
+    font-weight: 400;
+    color: #000;
+    margin-bottom: 15px;
+  }
+
+  button {
+    margin: 0 auto;
+  }
 `
 
-const WithdrawRuleModal = styled(Modal)`
+const ModalWrapper = styled(Modal)`
   .ant-modal-title {
     font-weight: 700;
     text-align: center;
   }
 `
 
-export default function ChildDomainItem({
-  name,
-  owner,
-  expiryDate,
-  isMigrated,
-  isFavourite,
-  checkedBoxes,
-  setCheckedBoxes,
-  setSelectAll,
-  showBlockies = true,
-  canDeleteSubdomain,
-  refetch
-}) {
+const SEARCH_QUERY = gql`
+  query searchQuery {
+    isENSReady @client
+  }
+`
+
+export default function ChildDomainItem({ name, owner, isMigrated, refetch }) {
   const { state, actions } = useEditable()
   const { txHash, pending, confirmed } = state
   const { startPending, setConfirmed } = actions
   const [withdrawLoading, setWithdrawLoading] = useState(false)
   const [blockMsgLoading, setBlockMsgLoading] = useState(false)
   const [ruleVisible, setRuleVisible] = useState(false)
+  const [inviteVisible, setInviteVisible] = useState(false)
   const [blockMsg, setBlockMsg] = useState({
     address: '-',
     keyAmountRound: '-',
@@ -210,20 +167,14 @@ export default function ChildDomainItem({
     totalFrozenSupply: '-',
     curBlockNumber: '-'
   })
-  const [tokenIdState, setTokenId] = useState(() => {
-    const sns = getSNS()
-    let tokenId = ''
-    try {
-      sns.getNameOfOwner(address).then(resp => {
-        sns.getTokenIdOfName(resp).then(res => {
-          tokenId = parseInt(res._hex, 16)
-          setTokenId(tokenId)
-        })
-      })
-    } finally {
-      return tokenId
-    }
-  })
+  const [inviteCount, setInviteCount] = useState(0)
+  const [inviteIncome, setInviteIncome] = useState(0)
+
+  const {
+    data: { isENSReady }
+  } = useQuery(SEARCH_QUERY)
+
+  const [isInvite, setInvite] = useState(false)
 
   let { t } = useTranslation()
   const smallBP = useMediaMin('small')
@@ -245,8 +196,6 @@ export default function ChildDomainItem({
   // get block info
   const getBlockMsgFn = () => {
     setBlockMsgLoading(true)
-    console.log('blockMsg:', blockMsg)
-    console.log('NODE_ENV:', process.env.NODE_ENV)
     axios
       .get(
         `/api/v1/accountService/account/queryAccount?KeyName=${label}&address=${owner}`
@@ -375,6 +324,80 @@ export default function ChildDomainItem({
       })
   }
 
+  const handleAddInviter = inviterInstance => {
+    inviterInstance.addInviter().then(resp => {
+      setInvite(true)
+      messageMention({ type: 'success', content: '成功' })
+    })
+  }
+
+  const becomeInviter = async () => {
+    // get inviter instance obj
+    const inviterInstance = await getSNSInvite()
+
+    // get become inviter price
+    const inviterPrice = await inviterInstance.getApplyInviterPrice()
+
+    const sns = getSNS()
+    const keyAddress = await sns.getKeyCoinsAddress()
+    const IERC20 = await getSNSIERC20(keyAddress)
+
+    // console.log('inviterInstance',inviterInstance.registryAddress)
+    //get inviter contract address
+    //test
+    // const inviterAdd = '0xC4FD81B29BD4EE39E232622867D4864ad503aC4a'
+    const inviterAdd = inviterInstance.registryAddress
+    // Authorization to SNS
+    await IERC20.approve(inviterAdd, inviterPrice)
+
+    message.loading({
+      key: 1,
+      content: t('z.transferSending'),
+      duration: 0,
+      style: { marginTop: '20vh' }
+    })
+
+    // Query if the authorization is successful
+    handleQueryAllowance(
+      IERC20,
+      owner,
+      inviterAdd,
+      handleAddInviter(inviterInstance)
+    )
+  }
+
+  const handleInvite = async () => {
+    if (isInvite) {
+      setInviteVisible(true)
+      return
+    }
+    try {
+      await becomeInviter()
+    } catch (error) {
+      console.log('becomeInviter:', error)
+    }
+  }
+
+  const handleIsInviter = useCallback(async inviteInstance => {
+    let inviter = false
+    if (inviteInstance) {
+      inviter = await inviteInstance.isInviter()
+    }
+    setInvite(inviter)
+  }, [])
+
+  const getInviteCountFn = async inviteInstance => {
+    const resp = await inviteInstance.getInviteCount()
+    const count = parseInt(resp._hex, 16)
+    setInviteCount(count)
+  }
+
+  const getInviteIncomeFn = async inviteInstance => {
+    const resp = await inviteInstance.getInviterIncome()
+    const income = new EthVal(`${resp._hex || 0}`).toEth().toFixed(3)
+    setInviteIncome(income)
+  }
+
   useEffect(() => {
     getBlockMsgFn()
     const timer = setInterval(() => {
@@ -384,6 +407,42 @@ export default function ChildDomainItem({
       clearInterval(timer)
     }
   }, [])
+
+  useEffect(() => {
+    if (isENSReady) {
+      const inviteInstance = getSNSInvite()
+      handleIsInviter(inviteInstance)
+      getInviteCountFn(inviteInstance)
+      getInviteIncomeFn(inviteInstance)
+    }
+  }, [isENSReady])
+
+  const data = [
+    {
+      title: 'Title 1'
+    },
+    {
+      title: 'Title 2'
+    },
+    {
+      title: 'Title 3'
+    },
+    {
+      title: 'Title 4'
+    },
+    {
+      title: 'Title 4'
+    },
+    {
+      title: 'Title 4'
+    },
+    {
+      title: 'Title 4'
+    },
+    {
+      title: 'Title 4'
+    }
+  ]
 
   return (
     <ChildDomainItemContainer>
@@ -397,59 +456,6 @@ export default function ChildDomainItem({
         />
       ) : (
         <Row gutter={[16, 16]} wrap={true}>
-          <Col flex="1 1 400px" hidden>
-            <DomainLinkContainer bordered>
-              <DomainLink
-                showBlockies={showBlockies}
-                data-testid={`${name}`}
-                warning={isMigrated === false ? true : false}
-                key={name}
-                to={`/name/${name}`}
-              >
-                {showBlockies && smallBP && (
-                  <SingleNameBlockies imageSize={24} address={owner} />
-                )}
-                <h3>{label}</h3>
-                {canDeleteSubdomain ? (
-                  <Bin
-                    data-testid={'delete-name'}
-                    onClick={e => {
-                      e.preventDefault()
-                      mutate()
-                    }}
-                  />
-                ) : (
-                  <></>
-                )}
-                {!isDecrypted && (
-                  <Tooltip
-                    text="<p>This name is only partially decoded. If you know the name, you can search for it in the search bar to decrypt it and renew</p>"
-                    position="top"
-                    border={true}
-                    offset={{ left: 0, top: 10 }}
-                  >
-                    {({ tooltipElement, showTooltip, hideTooltip }) => {
-                      return (
-                        <div style={{ position: 'relative' }}>
-                          <QuestionMark
-                            onMouseOver={() => {
-                              showTooltip()
-                            }}
-                            onMouseLeave={() => {
-                              hideTooltip()
-                            }}
-                          />
-                          &nbsp;
-                          {tooltipElement}
-                        </div>
-                      )
-                    }}
-                  </Tooltip>
-                )}
-              </DomainLink>
-              {tokenIdState ? <OpenseaLink tokenId={tokenIdState} /> : ''}
-            </DomainLinkContainer>
-          </Col>
           <Col flex="1 1 400px">
             <Loading loading={blockMsgLoading} defaultColor="#ea6060">
               <BlockMsgContainer
@@ -462,32 +468,12 @@ export default function ChildDomainItem({
                     {t('blockMsg.availableAmount')}:
                     {handleEmptyValue(blockMsg.availableAmountRound)}
                   </BlockText>
-                  <ButtonAndIcon>
-                    <Loading loading={withdrawLoading}>
-                      <ButtonWrapper
-                        disabled={
-                          handleEmptyValue(blockMsg.availableAmountRound) !==
-                            '-' && blockMsg.availableAmountRound !== '0'
-                            ? false
-                            : true
-                        }
-                        type="primary"
-                        shape="round"
-                        size="middle"
-                        danger
-                        onClick={() => {
-                          callWithdraw()
-                        }}
-                      >
-                        {t('blockMsg.withdraw')}
-                      </ButtonWrapper>
-                    </Loading>
-                    <TooltipAnt title={t('blockMsg.withdrawRule')}>
-                      <InfoCircleOutlinedContainer
-                        onClick={() => setRuleVisible(true)}
-                      />
-                    </TooltipAnt>
-                  </ButtonAndIcon>
+
+                  <TooltipAnt title={t('blockMsg.withdrawRule')}>
+                    <InfoCircleOutlinedContainer
+                      onClick={() => setRuleVisible(true)}
+                    />
+                  </TooltipAnt>
                 </BlockTextWrapper>
                 <BlockText>
                   {t('blockMsg.keyAmount')}:
@@ -509,17 +495,59 @@ export default function ChildDomainItem({
                 <h4 style={{ color: '#ddd' }}>
                   * {t('blockMsg.EstimatedTimeOfAirdrop')}
                 </h4>
+
+                <ButtonAndIcon>
+                  <Loading loading={withdrawLoading}>
+                    <ButtonWrapper
+                      disabled={
+                        handleEmptyValue(blockMsg.availableAmountRound) !==
+                          '-' && blockMsg.availableAmountRound !== '0'
+                          ? false
+                          : true
+                      }
+                      type="primary"
+                      shape="round"
+                      size="small"
+                      danger
+                      onClick={() => {
+                        callWithdraw()
+                      }}
+                    >
+                      {t('blockMsg.withdraw')}
+                    </ButtonWrapper>
+                  </Loading>
+                </ButtonAndIcon>
               </BlockMsgContainer>
             </Loading>
           </Col>
+
+          <Col flex="1 1 400px">
+            <InviteContainer bodyStyle={{ padding: '0 10px' }}>
+              <div style={{ height: '175px' }}>
+                <BlockText>
+                  {t('invite.totalIncome')}(KEY):{inviteIncome}
+                </BlockText>
+                <BlockText>
+                  {t('invite.count')}:{inviteCount}
+                </BlockText>
+              </div>
+              <ButtonWrapper
+                danger
+                shape="round"
+                type="primary"
+                onClick={handleInvite}
+              >
+                {isInvite ? `${t('invite.list')}` : `${t('invite.become')}`}
+              </ButtonWrapper>
+            </InviteContainer>
+          </Col>
         </Row>
       )}
-      <WithdrawRuleModal
+      <ModalWrapper
         title={t('blockMsg.withdrawRule')}
         visible={ruleVisible}
         onCancel={() => setRuleVisible(false)}
         style={{ top: '20vh' }}
-        maskClosable={false}
         className="NoticeModalBody"
         footer={[
           <Button
@@ -536,7 +564,36 @@ export default function ChildDomainItem({
         <Paragraph>{t('blockMsg.withdrawRuleContent1')}</Paragraph>
         <Paragraph>{t('blockMsg.withdrawRuleContent2')}</Paragraph>
         <Paragraph>{t('blockMsg.withdrawRuleContent3')}</Paragraph>
-      </WithdrawRuleModal>
+      </ModalWrapper>
+      <ModalWrapper
+        title={t('invite.modalTitle')}
+        visible={inviteVisible}
+        onCancel={() => setInviteVisible(false)}
+        style={{ top: '20vh' }}
+        bodyStyle={{
+          height: '400px',
+          overflow: 'auto'
+        }}
+        className="NoticeModalBody"
+        footer={null}
+      >
+        <List
+          grid={{ gutter: 16, column: 1 }}
+          dataSource={data}
+          renderItem={item => (
+            <List.Item>
+              <Card style={{ borderRadius: '16px' }}>
+                <div>{t('invite.hash')} :</div>
+                <div>{t('invite.date')} :</div>
+                <div>{t('invite.balance')} :</div>
+                <Button danger shape="round" block>
+                  {t('invite.details')}
+                </Button>
+              </Card>
+            </List.Item>
+          )}
+        />
+      </ModalWrapper>
     </ChildDomainItemContainer>
   )
 }

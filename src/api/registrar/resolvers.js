@@ -6,6 +6,7 @@ import EthVal from 'ethval'
 
 import modeNames from '../modes'
 import { sendHelper } from '../resolverUtils'
+import { emptyAddress } from 'sns-app-contract-api'
 
 const defaults = {}
 
@@ -13,7 +14,7 @@ const resolvers = {
   Query: {
     async getRentPrice(_) {
       const sns = getSNS()
-      return sns.getRegisteredPrice()
+      return sns.getRegisteredPrice(emptyAddress)
     },
     async getRentPrices(_, { labels, duration }) {
       const registrar = getRegistrar()
@@ -57,11 +58,11 @@ const resolvers = {
     }
   },
   Mutation: {
-    async commit(_, { label, coinsType }) {
+    async commit(_, { label, coinsType, invite }) {
       // get sns instance object
       const sns = getSNS()
       if (coinsType === 'key') {
-        const tx = await sns.mintByMoreCoins(label, 1)
+        const tx = await sns.mintByMoreCoins(label, 1, invite)
         return sendHelper(tx)
       } else if (coinsType === 'lowb') {
         const tx = await sns.mintByMoreCoins(label, 2)

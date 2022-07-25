@@ -55,6 +55,7 @@
     "migrate": "Migrate",
     "mynames": "My Account",
     "registProcess": "Registration Tutorial",
+    "docs": "Docs",
     "network": "network",
     "otheraddresses": "Other Addresses",
     "parent": "parent",
@@ -463,5 +464,18 @@
     "withdrawRuleContent1": "1. Tokens can be withdrawn per account: up to 10 KEY/week, below 10 KEY can be withdrawn in one cycle.",
     "withdrawRuleContent2": "2. Tokens can be withdrawn in a cumulative system, and can be withdrawn at once after several cycles. ",
     "withdrawRuleContent3": "3. A small withdrawal fee will be charged when you click on the token withdrawal request, and the exact amount will be indicated when you initiate the transaction."
+  },
+  "invite":{
+    "totalIncome":"Total Invitees Earnings",
+    "count":"Total Invitation",
+    "become":"Become an Inviter",
+    "list":"Invite List",
+    "modalTitle":"Invitees List",
+    "hash":"Transaction Hash",
+    "date":"Transaction Date",
+    "balance":"Rebate amount",
+    "details":"Transaction Details",
+    "note":"Note: Enter xxx.key invitation code when you pay with KEY to enjoy 10% discount on registration (invalid invitation code will not be able to enjoy the discount)",
+    "inp":"Input xxx.key (optional)"
   }
 }

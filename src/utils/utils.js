@@ -19,6 +19,9 @@ import { EMPTY_ADDRESS } from './records'
 import getSNS from '../apollo/mutations/sns'
 import { gql } from '@apollo/client'
 import { useQuery } from '@apollo/client'
+import { message } from 'antd'
+import { UnknowErrMsgComponent, TransactionBusy } from 'components/UnknowErrMsg'
+import EthVal from 'ethval'
 
 // From https://github.com/0xProject/0x-monorepo/blob/development/packages/utils/src/address_utils.ts
 
@@ -210,6 +213,13 @@ export const aboutPageURL = () => {
   return `https://www.linkkey.io`
 }
 
+export const docsPageURL = () => {
+  // const lang = window.localStorage.getItem('language') || ''
+
+  // return `https://ens.domains/${lang === 'en' ? '' : lang}`
+  return `https://docs.linkkey.tech`
+}
+
 export function isRecordEmpty(value) {
   return value === emptyAddress || value === ''
 }
@@ -380,4 +390,51 @@ export function handleEmptyValue(value) {
     return value
   }
   return '-'
+}
+
+export const handleQueryAllowance = (IERC20, account, address, mutateFn) => {
+  // Query if the authorization is successful
+  // Query every three seconds, query ten times
+  setTimeout(async () => {
+    let timer,
+      count = 0,
+      allowancePrice
+    timer = setInterval(async () => {
+      try {
+        count += 1
+        // query authorization sns key price
+        allowancePrice = await IERC20.allowance(account, address)
+        const price = new EthVal(`${allowancePrice || 0}`).toEth().toFixed(3)
+        if (price > 0) {
+          clearInterval(timer)
+          // destroy message mention
+          message.destroy(1)
+          // mint nft of key
+          mutateFn()
+        }
+      } catch (e) {
+        console.log('allowance:', e)
+        clearInterval(timer)
+        message.error({
+          key: 2,
+          content: <UnknowErrMsgComponent />,
+          duration: 3,
+          style: { marginTop: '20vh' }
+        })
+        // destroy message mention
+        message.destroy(1)
+      }
+      if (count === 20) {
+        clearInterval(timer)
+        message.error({
+          key: 3,
+          content: <TransactionBusy />,
+          duration: 3,
+          style: { marginTop: '20vh' }
+        })
+        // destroy message mention
+        message.destroy(1)
+      }
+    }, 3000)
+  }, 0)
 }
