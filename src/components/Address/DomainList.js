@@ -63,20 +63,6 @@ export default function DomainList({
   domains,
   showBlockies
 }) {
-  // console.log('domains-----', domains)
-  // if (snsNameInfo) {
-  //   console.log('snsNameInfo', snsNameInfo)
-  //   console.log('snsNameInfo', snsNameInfo.singleName.name)
-  // }
-  console.log('domains:', domains)
-  console.log('snsNameInfo:', snsNameInfo)
-  // if ((!domains || domains.length === 0) && !hasName(snsNameInfo)) {
-  //   return (
-  //     <NoDomainsContainer>
-  //       <h2>This address does not own any names</h2>
-  //     </NoDomainsContainer>
-  //   )
-  // }
   return (
     <DomainsContainer>
       {domains.map(d => {

@@ -53,6 +53,7 @@
     "migrate": "移行",
     "mynames": "私の口座",
     "registProcess": "登録プロセス",
+    "docs": "にやすりをかける",
     "network": "ネットワーク",
     "otheraddresses": "その他のアドレス",
     "parent": "ペアレント",
@@ -459,5 +460,18 @@
     "withdrawRuleContent1": "1. トークンはアカウントごとに引き出すことができます：最大10KEY/週、10KEY以下は1サイクルで引き出すことができます。",
     "withdrawRuleContent2": "2. トークンの引き出しは累計で行い、何回かに分けて1回分の引き出しが可能です。",
     "withdrawRuleContent3": "3. 引き出し要求をクリックすると、少額の引き出し手数料が発生します。正確な金額は、取引が開始されたときに表示されます。"
+  },
+  "invite":{
+    "totalIncome":"招待者利益合計",
+    "count":"招待者数",
+    "become":"招待者になる",
+    "list":"招待状リスト",
+    "modalTitle":"招待者リスト",
+    "hash":"トレーディング Hash",
+    "date":"トレーディング Date",
+    "balance":"リベート額",
+    "details":"取引内容",
+    "note":"注意：KEYで支払う際にxxx.keyの招待コードを入力すると、登録時に10％の割引が適用されます（招待コードが無効な場合は割引が適用されません）。",
+    "inp":"xxx.keyを入力（任意）"
   }
 }

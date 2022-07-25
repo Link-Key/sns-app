@@ -11,3 +11,7 @@ export function UnknowErrMsgComponent() {
     </>
   )
 }
+
+export function TransactionBusy() {
+  return <Trans i18nKey={`z.transferBusy`} />
+}

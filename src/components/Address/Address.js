@@ -337,57 +337,28 @@ export default function Address({
 
   let snsNameInfo = getSNSNameInfo(address)
 
-  const [tokenIdState, setTokenId] = useState(() => {
+  const [tokenIdState, setTokenId] = useState()
+
+  const handleTokenIdState = async () => {
     const sns = getSNS()
     let tokenId = ''
-    try {
-      sns.getNameOfOwner(address).then(resp => {
-        sns.getTokenIdOfName(resp).then(res => {
-          tokenId = parseInt(res._hex, 16)
-          setTokenId(tokenId)
-        })
-      })
-    } finally {
-      return tokenId
+
+    const name = await sns.getNameOfOwner(address)
+    if (name) {
+      tokenId = await sns.getTokenIdOfName(name)
     }
-  })
-
-  // console.log('snsNameInfo-----', snsNameInfo)
-
-  // const { loading, data, error, refetch } = useDomains({
-  //   resultsPerPage,
-  //   domainType,
-  //   address: normalisedAddress,
-  //   sort: activeSort,
-  //   page,
-  //   expiryDate
-  // })
+    setTokenId(parseInt(tokenId._hex, 16))
+  }
 
   const { data: { favourites } = [] } = useQuery(GET_FAVOURITES)
   useEffect(() => {
     if (isENSReady) {
       getEtherScanAddr().then(setEtherScanAddr)
+      handleTokenIdState()
     }
   }, [isENSReady])
 
-  // if (error) {
-  //   console.log(error)
-  //   return <>Error getting domains. {JSON.stringify(error)}</>
-  // }
-  //
-  // if (loading) {
-  //   return <Loader withWrap large />
-  // }
-
   let normalisedDomains = []
-
-  // if (domainType === 'registrant' && data.account) {
-  //   normalisedDomains = [...data.account.registrations]
-  // } else if (domainType === 'controller' && data.account) {
-  //   normalisedDomains = [
-  //     ...filterOutReverse(data.account.domains).map(domain => ({ domain }))
-  //   ]
-  // }
 
   let decryptedDomains = filterNormalised(
     decryptNames(normalisedDomains),
@@ -421,31 +392,6 @@ export default function Address({
 
   return (
     <>
-      {/*<NonMainPageBannerContainerWithMarginBottom>*/}
-      {/*  <DAOBannerContent />*/}
-      {/*</NonMainPageBannerContainerWithMarginBottom>*/}
-
-      {/*{showOriginBanner && showOriginBannerFlag && (*/}
-      {/*  <Banner>*/}
-      {/*    <Close onClick={() => setShowOriginBannerFlag(false)} src={close} />*/}
-      {/*    {t('address.transactionBanner')}*/}
-      {/*  </Banner>*/}
-      {/*)}*/}
-      {/*{hasNamesExpiringSoon && (*/}
-      {/*  <Banner>*/}
-      {/*    <h3>*/}
-      {/*      <img alt="exclamation mark" src={warning} />*/}
-      {/*      &nbsp; {t('address.namesExpiringSoonBanner.title')}*/}
-      {/*      <p>*/}
-      {/*        <Trans i18nKey="address.namesExpiringSoonBanner.text">*/}
-      {/*          One or more names are expiring soon, renew them all in one*/}
-      {/*          transaction by selecting multiple names and click "Renew"*/}
-      {/*        </Trans>*/}
-      {/*      </p>*/}
-      {/*    </h3>*/}
-      {/*  </Banner>*/}
-      {/*)}*/}
-
       <AddressContainer>
         <TopBar>
           <AddressTitleContainer>
@@ -490,55 +436,6 @@ export default function Address({
             </TooltipAnt>
           </GoToIconWrapper>
         </TopBar>
-        {/*<AddReverseRecord account={account} currentAddress={address} />*/}
-        {/*<Controls>*/}
-        {/*  <Filtering*/}
-        {/*    activeFilter={domainType}*/}
-        {/*    setActiveSort={setActiveSort}*/}
-        {/*    url={url}*/}
-        {/*  />*/}
-
-        {/*  {domainType === 'registrant' && (*/}
-        {/*    <RenewAll*/}
-        {/*      years={years}*/}
-        {/*      setYears={setYears}*/}
-        {/*      activeFilter={domainType}*/}
-        {/*      selectedNames={selectedNames}*/}
-        {/*      setCheckedBoxes={setCheckedBoxes}*/}
-        {/*      setSelectAll={setSelectAll}*/}
-        {/*      allNames={allNames}*/}
-        {/*      address={address}*/}
-        {/*      data={data}*/}
-        {/*      refetch={refetch}*/}
-        {/*      getterString="account.registrations"*/}
-        {/*    />*/}
-        {/*  )}*/}
-        {/*  <Sorting*/}
-        {/*    activeSort={activeSort}*/}
-        {/*    setActiveSort={setActiveSort}*/}
-        {/*    activeFilter={domainType}*/}
-        {/*  />*/}
-
-        {/*  {domainType === 'registrant' && (*/}
-        {/*    <>*/}
-        {/*      <SelectAll>*/}
-        {/*        <Checkbox*/}
-        {/*          testid="checkbox-renewall"*/}
-        {/*          type="double"*/}
-        {/*          checked={selectAll}*/}
-        {/*          onClick={() => {*/}
-        {/*            if (!selectAll) {*/}
-        {/*              selectAllNames()*/}
-        {/*            } else {*/}
-        {/*              setCheckedBoxes({})*/}
-        {/*            }*/}
-        {/*            setSelectAll(selectAll => !selectAll)*/}
-        {/*          }}*/}
-        {/*        />*/}
-        {/*      </SelectAll>*/}
-        {/*    </>*/}
-        {/*  )}*/}
-        {/*</Controls>*/}
 
         <DomainList
           snsNameInfo={snsNameInfo}
@@ -553,18 +450,6 @@ export default function Address({
           setCheckedBoxes={setCheckedBoxes}
           showBlockies={false}
         />
-        {/*<Pager*/}
-        {/*  variables={{ id: address, expiryDate }}*/}
-        {/*  currentPage={page}*/}
-        {/*  resultsPerPage={resultsPerPage}*/}
-        {/*  setResultsPerPage={setResultsPerPage}*/}
-        {/*  pageLink={`/address/${address}/${domainType}`}*/}
-        {/*  query={*/}
-        {/*    domainType === 'registrant'*/}
-        {/*      ? GET_REGISTRATIONS_SUBGRAPH*/}
-        {/*      : GET_DOMAINS_SUBGRAPH*/}
-        {/*  }*/}
-        {/*/>*/}
       </AddressContainer>
     </>
   )
