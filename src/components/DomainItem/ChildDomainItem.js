@@ -21,7 +21,11 @@ import { InfoCircleOutlined } from '@ant-design/icons'
 import TooltipAnt from 'utils/tooltipAnt'
 import Loading from 'components/Loading/Loading'
 import { Trans } from 'react-i18next'
-import { handleEmptyValue, handleQueryAllowance } from 'utils/utils'
+import {
+  handleEmptyValue,
+  handleErrorCode,
+  handleQueryAllowance
+} from 'utils/utils'
 import './ChildDomainItem.css'
 import { UnknowErrMsgComponent } from 'components/UnknowErrMsg'
 import { useCallback } from 'react'
@@ -325,10 +329,18 @@ export default function ChildDomainItem({ name, owner, isMigrated, refetch }) {
   }
 
   const handleAddInviter = inviterInstance => {
-    inviterInstance.addInviter().then(resp => {
-      setInvite(true)
-      messageMention({ type: 'success', content: '成功' })
-    })
+    inviterInstance
+      .addInviter()
+      .then(resp => {
+        console.log('resp:', resp)
+        setInvite(true)
+        messageMention({ type: 'success', content: '成功' })
+      })
+      .catch(error => {
+        console.log('addInviter:', error)
+        handleErrorCode(error)
+        return
+      })
   }
 
   const becomeInviter = async () => {
@@ -348,7 +360,13 @@ export default function ChildDomainItem({ name, owner, isMigrated, refetch }) {
     // const inviterAdd = '0xC4FD81B29BD4EE39E232622867D4864ad503aC4a'
     const inviterAdd = inviterInstance.registryAddress
     // Authorization to SNS
-    await IERC20.approve(inviterAdd, inviterPrice)
+    try {
+      await IERC20.approve(inviterAdd, inviterPrice)
+    } catch (error) {
+      console.log('inviteApprove:', error)
+      handleErrorCode(error)
+      return
+    }
 
     message.loading({
       key: 1,
@@ -382,6 +400,7 @@ export default function ChildDomainItem({ name, owner, isMigrated, refetch }) {
     let inviter = false
     if (inviteInstance) {
       inviter = await inviteInstance.isInviter()
+      console.log('inviter:', inviter)
     }
     setInvite(inviter)
   }, [])

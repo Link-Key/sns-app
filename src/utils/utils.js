@@ -22,6 +22,7 @@ import { useQuery } from '@apollo/client'
 import { message } from 'antd'
 import { UnknowErrMsgComponent, TransactionBusy } from 'components/UnknowErrMsg'
 import EthVal from 'ethval'
+import messageMention from './messageMention'
 
 // From https://github.com/0xProject/0x-monorepo/blob/development/packages/utils/src/address_utils.ts
 
@@ -437,4 +438,33 @@ export const handleQueryAllowance = (IERC20, account, address, mutateFn) => {
       }
     }, 3000)
   }, 0)
+}
+
+export const handleErrorCode = e => {
+  let errorContent = 'error'
+  // handle contract response error code
+  if (e && e.data && e.data.code && e.data.message) {
+    let errorMessages = e.data.message.split('---')
+    if (errorMessages.length === 4) {
+      // get errorCode
+      let errCode = errorMessages[0].split(':')[1].trim()
+      errorContent = <Trans i18nKey={`withdrawErrCode.${errCode}`} />
+    }
+  }
+  switch (e.code) {
+    case 4001:
+      errorContent = e.data.message
+      break
+    case -32603:
+      errorContent = e.data.message
+      break
+    default:
+      errorContent = <UnknowErrMsgComponent />
+  }
+  messageMention({
+    type: 'error',
+    content: errorContent,
+    duration: 3,
+    style: { marginTop: '10vh' }
+  })
 }
