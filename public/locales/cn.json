@@ -438,6 +438,7 @@
   "serviceMsg": {
     "servErr": "网络服务出错",
     "paramsIsNull": "参数为空",
+    "recordIsNull": "数据为空",
     "unkonwErr": "未知错误",
     "feedback": "可点击",
     "feedback1": "反馈问题。"
@@ -469,6 +470,7 @@
     "hash":"交易哈希",
     "date":"交易时间",
     "balance":"返佣金额",
+    "tip": "仅展示最近的数据，更多请访问",
     "details":"交易详情",
     "note":"注：用KEY支付时输入xxx.key邀请码，可享9折注册优惠（无效邀请码将无法享受折扣）",
     "inp":"输入xxx.key (选填)"

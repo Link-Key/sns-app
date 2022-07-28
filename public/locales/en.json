@@ -443,6 +443,7 @@
   "serviceMsg": {
     "servErr": "Internal server error",
     "paramsIsNull": "Query param all empty",
+    "recordIsNull": "record is null",
     "unkonwErr": "Unknown error",
     "feedback": "You can click ",
     "feedback1": " to give feedback on your question."
@@ -474,6 +475,7 @@
     "hash":"Transaction Hash",
     "date":"Transaction Date",
     "balance":"Rebate amount",
+    "tip": "Only show recent txs, more txs visit",
     "details":"Transaction Details",
     "note":"Note: Enter xxx.key invitation code when you pay with KEY to enjoy 10% discount on registration (invalid invitation code will not be able to enjoy the discount)",
     "inp":"Input xxx.key (optional)"
