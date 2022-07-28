@@ -21,7 +21,11 @@ import { InfoCircleOutlined } from '@ant-design/icons'
 import TooltipAnt from 'utils/tooltipAnt'
 import Loading from 'components/Loading/Loading'
 import { Trans } from 'react-i18next'
-import { handleEmptyValue, handleQueryAllowance } from 'utils/utils'
+import {
+  handleEmptyValue,
+  handleErrorCode,
+  handleQueryAllowance
+} from 'utils/utils'
 import './ChildDomainItem.css'
 import { UnknowErrMsgComponent } from 'components/UnknowErrMsg'
 import { useCallback } from 'react'
@@ -82,6 +86,7 @@ const ButtonAndIcon = styled('div')`
   display: flex;
   justify-content: center;
   align-items: center;
+  position: relative;
 `
 
 const BlockText = styled(H2)`
@@ -99,6 +104,10 @@ const TextContainer = styled(Text)`
 `
 
 const InfoCircleOutlinedContainer = styled(InfoCircleOutlined)`
+  position: absolute;
+  left: 0;
+  right: 0;
+  transform: translateX(70px);
   padding: 0 10px;
   font-size: 25px;
   color: #ea6060;
@@ -329,10 +338,18 @@ export default function ChildDomainItem({ name, owner, isMigrated, refetch }) {
   }
 
   const handleAddInviter = inviterInstance => {
-    inviterInstance.addInviter().then(resp => {
-      setInvite(true)
-      messageMention({ type: 'success', content: '成功' })
-    })
+    inviterInstance
+      .addInviter()
+      .then(resp => {
+        console.log('resp:', resp)
+        setInvite(true)
+        messageMention({ type: 'success', content: '成功' })
+      })
+      .catch(error => {
+        console.log('addInviter:', error)
+        handleErrorCode(error)
+        return
+      })
   }
 
   const becomeInviter = async () => {
@@ -352,7 +369,13 @@ export default function ChildDomainItem({ name, owner, isMigrated, refetch }) {
     // const inviterAdd = '0xC4FD81B29BD4EE39E232622867D4864ad503aC4a'
     const inviterAdd = inviterInstance.registryAddress
     // Authorization to SNS
-    await IERC20.approve(inviterAdd, inviterPrice)
+    try {
+      await IERC20.approve(inviterAdd, inviterPrice)
+    } catch (error) {
+      console.log('inviteApprove:', error)
+      handleErrorCode(error)
+      return
+    }
 
     message.loading({
       key: 1,
@@ -387,6 +410,7 @@ export default function ChildDomainItem({ name, owner, isMigrated, refetch }) {
     let inviter = false
     if (inviteInstance) {
       inviter = await inviteInstance.isInviter()
+      console.log('inviter:', inviter)
     }
     setInvite(inviter)
   }, [])
@@ -556,38 +580,34 @@ export default function ChildDomainItem({ name, owner, isMigrated, refetch }) {
                 size="default"
                 bodyStyle={{ padding: '0 10px' }}
               >
-                <BlockTextWrapper>
+                <div>
+                  <BlockTextWrapper>
+                    <BlockText>
+                      {t('blockMsg.availableAmount')}:
+                      {handleEmptyValue(blockMsg.availableAmountRound)}
+                    </BlockText>
+                  </BlockTextWrapper>
                   <BlockText>
-                    {t('blockMsg.availableAmount')}:
-                    {handleEmptyValue(blockMsg.availableAmountRound)}
+                    {t('blockMsg.keyAmount')}:
+                    <TextContainer
+                      ellipsis={true}
+                      style={{ backgroundColor: '#fff' }}
+                    >
+                      {handleEmptyValue(blockMsg.keyAmountRound)}
+                    </TextContainer>
                   </BlockText>
-
-                  <TooltipAnt title={t('blockMsg.withdrawRule')}>
-                    <InfoCircleOutlinedContainer
-                      onClick={() => setRuleVisible(true)}
-                    />
-                  </TooltipAnt>
-                </BlockTextWrapper>
-                <BlockText>
-                  {t('blockMsg.keyAmount')}:
-                  <TextContainer
-                    ellipsis={true}
-                    style={{ backgroundColor: '#fff' }}
-                  >
-                    {handleEmptyValue(blockMsg.keyAmountRound)}
-                  </TextContainer>
-                </BlockText>
-                <BlockText>
-                  {t('blockMsg.totalSupply')}:
-                  {handleEmptyValue(blockMsg.totalSupply)}
-                </BlockText>
-                <BlockText>
-                  {t('blockMsg.blockHeight')}:
-                  {handleEmptyValue(blockMsg.curBlockNumber)}
-                </BlockText>
-                <h4 style={{ color: '#ddd' }}>
-                  * {t('blockMsg.EstimatedTimeOfAirdrop')}
-                </h4>
+                  <BlockText>
+                    {t('blockMsg.totalSupply')}:
+                    {handleEmptyValue(blockMsg.totalSupply)}
+                  </BlockText>
+                  <BlockText>
+                    {t('blockMsg.blockHeight')}:
+                    {handleEmptyValue(blockMsg.curBlockNumber)}
+                  </BlockText>
+                  <h4 style={{ color: '#ddd' }}>
+                    * {t('blockMsg.EstimatedTimeOfAirdrop')}
+                  </h4>
+                </div>
 
                 <ButtonAndIcon>
                   <Loading loading={withdrawLoading}>
@@ -609,6 +629,12 @@ export default function ChildDomainItem({ name, owner, isMigrated, refetch }) {
                       {t('blockMsg.withdraw')}
                     </ButtonWrapper>
                   </Loading>
+
+                  <TooltipAnt title={t('blockMsg.withdrawRule')}>
+                    <InfoCircleOutlinedContainer
+                      onClick={() => setRuleVisible(true)}
+                    />
+                  </TooltipAnt>
                 </ButtonAndIcon>
               </BlockMsgContainer>
             </Loading>

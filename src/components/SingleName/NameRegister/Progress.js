@@ -2,7 +2,7 @@ import React from 'react'
 import styled from '@emotion/styled/macro'
 
 import { hasReachedState } from './registerReducer'
-
+import mq from 'mediaQuery'
 import Tooltip from '../../Tooltip/Tooltip'
 import { ReactComponent as DefaultQuestionMark } from 'components/Icons/QuestionMarkSmall.svg'
 import { ReactComponent as DefaultCheckCircle } from 'components/Icons/CheckCircle.svg'
@@ -37,7 +37,14 @@ const ProgressBar = styled('div')`
 
 const Steps = styled('div')`
   display: flex;
-  margin-bottom: 20px;
+  flex-direction: column;
+  gap: 20px;
+  ${mq.large`
+    display: flex;
+    flex-direction:row;
+    gap:0;
+    margin-bottom: 20px;
+  `}
 `
 
 const StepContainer = styled('section')`
