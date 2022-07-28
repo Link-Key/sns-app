@@ -27,6 +27,8 @@ import { UnknowErrMsgComponent } from 'components/UnknowErrMsg'
 import { useCallback } from 'react'
 import { gql } from '@apollo/client'
 import EthVal from 'ethval'
+import { getAccount, getNetworkId } from 'sns-app-contract-api'
+import { address } from '@myetherwallet/mewconnect-web-client/src/connectProvider/web3Provider/helpers/solidityTypes'
 
 const { Text, Paragraph } = Typography
 
@@ -169,6 +171,8 @@ export default function ChildDomainItem({ name, owner, isMigrated, refetch }) {
   })
   const [inviteCount, setInviteCount] = useState(0)
   const [inviteIncome, setInviteIncome] = useState(0)
+  const [inviteOldTxs, setInviteOldTxs] = useState([])
+  const [polygonUrl, setPolygonUrl] = useState([])
 
   const {
     data: { isENSReady }
@@ -368,6 +372,7 @@ export default function ChildDomainItem({ name, owner, isMigrated, refetch }) {
 
   const handleInvite = async () => {
     if (isInvite) {
+      await getInviteListFn()
       setInviteVisible(true)
       return
     }
@@ -392,10 +397,124 @@ export default function ChildDomainItem({ name, owner, isMigrated, refetch }) {
     setInviteCount(count)
   }
 
+  const getPolygonscanUrl = async () => {
+    setPolygonUrl(`https://polygonscan.com/address/` + (await getAccount()))
+  }
+
   const getInviteIncomeFn = async inviteInstance => {
     const resp = await inviteInstance.getInviterIncome()
     const income = new EthVal(`${resp._hex || 0}`).toEth().toFixed(3)
     setInviteIncome(income)
+  }
+
+  let networkId = null
+  const getInviteListFn = async () => {
+    /**
+     * 1. 判断测试网 or 主网
+     * 2. 根据地址获取交易列表
+     * 3. 筛选符合条件的交易
+     * 4. 交易解析 & 渲染
+     */
+    networkId = await getNetworkId()
+    let address = await getAccount()
+    const API_KEY = 'EXHHZYPQVP3WV96BDG5WZ2EVP6BAHIHSC1'
+    const CONTRACT_ADDRESS =
+      networkId == 80001
+        ? '0xfa12f5ff3c2a137a02f1678e50c54276624b50fb'
+        : '0x5CA9A8405499a1Ee8fbB1849f197b2b7e518985f'
+    console.log('CONTRACT_ADDRESS', CONTRACT_ADDRESS)
+    const testnetBaseUrl = `https://api-testnet.polygonscan.com/api?`
+    const mainnetBaseUrl = `https://api.polygonscan.com/api?`
+    const urlParams = `module=account&action=tokentx&page=1&sort=desc&contractaddress=${CONTRACT_ADDRESS}&address=${address}&offset=20&apikey=${API_KEY}`
+    const mainUrlParams = `module=account&action=tokentx&page=1&sort=desc&contractaddress=${CONTRACT_ADDRESS}&address=${address}&offset=20&apikey=${API_KEY}&startblock=0
+   &endblock=99999999`
+    switch (networkId) {
+      case 80001:
+      case '80001':
+        handleReq(testnetBaseUrl + urlParams, address)
+        break
+      case 137:
+      case '137':
+        handleReq(mainnetBaseUrl + mainUrlParams, address)
+        break
+      default:
+        break
+    }
+  }
+
+  const getDateTime = item => {
+    return new Date(item * 1000).toLocaleString()
+  }
+
+  const handleInviteRewardData = async data => {
+    const networkId = await getNetworkId()
+
+    const arr = []
+
+    for (let i = 0; i < data.length; i++) {
+      console.log('data >>>', data[i])
+      let inviteRewardAmount = new EthVal(`${data[i].value || 0}`)
+        .toEth()
+        .toFixed(3)
+      if (inviteRewardAmount != '0.063' && inviteRewardAmount != '0.945') {
+        continue
+      }
+      data[i].url =
+        networkId == 80001
+          ? 'https://mumbai.polygonscan.com/tx/' + data[i].hash
+          : 'https://polygonscan.com/tx/' + data[i].hash
+      data[i].inviteRewardAmount = inviteRewardAmount + 'KEY'
+      data[i].dateTime = getDateTime(data[i].timeStamp)
+      arr.push(data[i])
+    }
+    setInviteOldTxs(arr)
+  }
+
+  const handleReq = (url, address) => {
+    axios
+      .get(url)
+      .then(resp => {
+        if (resp && resp.data && resp.data.status === '1') {
+          let txData = resp.data.result
+          let inviteTxs = []
+          for (let i = 0; i < txData.length; i++) {
+            if (txData[i].to === address.toLocaleLowerCase()) {
+              inviteTxs.push(txData[i])
+            }
+          }
+          // inviteTxs.reverse()
+          console.log('inviteTxs', inviteTxs)
+          handleInviteRewardData(inviteTxs)
+        } else if (resp && resp.data && resp.data.code === 500) {
+          messageMention({
+            type: 'error',
+            content: `${t('serviceMsg.servErr')}`
+          })
+        } else if (resp && resp.data && resp.data.code === 10001) {
+          messageMention({
+            type: 'warn',
+            content: `${t('serviceMsg.paramsIsNull')}`
+          })
+        } else if (resp && resp.data && resp.data.status === '0') {
+          // clearInterval(timer)
+          messageMention({
+            type: 'warn',
+            content: `${t('serviceMsg.recordIsNull')}`
+          })
+        } else {
+          messageMention({
+            type: 'error',
+            content: `${t('serviceMsg.unkonwErr')}`
+          })
+        }
+      })
+      .catch(e => {
+        console.log(e)
+        messageMention({
+          type: 'error',
+          content: `${t('serviceMsg.unkonwErr')}`
+        })
+      })
   }
 
   useEffect(() => {
@@ -414,35 +533,9 @@ export default function ChildDomainItem({ name, owner, isMigrated, refetch }) {
       handleIsInviter(inviteInstance)
       getInviteCountFn(inviteInstance)
       getInviteIncomeFn(inviteInstance)
+      getPolygonscanUrl()
     }
   }, [isENSReady])
-
-  const data = [
-    {
-      title: 'Title 1'
-    },
-    {
-      title: 'Title 2'
-    },
-    {
-      title: 'Title 3'
-    },
-    {
-      title: 'Title 4'
-    },
-    {
-      title: 'Title 4'
-    },
-    {
-      title: 'Title 4'
-    },
-    {
-      title: 'Title 4'
-    },
-    {
-      title: 'Title 4'
-    }
-  ]
 
   return (
     <ChildDomainItemContainer>
@@ -577,16 +670,31 @@ export default function ChildDomainItem({ name, owner, isMigrated, refetch }) {
         className="NoticeModalBody"
         footer={null}
       >
+        <p className="desc">
+          {t('invite.tip')}{' '}
+          <a onClick={() => window.open(polygonUrl)}>Polygonscan</a>{' '}
+        </p>
         <List
           grid={{ gutter: 16, column: 1 }}
-          dataSource={data}
+          dataSource={inviteOldTxs}
           renderItem={item => (
             <List.Item>
               <Card style={{ borderRadius: '16px' }}>
-                <div>{t('invite.hash')} :</div>
-                <div>{t('invite.date')} :</div>
-                <div>{t('invite.balance')} :</div>
-                <Button danger shape="round" block>
+                <div>
+                  {t('invite.hash')} : {item.hash}{' '}
+                </div>
+                <div>
+                  {t('invite.date')} : {item.dateTime}{' '}
+                </div>
+                <div>
+                  {t('invite.balance')} : {item.inviteRewardAmount}
+                </div>
+                <Button
+                  danger
+                  shape="round"
+                  onClick={() => window.open(item.url)}
+                  block
+                >
                   {t('invite.details')}
                 </Button>
               </Card>
