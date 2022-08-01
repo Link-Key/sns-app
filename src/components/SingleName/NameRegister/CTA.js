@@ -148,8 +148,8 @@ function getCTA({
     let inviteAdd = emptyAddress
     if (inviteName) {
       inviteAdd = await sns.getResolverOwner(inviteName)
-      setCoinsValue({ ...coinsValueObj, invite: inviteAdd })
     }
+    setCoinsValue({ ...coinsValueObj, invite: inviteAdd })
     const keyPrice = await sns.getKeyCoinsPrice(inviteAdd)
     // get IERC20 contract instance object
     const IERC20 = await getSNSIERC20(keyAddress)
