@@ -87,6 +87,9 @@ const ButtonAndIcon = styled('div')`
   justify-content: center;
   align-items: center;
   position: relative;
+  .ant-btn {
+    z-index: 99999;
+  }
 `
 
 const BlockText = styled(H2)`
