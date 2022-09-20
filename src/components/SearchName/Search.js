@@ -156,7 +156,12 @@ function Search({ history, className, style }) {
           }
 
           input.value = ''
+          console.log('split:', searchTerm.split('.'))
           if (type === 'supported' || type === 'short') {
+            if (searchTerm.split('.')[1].length === 3) {
+              history.push(`/activity/${searchTerm}`)
+              return
+            }
             history.push(`/name/${searchTerm}`)
             return
           } else {
@@ -166,7 +171,11 @@ function Search({ history, className, style }) {
             } else {
               suffix = searchTerm
             }
-            history.push(`/name/${suffix}`)
+
+            console.log('suffix3位数:', suffix.length, typeof suffix.length)
+            suffix.length === 7
+              ? history.push(`/activity/${suffix}`)
+              : history.push(`/name/${suffix}`)
           }
         }}
       >

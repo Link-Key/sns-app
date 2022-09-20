@@ -72,6 +72,14 @@
   background-color: #ff787526 !important;
 }
 
+.ant-steps-item-process > .ant-steps-item-container > .ant-steps-item-icon {
+  background-color: #ea6060 !important;
+}
+
+.ant-steps-item-process > .ant-steps-item-container > .ant-steps-item-icon {
+  border-color: #ea6060 !important;
+}
+
 ::-webkit-scrollbar {
   width: 5px;
 

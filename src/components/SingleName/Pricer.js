@@ -32,6 +32,9 @@ const Chain = styled(ChainDefault)`
 const OrangeExclamation = styled(DefaultOrangeExclamation)`
   height: 12px;
   width: 12px;
+  position: relative;
+  top: 1px;
+  margin-right: 2px;
 `
 
 const Prompt = styled('div')`
