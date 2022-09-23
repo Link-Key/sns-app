@@ -57,6 +57,9 @@
 .ant-select-dropdown {
   border-radius: 16px !important;
 }
+.ant-select-selector {
+  border-radius: 50px !important;
+}
 
 .ant-select-item-option:not(.ant-select-item-option-disabled) {
   border-radius: 50px !important;

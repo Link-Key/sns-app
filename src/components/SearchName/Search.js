@@ -9,6 +9,11 @@ import '../../api/subDomainRegistrar'
 import { withRouter } from 'react-router'
 import searchIcon from '../../assets/search.png'
 import mq, { useMediaMin, useMediaMax } from 'mediaQuery'
+import { useCallback } from 'react'
+import getSNS from 'apollo/mutations/sns'
+import { useAccount } from 'components/QueryAccount'
+import { useEffect } from 'react'
+import { emptyAddress } from 'sns-app-contract-api'
 
 const SearchForm = styled('form')`
   display: flex;
@@ -114,6 +119,7 @@ function Search({ history, className, style }) {
   const { t } = useTranslation()
   const [inputValue, setInputValue] = useState(null)
   const [foucsState, setFoucsState] = useState(false)
+
   const {
     data: { isENSReady }
   } = useQuery(SEARCH_QUERY)
@@ -126,7 +132,21 @@ function Search({ history, className, style }) {
         .join('.')
     )
   }
+
+  const account = useAccount()
+
+  console.log('account:', account)
+
+  const addressRegisteredFn = useCallback(async name => {
+    const sns = await getSNS()
+    console.log('name:', name)
+    const info = await sns.recordExists(name)
+    console.log('info:', info)
+    return info
+  }, [])
+
   const hasSearch = inputValue && inputValue.length > 0 && isENSReady
+
   return (
     <>
       <SearchForm
@@ -155,10 +175,18 @@ function Search({ history, className, style }) {
             return
           }
 
+          let isRegister = false
+          if (searchTerm.split('.').length === 2) {
+            isRegister = await addressRegisteredFn(searchTerm)
+          } else {
+            isRegister = await addressRegisteredFn(`${searchTerm}.key`)
+          }
+          console.log('isRegister:', isRegister)
+
           input.value = ''
-          console.log('split:', searchTerm.split('.'))
+          console.log('type:', type)
           if (type === 'supported' || type === 'short') {
-            if (searchTerm.split('.')[1].length === 3) {
+            if (searchTerm.split('.')[0].length === 3 && !isRegister) {
               history.push(`/activity/${searchTerm}`)
               return
             }
@@ -171,9 +199,7 @@ function Search({ history, className, style }) {
             } else {
               suffix = searchTerm
             }
-
-            console.log('suffix3位数:', suffix.length, typeof suffix.length)
-            suffix.length === 7
+            suffix.length === 7 && !isRegister
               ? history.push(`/activity/${suffix}`)
               : history.push(`/name/${suffix}`)
           }

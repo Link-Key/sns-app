@@ -1,14 +1,32 @@
 import styled from '@emotion/styled/macro'
-import { Steps } from 'antd'
+import {
+  Modal,
+  Select,
+  Space,
+  Steps,
+  Typography,
+  Button as AntButton
+} from 'antd'
+import getSNS from 'apollo/mutations/sns'
 import MainContainer from 'components/Basic/MainContainer'
 import TopBar from 'components/Basic/TopBar'
 import Copy from 'components/CopyToClipboard/CopyToClipboard'
 import Button from 'components/Forms/Button'
+import { useAccount } from 'components/QueryAccount'
 import Pricer from 'components/SingleName/Pricer'
-
+import { gql, useQuery } from '@apollo/client'
 import { Title } from 'components/Typography/Basic'
+import { useCallback } from 'react'
+import { useEffect } from 'react'
+import { useState } from 'react'
 import { memo } from 'react'
 import { useTranslation } from 'react-i18next'
+import {
+  BNformatToWei,
+  ethFormatToWei,
+  hexToNumber,
+  weiFormatToEth
+} from 'utils/utils'
 
 const NameWrapper = styled('div')`
   display: flex;
@@ -31,12 +49,40 @@ const StepsWrapper = styled(Steps)`
 const ButtonWrapper = styled('div')`
   padding: 20px 40px;
   text-align: right;
-  /* button:{
+`
 
-  } */
+const ModalTitle = styled(Typography.Title)`
+  font-weight: 700;
+  text-align: center;
+`
+
+const SelectWrapper = styled(Select)`
+  width: 100%;
+  margin: 0 auto;
+`
+
+const ModalContent = styled('div')`
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+
+  width: 80%;
+  margin: 0 auto;
+  gap: 20px;
+  margin-top: 20px;
+  button: {
+    width: 100px !important;
+  }
+`
+
+const SEARCH_QUERY = gql`
+  query searchQuery {
+    isENSReady @client
+  }
 `
 
 const { Step } = Steps
+const { Option } = Select
 
 const Activity = ({
   match: {
@@ -44,9 +90,60 @@ const Activity = ({
   },
   location: { pathname }
 }) => {
+  const {
+    data: { isENSReady }
+  } = useQuery(SEARCH_QUERY)
+
   const { t } = useTranslation()
-  console.log('searchTerm:', searchTerm)
-  console.log('pathname:', pathname)
+  const account = useAccount()
+  const [registerVisible, setRegisterVisible] = useState(false)
+  const [selectCoins, setSelectCoins] = useState(1)
+  const [registerInfo, serRegisterInfo] = useState({
+    keyPrice: 0,
+    maticPrice: 0,
+    keyAddress: '-'
+  })
+
+  const keyRegisterFn = useCallback(async () => {}, [])
+  const maticRegisterFn = useCallback(async () => {
+    const sns = await getSNS()
+    console.log('searchTerm:', searchTerm)
+    console.log('maticPrice:', registerInfo.maticPrice)
+
+    const mintShort = await sns.shortNameMint(
+      searchTerm,
+      1,
+      registerInfo.maticPrice
+    )
+    console.log('mintShort:', mintShort)
+  }, [])
+
+  const handleRegisterFn = useCallback(async () => {
+    console.log('selectCoins:', selectCoins)
+    if (selectCoins === 1) {
+      await maticRegisterFn()
+    }
+  }, [selectCoins])
+
+  const getRegisterPrice = useCallback(async () => {
+    const sns = await getSNS()
+    const coinPrice = await sns.getInfo(account, '', 0)
+    if (coinPrice && coinPrice.priceOfShort) {
+      const maticAmount = BNformatToWei(coinPrice.priceOfShort.maticPrice)
+      const keyAmount = BNformatToWei(coinPrice.priceOfShort.keyPrice)
+      serRegisterInfo({
+        keyPrice: keyAmount,
+        maticPrice: maticAmount,
+        keyAddress: coinPrice.priceOfShort.keyAddress
+      })
+    }
+  }, [])
+
+  useEffect(() => {
+    if (isENSReady) {
+      getRegisterPrice()
+    }
+  }, [isENSReady])
 
   return (
     <MainContainer state="Open">
@@ -79,8 +176,59 @@ const Activity = ({
       </StepsWrapper>
 
       <ButtonWrapper>
-        <Button>{t('register.buttons.request')}</Button>
+        <Button
+          onClick={() => {
+            setRegisterVisible(true)
+          }}
+        >
+          {t('register.buttons.request')}
+        </Button>
       </ButtonWrapper>
+
+      <Modal
+        visible={registerVisible}
+        onCancel={() => {
+          setRegisterVisible(false)
+        }}
+        maskClosable={false}
+        footer={null}
+        style={{
+          top: '20vh'
+        }}
+      >
+        <ModalTitle level={5}>{t('c.selectCoins')}</ModalTitle>
+
+        <ModalContent>
+          <SelectWrapper
+            status="error"
+            defaultValue={selectCoins}
+            size="middle"
+            width="100%"
+            onChange={value => {
+              setSelectCoins(value)
+            }}
+          >
+            <Option value={1}>
+              {weiFormatToEth(registerInfo.maticPrice)} Matic
+            </Option>
+            <Option value={2}>
+              {weiFormatToEth(registerInfo.keyPrice)} Key
+            </Option>
+          </SelectWrapper>
+
+          <AntButton
+            danger
+            shape="round"
+            block
+            type="primary"
+            onClick={async () => {
+              await handleRegisterFn()
+            }}
+          >
+            {t('c.register')}
+          </AntButton>
+        </ModalContent>
+      </Modal>
     </MainContainer>
   )
 }
