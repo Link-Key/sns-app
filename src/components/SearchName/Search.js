@@ -133,15 +133,9 @@ function Search({ history, className, style }) {
     )
   }
 
-  const account = useAccount()
-
-  console.log('account:', account)
-
   const addressRegisteredFn = useCallback(async name => {
     const sns = await getSNS()
-    console.log('name:', name)
     const info = await sns.recordExists(name)
-    console.log('info:', info)
     return info
   }, [])
 

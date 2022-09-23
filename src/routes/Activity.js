@@ -7,7 +7,7 @@ import {
   Typography,
   Button as AntButton
 } from 'antd'
-import getSNS from 'apollo/mutations/sns'
+import getSNS, { getSNSIERC20 } from 'apollo/mutations/sns'
 import MainContainer from 'components/Basic/MainContainer'
 import TopBar from 'components/Basic/TopBar'
 import Copy from 'components/CopyToClipboard/CopyToClipboard'
@@ -27,6 +27,8 @@ import {
   hexToNumber,
   weiFormatToEth
 } from 'utils/utils'
+import { LoadingOutlined } from '@ant-design/icons'
+import messageMention from 'utils/messageMention'
 
 const NameWrapper = styled('div')`
   display: flex;
@@ -103,47 +105,176 @@ const Activity = ({
     maticPrice: 0,
     keyAddress: '-'
   })
+  const [snsInstance, setSNS] = useState({})
+  const [IERC20Instance, setIERC20Instance] = useState({})
+  const [keyAddress, setKeyAddress] = useState('')
+  const [stepCurrent, setCurrentStep] = useState(0)
 
-  const keyRegisterFn = useCallback(async () => {}, [])
-  const maticRegisterFn = useCallback(async () => {
-    const sns = await getSNS()
-    console.log('searchTerm:', searchTerm)
-    console.log('maticPrice:', registerInfo.maticPrice)
+  console.log('selectCoins:', selectCoins)
+  console.log('IERC20Instance:', IERC20Instance)
 
-    const mintShort = await sns.shortNameMint(
-      searchTerm,
-      1,
-      registerInfo.maticPrice
-    )
-    console.log('mintShort:', mintShort)
+  const handleCloseFn = useCallback(() => {
+    setRegisterVisible(false)
+    setSelectCoins(1)
   }, [])
+
+  const queryAllowance = useCallback(async () => {
+    try {
+      const value = await IERC20Instance.allowance(
+        account,
+        snsInstance.registryAddress
+      )
+      return hexToNumber(value)
+    } catch (error) {
+      console.log('queryAllowanceErr:', error)
+    }
+  }, [account, IERC20Instance, snsInstance])
+
+  const approveFn = useCallback(async () => {
+    const value = await queryAllowance()
+    console.log('queryAllowance:', value)
+    try {
+      if (value >= weiFormatToEth(registerInfo.keyPrice)) {
+        console.log('approve')
+        return 'approve'
+      } else {
+        const resp = await IERC20Instance.approve(
+          snsInstance.registryAddress,
+          registerInfo.keyPrice
+        )
+        console.log('approveResp:', resp)
+        return 'unApprove'
+      }
+    } catch (error) {
+      console.log('callApproveErr:', error)
+      return false
+    }
+  }, [queryAllowance, registerInfo.keyPrice, snsInstance, IERC20Instance])
+
+  const handleKeyRegisterFn = useCallback(async () => {
+    clearInterval(window.shortNameKeyTimer)
+    setCurrentStep(3)
+    try {
+      const mintShort = await snsInstance.shortNameMint(
+        searchTerm,
+        2,
+        registerInfo.keyPrice
+      )
+      setCurrentStep(3)
+      console.log('mintShort:', mintShort)
+    } catch (error) {
+      console.log('handleKeyRegisterFnErr:', error)
+      messageMention({ type: 'error', content: 'mint error' })
+      setCurrentStep(0)
+    }
+  }, [snsInstance, registerInfo.keyPrice])
+
+  const keyRegisterFn = useCallback(async () => {
+    const isApprove = await approveFn()
+    if (isApprove === 'unApprove') {
+      setCurrentStep(2)
+      setTimeout(() => {
+        window.shortNameKeyTimer = setInterval(async () => {
+          const allowancePrice = await queryAllowance()
+          console.log('allowancePrice:', allowancePrice)
+          if (allowancePrice > 0) {
+            await handleKeyRegisterFn()
+          }
+        }, 2000)
+      }, 0)
+    }
+
+    if (isApprove === 'approve') {
+      setCurrentStep(2)
+      await handleKeyRegisterFn()
+    }
+  }, [approveFn, handleKeyRegisterFn, queryAllowance])
+
+  const maticRegisterFn = useCallback(async () => {
+    setCurrentStep(3)
+    console.log('searchTerm:', typeof searchTerm)
+    console.log('maticPrice:', registerInfo.maticPrice)
+    try {
+      const mintShort = await snsInstance.shortNameMint(
+        searchTerm,
+        1,
+        registerInfo.maticPrice
+      )
+      setCurrentStep(3)
+      console.log('mintShort:', mintShort)
+    } catch (error) {
+      console.log('maticRegisterFnErr:', error)
+      messageMention({ type: 'error', content: 'mint error' })
+      setCurrentStep(0)
+    }
+  }, [registerInfo.maticPrice, searchTerm, snsInstance])
 
   const handleRegisterFn = useCallback(async () => {
     console.log('selectCoins:', selectCoins)
     if (selectCoins === 1) {
       await maticRegisterFn()
     }
-  }, [selectCoins])
+    if (selectCoins === 2) {
+      console.log('key register')
+      await keyRegisterFn()
+    }
+    handleCloseFn()
+  }, [selectCoins, maticRegisterFn, keyRegisterFn, handleCloseFn])
 
-  const getRegisterPrice = useCallback(async () => {
-    const sns = await getSNS()
+  const getRegisterPrice = useCallback(async sns => {
     const coinPrice = await sns.getInfo(account, '', 0)
     if (coinPrice && coinPrice.priceOfShort) {
       const maticAmount = BNformatToWei(coinPrice.priceOfShort.maticPrice)
       const keyAmount = BNformatToWei(coinPrice.priceOfShort.keyPrice)
-      serRegisterInfo({
+      const info = {
         keyPrice: keyAmount,
         maticPrice: maticAmount,
         keyAddress: coinPrice.priceOfShort.keyAddress
+      }
+      serRegisterInfo({
+        ...info
       })
+      return info
+    }
+    return {}
+  }, [])
+
+  const getSNSInstance = useCallback(async () => {
+    try {
+      const sns = await getSNS()
+      setSNS(sns)
+      return sns
+    } catch (error) {
+      console.log('getSNSInstanceErr:', error)
+      return {}
+    }
+  }, [])
+
+  const getIERC20Instance = useCallback(async address => {
+    try {
+      const IERC20 = await getSNSIERC20(address)
+      setIERC20Instance(IERC20)
+    } catch (error) {
+      console.log('getIERC20InstanceErr:', error)
     }
   }, [])
 
   useEffect(() => {
     if (isENSReady) {
-      getRegisterPrice()
+      getSNSInstance().then(sns => {
+        console.log('registryAddress:', sns.registryAddress)
+        if (sns && sns.registryAddress) {
+          getRegisterPrice(sns).then(info => {
+            if (info && info.keyAddress) {
+              console.log('infoKeyAddress:', info.keyAddress)
+              setKeyAddress(info.keyAddress)
+              getIERC20Instance(info.keyAddress)
+            }
+          })
+        }
+      })
     }
-  }, [isENSReady])
+  }, [isENSReady, getSNSInstance, getRegisterPrice, getIERC20Instance])
 
   return (
     <MainContainer state="Open">
@@ -158,7 +289,7 @@ const Activity = ({
         <Pricer />
       </RegisterContent>
 
-      <StepsWrapper>
+      <StepsWrapper current={stepCurrent}>
         <Step
           title={t('register.buttons.request')}
           description={
@@ -167,6 +298,7 @@ const Activity = ({
         />
         <Step
           title={t('register.step2.title')}
+          icon={stepCurrent === 2 ? <LoadingOutlined /> : ''}
           description={t('register.step2.text')}
         />
         <Step
@@ -188,7 +320,7 @@ const Activity = ({
       <Modal
         visible={registerVisible}
         onCancel={() => {
-          setRegisterVisible(false)
+          handleCloseFn()
         }}
         maskClosable={false}
         footer={null}
@@ -201,7 +333,7 @@ const Activity = ({
         <ModalContent>
           <SelectWrapper
             status="error"
-            defaultValue={selectCoins}
+            value={selectCoins}
             size="middle"
             width="100%"
             onChange={value => {
