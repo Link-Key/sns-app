@@ -20187,10 +20187,10 @@ snapdragon@^0.8.1:
     source-map-resolve "^0.5.0"
     use "^3.1.0"
 
-sns-app-contract-api@^1.1.22:
-  version "1.1.22"
-  resolved "https://registry.yarnpkg.com/sns-app-contract-api/-/sns-app-contract-api-1.1.22.tgz#a6ad5ef22c1a66a4ce807f8b9b5154ef390e2aa4"
-  integrity sha512-XP0rX/R3o1j526Y81g1AcsA5uFYC2jvGe4jPlb/bD6mgbYYuKc4+fGiDX+92AU8TrneH02WO006kYsCmUaqz9Q==
+sns-app-contract-api@^1.1.23:
+  version "1.1.23"
+  resolved "https://registry.yarnpkg.com/sns-app-contract-api/-/sns-app-contract-api-1.1.23.tgz#dcd8734e370691d22b61a7ebd400218b7e7398dd"
+  integrity sha512-/HpbUoNnE+FO17z5N3R0NseyGx1bXj3Na+DHt6VbTNvuor7SKEbkwzvI9N7hGsOZDMiLbaZaBlMw6OAg4GEx1A==
   dependencies:
     "@0xproject/utils" "^2.0.2"
     "@babel/plugin-proposal-class-properties" "^7.8.3"

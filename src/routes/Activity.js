@@ -154,6 +154,8 @@ const Activity = ({
   const handleKeyRegisterFn = useCallback(async () => {
     clearInterval(window.shortNameKeyTimer)
     setCurrentStep(3)
+    console.log('searchTerm:', searchTerm)
+    console.log('keyPrice:', registerInfo.keyPrice)
     try {
       const mintShort = await snsInstance.shortNameMint(
         searchTerm,
