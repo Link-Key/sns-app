@@ -29,6 +29,7 @@ import {
 } from 'utils/utils'
 import { LoadingOutlined } from '@ant-design/icons'
 import messageMention from 'utils/messageMention'
+import { useHistory } from 'react-router'
 
 const NameWrapper = styled('div')`
   display: flex;
@@ -109,6 +110,8 @@ const Activity = ({
   const [IERC20Instance, setIERC20Instance] = useState({})
   const [keyAddress, setKeyAddress] = useState('')
   const [stepCurrent, setCurrentStep] = useState(0)
+
+  const history = useHistory()
 
   console.log('selectCoins:', selectCoins)
   console.log('IERC20Instance:', IERC20Instance)
@@ -310,13 +313,23 @@ const Activity = ({
       </StepsWrapper>
 
       <ButtonWrapper>
-        <Button
-          onClick={() => {
-            setRegisterVisible(true)
-          }}
-        >
-          {t('register.buttons.request')}
-        </Button>
+        {stepCurrent === 3 ? (
+          <Button
+            onClick={() => {
+              history.push(`/address/${account}`)
+            }}
+          >
+            {t('register.buttons.setreverserecord')}
+          </Button>
+        ) : (
+          <Button
+            onClick={() => {
+              setRegisterVisible(true)
+            }}
+          >
+            {t('register.buttons.request')}
+          </Button>
+        )}
       </ButtonWrapper>
 
       <Modal
