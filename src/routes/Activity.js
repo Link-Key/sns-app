@@ -108,13 +108,9 @@ const Activity = ({
   })
   const [snsInstance, setSNS] = useState({})
   const [IERC20Instance, setIERC20Instance] = useState({})
-  const [keyAddress, setKeyAddress] = useState('')
   const [stepCurrent, setCurrentStep] = useState(0)
 
   const history = useHistory()
-
-  console.log('selectCoins:', selectCoins)
-  console.log('IERC20Instance:', IERC20Instance)
 
   const handleCloseFn = useCallback(() => {
     setRegisterVisible(false)
@@ -156,17 +152,23 @@ const Activity = ({
 
   const handleKeyRegisterFn = useCallback(async () => {
     clearInterval(window.shortNameKeyTimer)
-    setCurrentStep(3)
-    console.log('searchTerm:', searchTerm)
-    console.log('keyPrice:', registerInfo.keyPrice)
     try {
-      const mintShort = await snsInstance.shortNameMint(
-        searchTerm,
-        2,
-        registerInfo.keyPrice
-      )
-      setCurrentStep(3)
-      console.log('mintShort:', mintShort)
+      snsInstance
+        .shortNameMint(searchTerm, 2, registerInfo.keyPrice)
+        .then(() => {
+          window.registerComTimer = setTimeout(() => {
+            setInterval(async () => {
+              const isSuccessRegister = await snsInstance.recordExists(
+                searchTerm
+              )
+              console.log('isSuccessRegister:', isSuccessRegister)
+              if (isSuccessRegister) {
+                clearInterval(window.registerComTimer)
+                setCurrentStep(3)
+              }
+            }, 2000)
+          }, 0)
+        })
     } catch (error) {
       console.log('handleKeyRegisterFnErr:', error)
       messageMention({ type: 'error', content: 'mint error' })
@@ -196,17 +198,25 @@ const Activity = ({
   }, [approveFn, handleKeyRegisterFn, queryAllowance])
 
   const maticRegisterFn = useCallback(async () => {
-    setCurrentStep(3)
-    console.log('searchTerm:', typeof searchTerm)
+    setCurrentStep(2)
     console.log('maticPrice:', registerInfo.maticPrice)
     try {
-      const mintShort = await snsInstance.shortNameMint(
-        searchTerm,
-        1,
-        registerInfo.maticPrice
-      )
-      setCurrentStep(3)
-      console.log('mintShort:', mintShort)
+      snsInstance
+        .shortNameMint(searchTerm, 1, registerInfo.maticPrice)
+        .then(() => {
+          window.registerComTimer = setTimeout(() => {
+            setInterval(async () => {
+              const isSuccessRegister = await snsInstance.recordExists(
+                searchTerm
+              )
+              console.log('isSuccessRegister:', isSuccessRegister)
+              if (isSuccessRegister) {
+                clearInterval(window.registerComTimer)
+                setCurrentStep(3)
+              }
+            }, 2000)
+          }, 0)
+        })
     } catch (error) {
       console.log('maticRegisterFnErr:', error)
       messageMention({ type: 'error', content: 'mint error' })
@@ -227,7 +237,7 @@ const Activity = ({
   }, [selectCoins, maticRegisterFn, keyRegisterFn, handleCloseFn])
 
   const getRegisterPrice = useCallback(async sns => {
-    const coinPrice = await sns.getInfo(account, '', 0)
+    const coinPrice = await sns.getInfo(sns.registryAddress, '', 0)
     if (coinPrice && coinPrice.priceOfShort) {
       const maticAmount = BNformatToWei(coinPrice.priceOfShort.maticPrice)
       const keyAmount = BNformatToWei(coinPrice.priceOfShort.keyPrice)
@@ -271,8 +281,6 @@ const Activity = ({
         if (sns && sns.registryAddress) {
           getRegisterPrice(sns).then(info => {
             if (info && info.keyAddress) {
-              console.log('infoKeyAddress:', info.keyAddress)
-              setKeyAddress(info.keyAddress)
               getIERC20Instance(info.keyAddress)
             }
           })
@@ -280,6 +288,9 @@ const Activity = ({
       })
     }
   }, [isENSReady, getSNSInstance, getRegisterPrice, getIERC20Instance])
+
+  console.log('stepCurrent:', stepCurrent)
+  console.log('stepCurrent bool:', stepCurrent === 0 || stepCurrent === 3)
 
   return (
     <MainContainer state="Open">
@@ -321,6 +332,8 @@ const Activity = ({
           >
             {t('register.buttons.setreverserecord')}
           </Button>
+        ) : stepCurrent === 2 || stepCurrent === 1 ? (
+          <Typography>{t('pendingTx.text')}</Typography>
         ) : (
           <Button
             onClick={() => {

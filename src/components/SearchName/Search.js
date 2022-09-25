@@ -177,6 +177,7 @@ function Search({ history, className, style }) {
           }
           console.log('isRegister:', isRegister)
 
+          console.log('search input:', input)
           input.value = ''
           console.log('type:', type)
           if (type === 'supported' || type === 'short') {
