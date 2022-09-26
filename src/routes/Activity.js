@@ -13,7 +13,7 @@ import TopBar from 'components/Basic/TopBar'
 import Copy from 'components/CopyToClipboard/CopyToClipboard'
 import Button from 'components/Forms/Button'
 import { useAccount } from 'components/QueryAccount'
-import Pricer from 'components/SingleName/Pricer'
+import RegisterHint from 'components/SingleName/RegisterHint'
 import { gql, useQuery } from '@apollo/client'
 import { Title } from 'components/Typography/Basic'
 import { useCallback } from 'react'
@@ -302,7 +302,7 @@ const Activity = ({
       </TopBar>
 
       <RegisterContent>
-        <Pricer />
+        <RegisterHint />
       </RegisterContent>
 
       <StepsWrapper current={stepCurrent}>
