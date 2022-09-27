@@ -108,7 +108,7 @@ const Activity = ({
   })
   const [snsInstance, setSNS] = useState({})
   const [IERC20Instance, setIERC20Instance] = useState({})
-  const [stepCurrent, setCurrentStep] = useState(0)
+  const [stepCurrent, setCurrentStep] = useState(3)
 
   const history = useHistory()
 
@@ -325,13 +325,23 @@ const Activity = ({
 
       <ButtonWrapper>
         {stepCurrent === 3 ? (
-          <Button
-            onClick={() => {
-              history.push(`/address/${account}`)
-            }}
-          >
-            {t('register.buttons.setreverserecord')}
-          </Button>
+          <Space>
+            <Button
+              type="hollow-primary"
+              onClick={() => {
+                window.open('https://app.linkkey.io/')
+              }}
+            >
+              Launch APP
+            </Button>
+            <Button
+              onClick={() => {
+                history.push(`/address/${account}`)
+              }}
+            >
+              {t('register.buttons.setreverserecord')}
+            </Button>
+          </Space>
         ) : stepCurrent === 2 || stepCurrent === 1 ? (
           <Typography>{t('pendingTx.text')}</Typography>
         ) : (

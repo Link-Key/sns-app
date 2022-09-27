@@ -3,6 +3,7 @@
     "etherscanButton": "View on Polygonscan",
     "openseaButton": "View on Opensea",
     "raribleButton": "View on Raible",
+    "linkkeyButton":"View on Linkkey-APP",
     "filter": {
       "controller": "Controller",
       "registrant": "Registrant"

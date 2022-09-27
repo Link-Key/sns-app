@@ -3,14 +3,12 @@ import { Link } from 'react-router-dom'
 import styled from '@emotion/styled'
 import { useQuery } from '@apollo/client'
 import { useLocation } from 'react-router-dom'
-import { useTranslation, Trans } from 'react-i18next'
+import { useTranslation } from 'react-i18next'
 import moment from 'moment'
 import { useAccount } from '../QueryAccount'
 
 import {
   GET_FAVOURITES,
-  GET_DOMAINS_SUBGRAPH,
-  GET_REGISTRATIONS_SUBGRAPH,
   GET_SNS_NAME,
   GET_SINGLE_NAME
 } from '../../graphql/queries'
@@ -31,29 +29,15 @@ import {
 } from '../../utils/utils'
 import { calculateIsExpiredSoon } from '../../utils/dates'
 import DomainList from './DomainList'
-import RenewAll from './RenewAll'
-import Sorting from './Sorting'
-import Filtering from './Filtering'
-import Loader from '../Loader'
-import Banner from '../Banner'
-import Checkbox from '../Forms/Checkbox'
 import { SingleNameBlockies } from '../Blockies'
-import Pager from './Pager'
-import AddReverseRecord from '../AddReverseRecord'
-
-import warning from '../../assets/yellowwarning.svg'
-import close from '../../assets/close.svg'
 import { useBlock } from '../hooks'
 import { gql } from '@apollo/client'
-import {
-  NonMainPageBannerContainerWithMarginBottom,
-  DAOBannerContent
-} from '../Banner/DAOBanner'
 import getSNS from 'apollo/mutations/sns'
 import * as PropTypes from 'prop-types'
 import PolygonscanIcon from 'components/Icons/PolygonscanIcon'
 import { Tooltip } from 'antd'
 import RaribleIcon from 'components/Icons/RaribleIcon'
+import LinkkeyAppIcon from 'components/Icons/LinkkeyAPP'
 import OpenseaIcon from 'components/Icons/OpenseaIcon'
 import TooltipAnt from 'utils/tooltipAnt'
 
@@ -106,7 +90,7 @@ const TooltipTitleWrapper = styled('div')`
 `
 
 const OpenseaLink = styled(DefaultOpenseaLink)`
-  margin-left: 10px;
+  /* margin-left: 10px; */
   svg {
     opacity: 1;
     transition: 0.1s;
@@ -418,6 +402,21 @@ export default function Address({
                   <RaribleLink tokenId={tokenIdState}>
                     <RaribleIcon />
                   </RaribleLink>
+                ) : (
+                  ''
+                )}
+              </LinkList>
+            </TooltipAnt>
+            <TooltipAnt title={t('address.linkkeyButton')}>
+              <LinkList>
+                {tokenIdState ? (
+                  <a
+                    href="https://app.linkkey.io/"
+                    target="_blank"
+                    style={{ marginLeft: '10px' }}
+                  >
+                    <LinkkeyAppIcon />
+                  </a>
                 ) : (
                   ''
                 )}

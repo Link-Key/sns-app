@@ -182,7 +182,7 @@ function Search({ history, className, style }) {
           console.log('type:', type)
           if (type === 'supported' || type === 'short') {
             if (searchTerm.split('.')[0].length === 3 && !isRegister) {
-              history.push(`/activity/${searchTerm}`)
+              history.push(`/ShortName/${searchTerm}`)
               return
             }
             history.push(`/name/${searchTerm}`)
@@ -195,7 +195,7 @@ function Search({ history, className, style }) {
               suffix = searchTerm
             }
             suffix.length === 7 && !isRegister
-              ? history.push(`/activity/${suffix}`)
+              ? history.push(`/ShortName/${suffix}`)
               : history.push(`/name/${suffix}`)
           }
         }}
