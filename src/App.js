@@ -36,10 +36,10 @@ const SingleName = lazy(() =>
   )
 )
 
-const Activity = lazy(() =>
+const ShortName = lazy(() =>
   import(
-    /* webpackChunkName: "Activity", webpackPrefetch:true */
-    './routes/Activity'
+    /* webpackChunkName: "ShortName", webpackPrefetch:true */
+    './routes/ShortName'
   )
 )
 
@@ -148,7 +148,7 @@ const App = () => {
         <Route path="/how-it-works" component={SearchResults} />
         <Route path="/search/:searchTerm" component={SearchResults} />
         <Route path="/name/:name" component={SingleName} />
-        <Route path="/activity/:name" component={Activity} />
+        <Route path="/ShortName/:name" component={ShortName} />
         <Route path="/address/:address/:domainType" component={Address} />
         <Route path="/address/:address" component={Address} />
         <Route path="/renew" component={Renew} />
