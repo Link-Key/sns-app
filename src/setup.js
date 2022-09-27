@@ -140,6 +140,8 @@ export const setWeb3Provider = async provider => {
       globalErrorReactive('Unsupported Network')
       return
     }
+    console.log('chainChanged:', _chainId)
+    location.reload()
     networkIdReactive(networkId)
     networkReactive(await getNetwork())
   })
