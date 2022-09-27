@@ -152,28 +152,29 @@ const Activity = ({
 
   const handleKeyRegisterFn = useCallback(async () => {
     clearInterval(window.shortNameKeyTimer)
-    try {
-      snsInstance
-        .shortNameMint(searchTerm, 2, registerInfo.keyPrice)
-        .then(() => {
-          window.registerComTimer = setTimeout(() => {
-            setInterval(async () => {
-              const isSuccessRegister = await snsInstance.recordExists(
-                searchTerm
-              )
-              console.log('isSuccessRegister:', isSuccessRegister)
-              if (isSuccessRegister) {
-                clearInterval(window.registerComTimer)
-                setCurrentStep(3)
-              }
-            }, 2000)
-          }, 0)
-        })
-    } catch (error) {
-      console.log('handleKeyRegisterFnErr:', error)
-      messageMention({ type: 'error', content: 'mint error' })
-      setCurrentStep(0)
-    }
+    snsInstance.shortNameMint(searchTerm, 2, registerInfo.keyPrice).then(
+      () => {
+        window.registerComTimer = setTimeout(() => {
+          setInterval(async () => {
+            const isSuccessRegister = await snsInstance.recordExists(searchTerm)
+            console.log('isSuccessRegister:', isSuccessRegister)
+            if (isSuccessRegister) {
+              clearInterval(window.registerComTimer)
+              setCurrentStep(3)
+            }
+          }, 2000)
+        }, 0)
+      },
+      error => {
+        console.log('handleKeyRegisterFnErr:', error)
+        if (error && error.data && error.data.message) {
+          messageMention({ type: 'error', content: error.data.message })
+        } else {
+          messageMention({ type: 'error', content: 'mint error' })
+        }
+        setCurrentStep(0)
+      }
+    )
   }, [snsInstance, registerInfo.keyPrice])
 
   const keyRegisterFn = useCallback(async () => {
@@ -200,38 +201,43 @@ const Activity = ({
   const maticRegisterFn = useCallback(async () => {
     setCurrentStep(2)
     console.log('maticPrice:', registerInfo.maticPrice)
-    try {
-      snsInstance
-        .shortNameMint(searchTerm, 1, registerInfo.maticPrice)
-        .then(() => {
-          window.registerComTimer = setTimeout(() => {
-            setInterval(async () => {
-              const isSuccessRegister = await snsInstance.recordExists(
-                searchTerm
-              )
-              console.log('isSuccessRegister:', isSuccessRegister)
-              if (isSuccessRegister) {
-                clearInterval(window.registerComTimer)
-                setCurrentStep(3)
-              }
-            }, 2000)
-          }, 0)
-        })
-    } catch (error) {
-      console.log('maticRegisterFnErr:', error)
-      messageMention({ type: 'error', content: 'mint error' })
-      setCurrentStep(0)
-    }
+    snsInstance.shortNameMint(searchTerm, 1, registerInfo.maticPrice).then(
+      () => {
+        window.registerComTimer = setTimeout(() => {
+          setInterval(async () => {
+            const isSuccessRegister = await snsInstance.recordExists(searchTerm)
+            console.log('isSuccessRegister:', isSuccessRegister)
+            if (isSuccessRegister) {
+              clearInterval(window.registerComTimer)
+              setCurrentStep(3)
+            }
+          }, 2000)
+        }, 0)
+      },
+      error => {
+        console.log('maticRegisterFnErr:', error)
+        if (error && error.data && error.data.message) {
+          messageMention({ type: 'error', content: error.data.message })
+        } else {
+          messageMention({ type: 'error', content: 'mint error' })
+        }
+        setCurrentStep(0)
+      }
+    )
   }, [registerInfo.maticPrice, searchTerm, snsInstance])
 
   const handleRegisterFn = useCallback(async () => {
     console.log('selectCoins:', selectCoins)
-    if (selectCoins === 1) {
-      await maticRegisterFn()
-    }
-    if (selectCoins === 2) {
-      console.log('key register')
-      await keyRegisterFn()
+    try {
+      if (selectCoins === 1) {
+        await maticRegisterFn()
+      }
+      if (selectCoins === 2) {
+        console.log('key register')
+        await keyRegisterFn()
+      }
+    } catch (error) {
+      console.log('error')
     }
     handleCloseFn()
   }, [selectCoins, maticRegisterFn, keyRegisterFn, handleCloseFn])
