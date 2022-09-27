@@ -192,6 +192,8 @@
     },
     "favourite": "* ブラウザを閉じた時にアクセスしやすいよう名前をお気に入りに登録する",
     "increaseRegistrationPeriod": "新規登録100件ごとに、登録料は0.\u200B\u200B3Maticまたは0.45KEYずつ増加します。",
+    "registerHint1": "",
+    "registerHint2": "でFollow-NFT/Group-NFTの発行に登録し、Web3のソーシャルサークルへの旅を開始する。",
     "notifications": {
       "ready": "は登録の準備ができています"
     },

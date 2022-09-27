@@ -3,6 +3,7 @@
     "etherscanButton": "View on Polygonscan",
     "openseaButton": "View on Opensea",
     "raribleButton": "View on Raible",
+    "linkkeyButton":"View on Linkkey-APP",
     "filter": {
       "controller": "Controller",
       "registrant": "Registrant"
@@ -196,6 +197,8 @@
     "notOpen": "Not open for 3-digit domains!",
     "favourite": "* Favorite the name for easy access in case you close out of your browser.",
     "increaseRegistrationPeriod": "For every 100 new registrations, the registration fee will increase by 0.3Matic or 0.45KEY.",
+    "registerHint1": "After registration, you can release Follow-NFT/Group-NFT in ",
+    "registerHint2": " to start your Web3 social circle journey!",
     "notifications": {
       "ready": "is ready to be registered"
     },

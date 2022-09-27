@@ -57,6 +57,9 @@
 .ant-select-dropdown {
   border-radius: 16px !important;
 }
+.ant-select-selector {
+  border-radius: 50px !important;
+}
 
 .ant-select-item-option:not(.ant-select-item-option-disabled) {
   border-radius: 50px !important;
@@ -70,6 +73,28 @@
 .ant-select-item-option-active:not(.ant-select-item-option-disabled) {
   border-radius: 50px !important;
   background-color: #ff787526 !important;
+}
+
+.ant-steps-item-process > .ant-steps-item-container > .ant-steps-item-icon {
+  background-color: #ea6060 !important;
+}
+
+.ant-steps-item-process > .ant-steps-item-container > .ant-steps-item-icon {
+  border-color: #ea6060 !important;
+}
+
+.ant-steps-item-finish .ant-steps-item-icon {
+  border-color: #ea6060 !important;
+}
+.ant-steps-item-finish .ant-steps-item-icon > .ant-steps-icon {
+  color: #ea6060 !important;
+}
+
+.ant-steps-item-finish
+  > .ant-steps-item-container
+  > .ant-steps-item-content
+  > .ant-steps-item-title::after {
+  background-color: #ea6060 !important;
 }
 
 ::-webkit-scrollbar {

@@ -62,7 +62,9 @@ function PricerInner({
     <>
       <Prompt>
         <OrangeExclamation />
-        {t('register.increaseRegistrationPeriod')}
+        {t('register.registerHint1')}{' '}
+        <a href="https://app.linkkey.io">Linkkey-app</a>{' '}
+        {t('register.registerHint2')}
       </Prompt>
 
       {/*<PricingContainer className={className} ref={reference}>*/}

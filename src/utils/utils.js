@@ -23,6 +23,7 @@ import { message } from 'antd'
 import { UnknowErrMsgComponent, TransactionBusy } from 'components/UnknowErrMsg'
 import EthVal from 'ethval'
 import messageMention from './messageMention'
+import { formatEther, parseEther, formatUnits } from 'ethers/lib/utils'
 
 // From https://github.com/0xProject/0x-monorepo/blob/development/packages/utils/src/address_utils.ts
 
@@ -467,4 +468,27 @@ export const handleErrorCode = e => {
     duration: 3,
     style: { marginTop: '10vh' }
   })
+}
+
+export const hexToNumber = value => {
+  return parseInt(value._hex, 16)
+}
+
+export const weiFormatToEth = value => {
+  let number = value.toString()
+  if (value && value._hex) {
+    number = hexToNumber(value).toString()
+  }
+  return Number(formatEther(number))
+}
+
+export const ethFormatToWei = value => {
+  if (typeof value === 'string') {
+    return parseEther(value)
+  }
+  return parseEther(value.toString())
+}
+
+export const BNformatToWei = value => {
+  return formatUnits(value, 'wei')
 }

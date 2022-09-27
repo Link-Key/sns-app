@@ -173,6 +173,8 @@ function Name({ details: domain, name, pathname, type, refetch }) {
 
   const key = useRefreshComponent()
 
+  console.log('containerState:', containerState)
+
   return (
     <NameContainer state={containerState} key={key}>
       <TopBar percentDone={percentDone}>

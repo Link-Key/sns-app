@@ -88,7 +88,7 @@ const ButtonAndIcon = styled('div')`
   align-items: center;
   position: relative;
   .ant-btn {
-    z-index: 99999;
+    z-index: 999;
   }
 `
 
