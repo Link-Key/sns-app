@@ -108,7 +108,7 @@ const Activity = ({
   })
   const [snsInstance, setSNS] = useState({})
   const [IERC20Instance, setIERC20Instance] = useState({})
-  const [stepCurrent, setCurrentStep] = useState(3)
+  const [stepCurrent, setCurrentStep] = useState(0)
 
   const history = useHistory()
 
