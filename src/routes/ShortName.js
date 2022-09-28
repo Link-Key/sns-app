@@ -23,6 +23,7 @@ import { memo } from 'react'
 import { useTranslation } from 'react-i18next'
 import {
   BNformatToWei,
+  emptyAddress,
   ethFormatToWei,
   hexToNumber,
   weiFormatToEth
@@ -242,23 +243,30 @@ const Activity = ({
     handleCloseFn()
   }, [selectCoins, maticRegisterFn, keyRegisterFn, handleCloseFn])
 
-  const getRegisterPrice = useCallback(async sns => {
-    const coinPrice = await sns.getInfo(sns.registryAddress, '', 0)
-    if (coinPrice && coinPrice.priceOfShort) {
-      const maticAmount = BNformatToWei(coinPrice.priceOfShort.maticPrice)
-      const keyAmount = BNformatToWei(coinPrice.priceOfShort.keyPrice)
-      const info = {
-        keyPrice: keyAmount,
-        maticPrice: maticAmount,
-        keyAddress: coinPrice.priceOfShort.keyAddress
+  const getRegisterPrice = useCallback(
+    async sns => {
+      console.log('account:?', account)
+      const coinPrice = await sns.getInfo(account, '', 0)
+      console.log('coinPrice:', coinPrice)
+      if (coinPrice && coinPrice.priceOfShort) {
+        const maticAmount = BNformatToWei(coinPrice.priceOfShort.maticPrice)
+        const keyAmount = BNformatToWei(coinPrice.priceOfShort.keyPrice)
+        console.log('maticAmount:', weiFormatToEth(maticAmount))
+        console.log('keyAmount:', weiFormatToEth(keyAmount))
+        const info = {
+          keyPrice: keyAmount,
+          maticPrice: maticAmount,
+          keyAddress: coinPrice.priceOfShort.keyAddress
+        }
+        serRegisterInfo({
+          ...info
+        })
+        return info
       }
-      serRegisterInfo({
-        ...info
-      })
-      return info
-    }
-    return {}
-  }, [])
+      return {}
+    },
+    [account]
+  )
 
   const getSNSInstance = useCallback(async () => {
     try {
@@ -284,7 +292,7 @@ const Activity = ({
     if (isENSReady) {
       getSNSInstance().then(sns => {
         console.log('registryAddress:', sns.registryAddress)
-        if (sns && sns.registryAddress) {
+        if (sns && sns.registryAddress && account !== emptyAddress) {
           getRegisterPrice(sns).then(info => {
             if (info && info.keyAddress) {
               getIERC20Instance(info.keyAddress)
@@ -293,10 +301,7 @@ const Activity = ({
         }
       })
     }
-  }, [isENSReady, getSNSInstance, getRegisterPrice, getIERC20Instance])
-
-  console.log('stepCurrent:', stepCurrent)
-  console.log('stepCurrent bool:', stepCurrent === 0 || stepCurrent === 3)
+  }, [isENSReady, getSNSInstance, getRegisterPrice, getIERC20Instance, account])
 
   return (
     <MainContainer state="Open">

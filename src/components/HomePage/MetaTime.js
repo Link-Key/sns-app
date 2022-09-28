@@ -33,7 +33,7 @@ class MetaTime extends Component {
   }
   render() {
     // TODO Add metadverse time lable
-    return <p className="App-clock">{this.state.time}</p>
+    return <span className="App-clock">{this.state.time}</span>
   }
 }
 

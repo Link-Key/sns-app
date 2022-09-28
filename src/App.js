@@ -3,7 +3,8 @@ import {
   HashRouter,
   BrowserRouter,
   Route as DefaultRoute,
-  Switch
+  Switch,
+  Redirect
 } from 'react-router-dom'
 import { useQuery } from '@apollo/client'
 import 'antd/dist/antd.css'
@@ -78,6 +79,13 @@ const Shared = lazy(() =>
   )
 )
 
+const Upgrade = lazy(() =>
+  import(
+    /* webpackChunkName: "ShortName", webpackPrefetch:true */
+    './routes/Upgrade'
+  )
+)
+
 // import TestRegistrar from './routes/TestRegistrar'
 // import Home from './routes/Home'
 // import SearchResults from './routes/SearchResults'
@@ -123,6 +131,8 @@ export const APP_DATA = gql`
   }
 `
 
+const upgradeMode = false
+
 const App = () => {
   useReactiveVarListeners()
   const {
@@ -139,22 +149,28 @@ const App = () => {
 
   return (
     <Router>
-      <Switch>
-        <Route exact path="/" component={Home} layout={HomePageLayout} />
-        <Route path="/test-registrar" component={TestRegistrar} />
-        <Route path="/favourites" component={Favourites} />
-        <Route path="/faq" component={Faq} />
-        <Route path="/my-bids" component={SearchResults} />
-        <Route path="/how-it-works" component={SearchResults} />
-        <Route path="/search/:searchTerm" component={SearchResults} />
-        <Route path="/name/:name" component={SingleName} />
-        <Route path="/ShortName/:name" component={ShortName} />
-        <Route path="/address/:address/:domainType" component={Address} />
-        <Route path="/address/:address" component={Address} />
-        <Route path="/renew" component={Renew} />
-        <Route path="/shared" component={Shared} />
-        <Route path="*" component={Error404} />
-      </Switch>
+      {upgradeMode ? (
+        <Switch>
+          <Route path="*" component={Upgrade} />
+        </Switch>
+      ) : (
+        <Switch>
+          <Route exact path="/" component={Home} layout={HomePageLayout} />
+          <Route path="/test-registrar" component={TestRegistrar} />
+          <Route path="/favourites" component={Favourites} />
+          <Route path="/faq" component={Faq} />
+          <Route path="/my-bids" component={SearchResults} />
+          <Route path="/how-it-works" component={SearchResults} />
+          <Route path="/search/:searchTerm" component={SearchResults} />
+          <Route path="/name/:name" component={SingleName} />
+          <Route path="/ShortName/:name" component={ShortName} />
+          <Route path="/address/:address/:domainType" component={Address} />
+          <Route path="/address/:address" component={Address} />
+          <Route path="/renew" component={Renew} />
+          <Route path="/shared" component={Shared} />
+          <Route path="*" component={Error404} />
+        </Switch>
+      )}
     </Router>
   )
 }
