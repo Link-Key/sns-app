@@ -1,5 +1,6 @@
 import styled from '@emotion/styled'
 import { Button, Card, Space, Typography } from 'antd'
+import { upgradeTIme } from 'App'
 import MetaTime from 'components/HomePage/MetaTime'
 import OuterLink from 'components/OuterLink'
 import { memo } from 'react'
@@ -17,11 +18,10 @@ const Upgrade = () => {
   return (
     <div style={{ textAlign: 'center', width: '100%' }}>
       <CardWrapper>
-        <Title>Upgrade Announcement</Title>
-        <Typography>
+        <Title style={{ color: '#fff' }}>Upgrade Announcement</Title>
+        <Typography style={{ color: '#fff' }}>
           The program is being upgraded, and the upgrade is expected to be
-          completed at [<MetaTime style={{ display: 'inline-block' }} />
-          ], please be patient.
+          completed at {upgradeTIme()}, please be patient.
         </Typography>
 
         <Space align="center">
