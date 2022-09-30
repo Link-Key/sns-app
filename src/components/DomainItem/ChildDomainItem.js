@@ -653,6 +653,13 @@ export default function ChildDomainItem({ name, owner, isMigrated, refetch }) {
                 <BlockText>
                   {t('invite.count')}:{inviteCount}
                 </BlockText>
+                {isInvite ? (
+                  <h4 />
+                ) : (
+                  <h4 style={{ color: '#ddd' }}>
+                    * {t('blockMsg.becomeInviteeNote')}
+                  </h4>
+                )}
               </div>
               <ButtonWrapper
                 danger
