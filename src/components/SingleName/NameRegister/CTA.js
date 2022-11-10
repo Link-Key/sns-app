@@ -438,7 +438,7 @@ function getCTA({
                         ),
                         content: (
                           <SelectRegisterForm
-                            initialValues={{ coins: 'key', inviteName: '' }}
+                            initialValues={{ coins: 'matic', inviteName: '' }}
                             form={coinForm}
                           >
                             <Form.Item name="coins">
@@ -448,12 +448,12 @@ function getCTA({
                                 size="middle"
                                 onChange={changeCoins}
                               >
-                                <Option value="key">{keyPrice} Key</Option>
+                                {/* <Option value="key">{keyPrice} Key</Option> */}
                                 <Option value="matic">
                                   {maticPrice} Matic
                                 </Option>
                                 <Option value="usdc">{usdcPrice} USDC</Option>
-                                <Option value="lowb">{lowbPrice} Lowb</Option>
+                                {/* <Option value="lowb">{lowbPrice} Lowb</Option> */}
                               </Select>
                             </Form.Item>
                             <Form.Item
