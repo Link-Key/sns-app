@@ -133,6 +133,11 @@ export const APP_DATA = gql`
 
 const upgradeMode = false
 
+export const upgradeTIme = () => {
+  const date = new Date('2022-09-28 12:00:00').toUTCString()
+  return date
+}
+
 const App = () => {
   useReactiveVarListeners()
   const {

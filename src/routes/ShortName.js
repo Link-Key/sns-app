@@ -392,9 +392,9 @@ const Activity = ({
             <Option value={1}>
               {weiFormatToEth(registerInfo.maticPrice)} Matic
             </Option>
-            <Option value={2}>
+            {/* <Option value={2}>
               {weiFormatToEth(registerInfo.keyPrice)} Key
-            </Option>
+            </Option> */}
           </SelectWrapper>
 
           <AntButton
