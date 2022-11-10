@@ -474,7 +474,7 @@ function getCTA({
                                 )
                               }
                             </Form.Item>
-                            <p>{t('invite.note')}</p>
+                            {/* <p>{t('invite.note')}</p> */}
                             <Form.Item>
                               <Button
                                 danger
