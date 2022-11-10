@@ -444,7 +444,7 @@ function getCTA({
                             <Form.Item name="coins">
                               <Select
                                 status="error"
-                                defaultValue="key"
+                                defaultValue="matic"
                                 size="middle"
                                 onChange={changeCoins}
                               >
@@ -684,7 +684,7 @@ const CTA = ({
   const [coinsValueObj, setCoinsValue] = useState({
     label,
     ownerAddress: account,
-    coinsType: 'key'
+    coinsType: 'matic'
   })
 
   useEffect(() => {
