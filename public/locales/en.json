@@ -256,7 +256,10 @@
   },
   "search": {
     "button": "Search",
-    "placeholder": "Search names or addresses"
+    "placeholder": "Search names or addresses",
+    "noData":"No Data (At least 3 digits )",
+    "registered":"Registered",
+    "unRegistered":"Unregistered"
   },
   "searchErrors": {
     "domainMalformed": {

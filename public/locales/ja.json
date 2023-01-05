@@ -251,7 +251,10 @@
   },
   "search": {
     "button": "検索",
-    "placeholder": "名前またはアドレスで検索"
+    "placeholder": "名前またはアドレスで検索",
+    "noData":"データなし (最低3桁)",
+    "registered":"登録済み",
+    "unRegistered":"未登録"
   },
   "searchErrors": {
     "domainMalformed": {

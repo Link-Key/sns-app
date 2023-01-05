@@ -75,6 +75,10 @@
   background-color: #ff787526 !important;
 }
 
+.ant-select:not(.ant-select-disabled):hover .ant-select-selector {
+  border: none;
+}
+
 .ant-steps-item-process > .ant-steps-item-container > .ant-steps-item-icon {
   background-color: #ea6060 !important;
 }
