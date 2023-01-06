@@ -250,7 +250,10 @@
   },
   "search": {
     "button": "查询",
-    "placeholder": "输入域名或地址"
+    "placeholder": "输入域名或地址",
+    "noData":"无数据 (至少3位字符)",
+    "registered":"已注册",
+    "unRegistered":"未注册"
   },
   "searchErrors": {
     "domainMalformed": {
