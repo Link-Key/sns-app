@@ -438,7 +438,10 @@ function getCTA({
                         ),
                         content: (
                           <SelectRegisterForm
-                            initialValues={{ coins: 'matic', inviteName: '' }}
+                            initialValues={{
+                              coins: 'matic',
+                              inviteName: localStorage.getItem('sns_invite')
+                            }}
                             form={coinForm}
                           >
                             <Form.Item name="coins">
@@ -462,17 +465,13 @@ function getCTA({
                                 prevValues.coins !== currentValues.coins
                               }
                             >
-                              {({ getFieldValue }) =>
-                                getFieldValue('coins') !== 'key' ? null : (
-                                  <Form.Item name="inviteName">
-                                    <Input
-                                      size="middle"
-                                      status="error"
-                                      placeholder={t('invite.inp')}
-                                    />
-                                  </Form.Item>
-                                )
-                              }
+                              <Form.Item name="inviteName">
+                                <Input
+                                  size="middle"
+                                  status="error"
+                                  placeholder={t('invite.inp')}
+                                />
+                              </Form.Item>
                             </Form.Item>
                             {/* <p>{t('invite.note')}</p> */}
                             <Form.Item>

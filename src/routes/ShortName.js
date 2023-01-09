@@ -5,7 +5,8 @@ import {
   Space,
   Steps,
   Typography,
-  Button as AntButton
+  Button as AntButton,
+  Input
 } from 'antd'
 import getSNS, { getSNSIERC20 } from 'apollo/mutations/sns'
 import MainContainer from 'components/Basic/MainContainer'
@@ -110,12 +111,20 @@ const Activity = ({
   const [snsInstance, setSNS] = useState({})
   const [IERC20Instance, setIERC20Instance] = useState({})
   const [stepCurrent, setCurrentStep] = useState(0)
+  const [inviteValue, setInviteValue] = useState(
+    localStorage.getItem('sns_invite')
+  )
 
   const history = useHistory()
+
+  const handleInviteInpChange = e => {
+    setInviteValue(e.target.value)
+  }
 
   const handleCloseFn = useCallback(() => {
     setRegisterVisible(false)
     setSelectCoins(1)
+    setInviteValue('')
   }, [])
 
   const queryAllowance = useCallback(async () => {
@@ -229,19 +238,20 @@ const Activity = ({
 
   const handleRegisterFn = useCallback(async () => {
     console.log('selectCoins:', selectCoins)
-    try {
-      if (selectCoins === 1) {
-        await maticRegisterFn()
-      }
-      if (selectCoins === 2) {
-        console.log('key register')
-        await keyRegisterFn()
-      }
-    } catch (error) {
-      console.log('error')
-    }
+    console.log('inviteValue:', inviteValue)
+    // try {
+    //   if (selectCoins === 1) {
+    //     await maticRegisterFn()
+    //   }
+    //   if (selectCoins === 2) {
+    //     console.log('key register')
+    //     await keyRegisterFn()
+    //   }
+    // } catch (error) {
+    //   console.log('error')
+    // }
     handleCloseFn()
-  }, [selectCoins, maticRegisterFn, keyRegisterFn, handleCloseFn])
+  }, [selectCoins, inviteValue, maticRegisterFn, keyRegisterFn, handleCloseFn])
 
   const getRegisterPrice = useCallback(
     async sns => {
@@ -396,6 +406,13 @@ const Activity = ({
               {weiFormatToEth(registerInfo.keyPrice)} Key
             </Option> */}
           </SelectWrapper>
+          <Input
+            value={inviteValue}
+            size="middle"
+            status="error"
+            placeholder={t('invite.inp')}
+            onChange={handleInviteInpChange}
+          />
 
           <AntButton
             danger
