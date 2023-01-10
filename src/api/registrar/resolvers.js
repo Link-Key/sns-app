@@ -62,16 +62,16 @@ const resolvers = {
       // get sns instance object
       const sns = getSNS()
       if (coinsType === 'key') {
-        const tx = await sns.mintByMoreCoins(label, 1, invite)
+        const tx = await sns.registry(label, 1, invite)
         return sendHelper(tx)
       } else if (coinsType === 'lowb') {
-        const tx = await sns.mintByMoreCoins(label, 2)
+        const tx = await sns.registry(label, 2, invite)
         return sendHelper(tx)
       } else if (coinsType === 'usdc') {
-        const tx = await sns.mintByMoreCoins(label, 3)
+        const tx = await sns.registry(label, 3, invite)
         return sendHelper(tx)
       } else {
-        const tx = await sns.registry(label)
+        const tx = await sns.registry(label, 0, invite)
         return sendHelper(tx)
       }
     },

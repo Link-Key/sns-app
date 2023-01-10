@@ -285,6 +285,11 @@ function getCTA({
   // use usdc coins register operation
   const getApproveOfUsdc = async mutate => {
     const sns = getSNS()
+    let inviteAdd = emptyAddress
+    if (inviteName) {
+      inviteAdd = await sns.getResolverOwner(inviteName)
+    }
+    setCoinsValue({ ...coinsValueObj, invite: inviteAdd })
     const usdcAddress = await sns.getUsdcCoinsAddress()
     const usdcPrice = await sns.getUsdcCoinsPrice()
 
@@ -351,6 +356,17 @@ function getCTA({
     }, 0)
   }
 
+  // use matic coins register operation
+  const useMaticRegister = async mutate => {
+    const sns = getSNS()
+    let inviteAdd = emptyAddress
+    if (inviteName) {
+      inviteAdd = await sns.getResolverOwner(inviteName)
+    }
+    setCoinsValue({ ...coinsValueObj, invite: inviteAdd })
+    mutate()
+  }
+
   const handleSelectCoinsRegister = async mutate => {
     switch (coinForm.getFieldsValue().coins) {
       case 'key':
@@ -361,11 +377,13 @@ function getCTA({
         }
         break
       case 'matic':
-        mutate()
+        await useMaticRegister(mutate)
         break
       case 'usdc':
         try {
-          await getApproveOfUsdc(mutate)
+          console.log('before:', coinsValueObj)
+          await getApproveOfUsdc(mutate, coinForm.getFieldsValue().inviteName)
+          console.log('getApproveOfUsdcCoins:', coinsValueObj)
         } catch (error) {
           console.log('getApproveOfUsdcError:', error)
         }
@@ -397,6 +415,8 @@ function getCTA({
     console.log('coin:', coinsValueObj)
   }, [coinsValueObj])
 
+  console.log('coinForm:', coinForm.getFieldsValue())
+
   switch (step) {
     case 'PRICE_DECISION':
       return (
@@ -405,7 +425,7 @@ function getCTA({
           variables={{
             ownerAddress: account,
             label,
-            coinsType: coinsValueObj.coinsType,
+            coinsType: coinForm.getFieldsValue().coinsType,
             invite: coinsValueObj.invite
           }}
           onCompleted={data => {
@@ -444,7 +464,7 @@ function getCTA({
                             }}
                             form={coinForm}
                           >
-                            <Form.Item name="coins">
+                            <Form.Item name="coinsType">
                               <Select
                                 status="error"
                                 defaultValue="matic"

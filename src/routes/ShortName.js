@@ -187,69 +187,87 @@ const Activity = ({
     )
   }, [snsInstance, registerInfo.keyPrice])
 
-  const keyRegisterFn = useCallback(async () => {
-    const isApprove = await approveFn()
-    if (isApprove === 'unApprove') {
-      setCurrentStep(2)
-      setTimeout(() => {
-        window.shortNameKeyTimer = setInterval(async () => {
-          const allowancePrice = await queryAllowance()
-          console.log('allowancePrice:', allowancePrice)
-          if (allowancePrice > 0) {
-            await handleKeyRegisterFn()
-          }
-        }, 2000)
-      }, 0)
-    }
-
-    if (isApprove === 'approve') {
-      setCurrentStep(2)
-      await handleKeyRegisterFn()
-    }
-  }, [approveFn, handleKeyRegisterFn, queryAllowance])
-
-  const maticRegisterFn = useCallback(async () => {
-    setCurrentStep(2)
-    console.log('maticPrice:', registerInfo.maticPrice)
-    snsInstance.shortNameMint(searchTerm, 1, registerInfo.maticPrice).then(
-      () => {
-        window.registerComTimer = setTimeout(() => {
-          setInterval(async () => {
-            const isSuccessRegister = await snsInstance.recordExists(searchTerm)
-            console.log('isSuccessRegister:', isSuccessRegister)
-            if (isSuccessRegister) {
-              clearInterval(window.registerComTimer)
-              setCurrentStep(3)
+  const keyRegisterFn = useCallback(
+    async inviteName => {
+      let inviteAdd = emptyAddress
+      if (inviteName) {
+        inviteAdd = await snsInstance.getResolverOwner(inviteName)
+      }
+      const isApprove = await approveFn()
+      if (isApprove === 'unApprove') {
+        setCurrentStep(2)
+        setTimeout(() => {
+          window.shortNameKeyTimer = setInterval(async () => {
+            const allowancePrice = await queryAllowance()
+            console.log('allowancePrice:', allowancePrice)
+            if (allowancePrice > 0) {
+              await handleKeyRegisterFn()
             }
           }, 2000)
         }, 0)
-      },
-      error => {
-        console.log('maticRegisterFnErr:', error)
-        if (error && error.data && error.data.message) {
-          messageMention({ type: 'error', content: error.data.message })
-        } else {
-          messageMention({ type: 'error', content: 'mint error' })
-        }
-        setCurrentStep(0)
       }
-    )
-  }, [registerInfo.maticPrice, searchTerm, snsInstance])
+
+      if (isApprove === 'approve') {
+        setCurrentStep(2)
+        await handleKeyRegisterFn()
+      }
+    },
+    [snsInstance, approveFn, handleKeyRegisterFn, queryAllowance]
+  )
+
+  const maticRegisterFn = useCallback(
+    async inviteName => {
+      setCurrentStep(2)
+      console.log('maticPrice:', registerInfo.maticPrice)
+      let inviteAdd = emptyAddress
+      if (inviteName) {
+        inviteAdd = await snsInstance.getResolverOwner(inviteName)
+      }
+      snsInstance
+        .shortNameMint(searchTerm, 1, inviteAdd, registerInfo.maticPrice)
+        .then(
+          () => {
+            window.registerComTimer = setTimeout(() => {
+              setInterval(async () => {
+                const isSuccessRegister = await snsInstance.recordExists(
+                  searchTerm
+                )
+                console.log('isSuccessRegister:', isSuccessRegister)
+                if (isSuccessRegister) {
+                  clearInterval(window.registerComTimer)
+                  setCurrentStep(3)
+                }
+              }, 2000)
+            }, 0)
+          },
+          error => {
+            console.log('maticRegisterFnErr:', error)
+            if (error && error.data && error.data.message) {
+              messageMention({ type: 'error', content: error.data.message })
+            } else {
+              messageMention({ type: 'error', content: 'mint error' })
+            }
+            setCurrentStep(0)
+          }
+        )
+    },
+    [registerInfo.maticPrice, searchTerm, snsInstance]
+  )
 
   const handleRegisterFn = useCallback(async () => {
     console.log('selectCoins:', selectCoins)
     console.log('inviteValue:', inviteValue)
-    // try {
-    //   if (selectCoins === 1) {
-    //     await maticRegisterFn()
-    //   }
-    //   if (selectCoins === 2) {
-    //     console.log('key register')
-    //     await keyRegisterFn()
-    //   }
-    // } catch (error) {
-    //   console.log('error')
-    // }
+    try {
+      if (selectCoins === 1) {
+        await maticRegisterFn(inviteValue)
+      }
+      if (selectCoins === 2) {
+        console.log('key register')
+        await keyRegisterFn(inviteValue)
+      }
+    } catch (error) {
+      console.log('error')
+    }
     handleCloseFn()
   }, [selectCoins, inviteValue, maticRegisterFn, keyRegisterFn, handleCloseFn])
 
