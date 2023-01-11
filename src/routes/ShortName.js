@@ -218,40 +218,39 @@ const Activity = ({
   const maticRegisterFn = useCallback(
     async inviteName => {
       setCurrentStep(2)
-      console.log('maticPrice:', registerInfo.maticPrice)
       let inviteAdd = emptyAddress
       if (inviteName) {
         inviteAdd = await snsInstance.getResolverOwner(inviteName)
       }
-      snsInstance
-        .shortNameMint(searchTerm, 1, inviteAdd, registerInfo.maticPrice)
-        .then(
-          () => {
-            window.registerComTimer = setTimeout(() => {
-              setInterval(async () => {
-                const isSuccessRegister = await snsInstance.recordExists(
-                  searchTerm
-                )
-                console.log('isSuccessRegister:', isSuccessRegister)
-                if (isSuccessRegister) {
-                  clearInterval(window.registerComTimer)
-                  setCurrentStep(3)
-                }
-              }, 2000)
-            }, 0)
-          },
-          error => {
-            console.log('maticRegisterFnErr:', error)
-            if (error && error.data && error.data.message) {
-              messageMention({ type: 'error', content: error.data.message })
-            } else {
-              messageMention({ type: 'error', content: 'mint error' })
-            }
-            setCurrentStep(0)
+      const price = await snsInstance.getInfo(emptyAddress, '', 0, inviteAdd)
+      const maticAmount = BNformatToWei(price.priceOfShort.maticPrice)
+      snsInstance.shortNameMint(searchTerm, 1, inviteAdd, maticAmount).then(
+        () => {
+          window.registerComTimer = setTimeout(() => {
+            setInterval(async () => {
+              const isSuccessRegister = await snsInstance.recordExists(
+                searchTerm
+              )
+              console.log('isSuccessRegister:', isSuccessRegister)
+              if (isSuccessRegister) {
+                clearInterval(window.registerComTimer)
+                setCurrentStep(3)
+              }
+            }, 2000)
+          }, 0)
+        },
+        error => {
+          console.log('maticRegisterFnErr:', error)
+          if (error && error.data && error.data.message) {
+            messageMention({ type: 'error', content: error.data.message })
+          } else {
+            messageMention({ type: 'error', content: 'mint error' })
           }
-        )
+          setCurrentStep(0)
+        }
+      )
     },
-    [registerInfo.maticPrice, searchTerm, snsInstance]
+    [searchTerm, snsInstance, emptyAddress]
   )
 
   const handleRegisterFn = useCallback(async () => {
@@ -273,14 +272,10 @@ const Activity = ({
 
   const getRegisterPrice = useCallback(
     async sns => {
-      console.log('account:?', account)
-      const coinPrice = await sns.getInfo(account, '', 0)
-      console.log('coinPrice:', coinPrice)
+      const coinPrice = await sns.getInfo(account, '', 0, emptyAddress)
       if (coinPrice && coinPrice.priceOfShort) {
         const maticAmount = BNformatToWei(coinPrice.priceOfShort.maticPrice)
         const keyAmount = BNformatToWei(coinPrice.priceOfShort.keyPrice)
-        console.log('maticAmount:', weiFormatToEth(maticAmount))
-        console.log('keyAmount:', weiFormatToEth(keyAmount))
         const info = {
           keyPrice: keyAmount,
           maticPrice: maticAmount,
