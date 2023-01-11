@@ -283,7 +283,7 @@ function getCTA({
   }
 
   // use usdc coins register operation
-  const getApproveOfUsdc = async mutate => {
+  const getApproveOfUsdc = async (mutate, inviteName) => {
     const sns = getSNS()
     let inviteAdd = emptyAddress
     if (inviteName) {
@@ -291,7 +291,7 @@ function getCTA({
     }
     setCoinsValue({ ...coinsValueObj, invite: inviteAdd })
     const usdcAddress = await sns.getUsdcCoinsAddress()
-    const usdcPrice = await sns.getUsdcCoinsPrice()
+    const usdcPrice = await sns.getUsdcCoinsPrice(inviteAdd)
 
     // get IERC20 contract instance object
     const IERC20 = await getSNSIERC20(usdcAddress)
@@ -357,7 +357,7 @@ function getCTA({
   }
 
   // use matic coins register operation
-  const useMaticRegister = async mutate => {
+  const useMaticRegister = async (mutate, inviteName) => {
     const sns = getSNS()
     let inviteAdd = emptyAddress
     if (inviteName) {
@@ -368,7 +368,7 @@ function getCTA({
   }
 
   const handleSelectCoinsRegister = async mutate => {
-    switch (coinForm.getFieldsValue().coins) {
+    switch (coinForm.getFieldsValue().coinsType) {
       case 'key':
         try {
           await getApproveOfKey(mutate, coinForm.getFieldsValue().inviteName)
@@ -377,20 +377,20 @@ function getCTA({
         }
         break
       case 'matic':
-        await useMaticRegister(mutate)
+        console.log('maticCoinForm:', coinForm.getFieldsValue())
+        console.log('coinsValueObj:', coinsValueObj)
+        await useMaticRegister(mutate, coinForm.getFieldsValue().inviteName)
         break
       case 'usdc':
         try {
-          console.log('before:', coinsValueObj)
           await getApproveOfUsdc(mutate, coinForm.getFieldsValue().inviteName)
-          console.log('getApproveOfUsdcCoins:', coinsValueObj)
         } catch (error) {
           console.log('getApproveOfUsdcError:', error)
         }
         break
       case 'lowb':
         try {
-          await getApproveOfLowb(mutate)
+          await getApproveOfLowb(mutate, coinForm.getFieldsValue().inviteName)
         } catch (error) {
           console.log('getApproveOfLowbError:', error)
         }
@@ -411,9 +411,9 @@ function getCTA({
     setCoinsValue({ ...coinsValueObj, coinsType: value })
   }
 
-  useEffect(() => {
-    console.log('coin:', coinsValueObj)
-  }, [coinsValueObj])
+  // useEffect(() => {
+  //   console.log('coin:', coinsValueObj)
+  // }, [coinsValueObj])
 
   console.log('coinForm:', coinForm.getFieldsValue())
 
@@ -459,7 +459,7 @@ function getCTA({
                         content: (
                           <SelectRegisterForm
                             initialValues={{
-                              coins: 'matic',
+                              coinsType: 'matic',
                               inviteName: localStorage.getItem('sns_invite')
                             }}
                             form={coinForm}
