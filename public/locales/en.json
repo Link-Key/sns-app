@@ -196,7 +196,7 @@
     },
     "notOpen": "Not open for 3-digit domains!",
     "favourite": "* Favorite the name for easy access in case you close out of your browser.",
-    "increaseRegistrationPeriod": "For every 100 new registrations, the registration fee will increase by 0.3Matic or 0.45KEY.",
+    "increaseRegistrationPeriod": "For every 100 new registrations, the registration fee will increase by 0.3Matic or 0.25USDC, 50% off registration fee every Thu & Fri.",
     "registerHint1": "After registration, you can release Follow-NFT/Group-NFT in ",
     "registerHint2": " to start your Web3 social circle journey!",
     "notifications": {

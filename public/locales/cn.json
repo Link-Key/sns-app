@@ -190,7 +190,7 @@
     },
     "notOpen": "暂未开放3位数一下的域名!",
     "favourite": "* 您可以收藏喜欢的域名，以便于浏览器关闭以后重新查看这个域名。",
-    "increaseRegistrationPeriod": "注册数量每新增100，注册费上调0.3Matic或0.45KEY。",
+    "increaseRegistrationPeriod": "每100个新注册者，注册费将增加0.3Matic或0.25USDC，每周四和周五的注册费将减半。",
     "registerHint1": "注册后前往",
     "registerHint2": "发行Follow-NFT/Group-NFT，即可开启Web3社交圈的旅行！",
     "notifications": {

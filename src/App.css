@@ -76,7 +76,7 @@
 }
 
 .ant-select:not(.ant-select-disabled):hover .ant-select-selector {
-  border: none;
+  border-color: #ea6060 !important;
 }
 
 .ant-steps-item-process > .ant-steps-item-container > .ant-steps-item-icon {
@@ -92,6 +92,10 @@
 }
 .ant-steps-item-finish .ant-steps-item-icon > .ant-steps-icon {
   color: #ea6060 !important;
+}
+
+.ant-input {
+  border-radius: 50px;
 }
 
 .ant-steps-item-finish

@@ -237,10 +237,7 @@ function Search({ history, className, style }) {
     } else {
       isRegister = await addressRegisteredFn(`${searchTerm}.key`)
     }
-    console.log('isRegister:', isRegister)
-
-    console.log('search input:', input)
-    input.value = ''
+    // input.value = ''
     if (type === 'supported' || type === 'short') {
       if (searchTerm.split('.')[0].length === 3 && !isRegister) {
         history.push(`/ShortName/${searchTerm}`)
@@ -323,7 +320,11 @@ function Search({ history, className, style }) {
           ref={el => (input = el)}
           onChange={handleParse}
           onFocus={() => setFocusState(true)}
-          // onBlur={() => setFocusState(false)}
+          onBlur={() =>
+            setTimeout(() => {
+              setFocusState(false)
+            }, [300])
+          }
         />
 
         {focusState && inputValue && (

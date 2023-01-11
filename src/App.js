@@ -131,7 +131,7 @@ export const APP_DATA = gql`
   }
 `
 
-const upgradeMode = false
+const upgradeMode = true
 
 export const upgradeTIme = () => {
   const date = new Date('2022-09-28 12:00:00').toUTCString()
@@ -148,9 +148,17 @@ const App = () => {
     setupAnalytics()
   }, [])
 
+  const inviteCode = new URLSearchParams(window.location.search).get('invite')
+
   if (globalError) {
     return <NetworkError message={globalError} />
   }
+
+  useEffect(() => {
+    if (inviteCode) {
+      localStorage.setItem('sns_invite', inviteCode)
+    }
+  }, [])
 
   return (
     <Router>
