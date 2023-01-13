@@ -183,7 +183,7 @@ function Search({ history, className, style }) {
   const queryDomain = async value => {
     const resp = await checkKeyName({ keyName: value })
     if (resp && resp.data && resp.data.code === 200) {
-      setRegisterStatus(resp.data.data)
+      setRegisterStatus(resp.data.data.registered)
     }
   }
 

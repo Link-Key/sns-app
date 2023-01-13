@@ -32,6 +32,7 @@ import LanguageSwitcher from '../components/LanguageSwitcher'
 import MetaTime from '../components/HomePage/MetaTime'
 import Hamburger from 'components/Header/Hamburger'
 import SideNav from 'components/SideNav/SideNav'
+import OKXBanner from 'components/Banner/OKXBanner'
 
 const HeroTop = styled('div')`
   display: flex;
@@ -150,34 +151,6 @@ const ExternalLink = styled('a')`
   }
 `
 
-const Announcement = styled('div')`
-  display: flex;
-  justify-content: center;
-  flex-direction: column;
-  background: #ea6060;
-  padding: 0 10px;
-  border-bottom: #ea6060 solid 3px;
-  h3 {
-    color: white;
-    font-weight: 400;
-    text-align: center;
-    padding: 0 20px;
-    margin-bottom: 10px;
-  }
-  p {
-    text-align: center;
-    color: white;
-  }
-  a {
-    color: white;
-    text-decoration: none;
-  }
-`
-
-const HowToUse = styled(HowToUseDefault)`
-  padding: 70px;
-`
-
 export const Hero = styled('section')`
   background: url(${bg}) center center no-repeat;
   background-size: cover;
@@ -240,24 +213,6 @@ const Search = styled(SearchDefault)`
       border-radius: 0 24px 24px 0;
     `}
   }
-`
-
-const Explanation = styled('div')`
-  display: grid;
-  width: 100%;
-
-  grid-template-columns: 1fr;
-  grid-template-rows: auto;
-  ${mq.medium`
-    grid-template-columns: 1fr 1fr;
-    grid-template-rows: auto;
-  `}
-  grid-gap: 0;
-`
-
-const H2 = styled('h2')`
-  font-size: 30px;
-  font-weight: 500;
 `
 
 const Section = styled('section')`
@@ -456,8 +411,11 @@ export default ({ match }) => {
           </MobileHeaderContainer>
         )}
       </HeroTop>
+
+      <OKXBanner />
+
       {/* <MainPageBannerContainer>
-       <DAOBannerContent />
+        <DAOBannerContent />
       </MainPageBannerContainer> */}
 
       <MainPageMetaTimeBannerContainer>

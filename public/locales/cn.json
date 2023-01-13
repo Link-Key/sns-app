@@ -132,7 +132,9 @@
     "subdomainFavouriteTitle": "子域名收藏夹"
   },
   "home": {
-    "announcements": {},
+    "announcements": {
+      "text":"使用OKX钱包注册，将获得额外的空投"
+    },
     "howtouse": {
       "body": "SNS 管理器是一个面向非技术用户的图形化界面。您可以利用它查询域名，管理域名指向的地址或资源，还可以为域名创建子域名。",
       "title": "如何使用 SNS"
