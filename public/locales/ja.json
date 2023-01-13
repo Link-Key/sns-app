@@ -134,7 +134,9 @@
     "subdomainFavouriteTitle": "お気に入りサブドメイン"
   },
   "home": {
-    "announcements": {},
+    "announcements": {
+      "text":"OKX Walletに登録すると、エアドロップを追加で受け取ることができる"
+    },
     "howtouse": {
       "body": "SNSアプリは、非技術者向けのグラフィカル・ユーザー・インターフェースです。名前の検索、アドレスやリソースの管理、サブドメインの作成などが可能です。",
       "title": "SNSの使い方"

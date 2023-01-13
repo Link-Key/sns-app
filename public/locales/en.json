@@ -138,7 +138,9 @@
     "subdomainFavouriteTitle": "Favourite Subdomains"
   },
   "home": {
-    "announcements": {},
+    "announcements": {
+      "text":"Sign up with OKX Wallet to receive additional airdrops"
+    },
     "howtouse": {
       "body": "The SNS App is a Graphical User Interface for non-technical users. It allows you to search any name, manage their addresses or resources it points to and create subdomains for each name.",
       "title": "How to use SNS"
