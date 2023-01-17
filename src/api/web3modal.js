@@ -77,6 +77,7 @@ export const connect = async () => {
     if (e !== 'Modal closed by user') {
       throw e
     }
+    throw e
   }
 }
 

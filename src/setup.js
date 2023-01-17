@@ -38,6 +38,27 @@ export const setSubDomainFavourites = () => {
   )
 }
 
+const handleUnsupportedNetwork = (provider = window.ethereum) => {
+  try {
+    if (provider) {
+      provider.request({
+        method: 'wallet_switchEthereumChain',
+        params: [{ chainId: '0x89' }]
+      })
+      provider.on('chainChanged', function(networkId) {
+        window.location.reload()
+      })
+    }
+    globalErrorReactive({
+      ...globalErrorReactive(),
+      network: 'Unsupported Network'
+    })
+  } catch (error) {
+    console.log('handleUnsupportedNetworkErr:', error)
+    window.location.reload()
+  }
+}
+
 export const isSupportedNetwork = networkId => {
   switch (networkId) {
     // case 1:
@@ -101,8 +122,8 @@ export const getProvider = async reconnect => {
     provider = providerObject
     return provider
   } catch (e) {
-    if (e.message.match(/Unsupported network/)) {
-      globalErrorReactive('Unsupported Network')
+    if (e.error && e.error.message.match(/Unsupported network/)) {
+      handleUnsupportedNetwork(e.provider)
       return
     }
   }
@@ -126,7 +147,8 @@ export const setWeb3Provider = async provider => {
   const accounts = await getAccounts()
 
   if (provider) {
-    provider.removeAllListeners()
+    if (provider.events?.removeAllListeners)
+      provider.events.removeAllListeners()
     accountsReactive(accounts)
     const account = accounts[0]
     const sns = getSNS()
@@ -137,11 +159,16 @@ export const setWeb3Provider = async provider => {
   provider?.on('chainChanged', async _chainId => {
     const networkId = await getNetworkId()
     if (!isSupportedNetwork(networkId)) {
-      globalErrorReactive('Unsupported Network')
+      handleUnsupportedNetwork(provider)
       return
     }
-    console.log('chainChanged:', _chainId)
-    location.reload()
+
+    await setup({
+      customProvider: provider,
+      reloadOnAccountsChange: false,
+      enforceReload: true
+    })
+
     networkIdReactive(networkId)
     networkReactive(await getNetwork())
   })
@@ -161,16 +188,15 @@ export default async reconnect => {
   try {
     // setFavourites()
     // setSubDomainFavourites()
+
     const provider = await getProvider(reconnect)
 
-    if (!provider) {
-      throw 'Please install a wallet'
-    }
+    if (!provider) throw 'Please install a wallet'
 
     const networkId = await getNetworkId()
 
     if (!isSupportedNetwork(networkId)) {
-      globalErrorReactive('Unsupported Network')
+      handleUnsupportedNetwork(provider)
       return
     }
 
