@@ -3,7 +3,7 @@ import styled from '@emotion/styled/macro'
 import { useTranslation } from 'react-i18next'
 import { gql } from '@apollo/client'
 import { useQuery } from '@apollo/client'
-
+import { LoadingOutlined, RightOutlined } from '@ant-design/icons'
 import { parseSearchTerm } from '../../utils/utils'
 import '../../api/subDomainRegistrar'
 import { withRouter } from 'react-router'
@@ -11,9 +11,7 @@ import searchIcon from '../../assets/search.png'
 import mq, { useMediaMin, useMediaMax } from 'mediaQuery'
 import { useCallback } from 'react'
 import getSNS from 'apollo/mutations/sns'
-import { useAccount } from 'components/QueryAccount'
-import { useEffect } from 'react'
-import { emptyAddress } from 'sns-app-contract-api'
+import { checkKeyName } from 'api/reqList'
 
 const SearchForm = styled('form')`
   display: flex;
@@ -35,11 +33,9 @@ const SearchForm = styled('form')`
   input {
     padding: 20px 10px;
     width: 100%;
-    height:40px;
+    height: 40px;
     border: none;
     border-radius: 14px 0 0 14px;
-    // ${p =>
-      p.mediumBP ? `border-radius:14px 0 0 14px;` : `border-radius:0;`}
     font-size: 16px;
     font-family: Overpass;
     font-weight: 100;
@@ -56,9 +52,9 @@ const SearchForm = styled('form')`
     }
 
     &::-webkit-input-placeholder {
-      /* Chrome/Opera/Safari */
+      // Chrome/Opera/Safari
       color: #ccd4da;
-      line-height:47px;
+      line-height: 47px;
     }
   }
 
@@ -68,9 +64,9 @@ const SearchForm = styled('form')`
         ? 'background: #eb8b8c;color: white;'
         : 'background: #ddd; color:#fff;'}
     font-size: 18px;
-    height:40px;
+    height: 40px;
     font-family: Overpass;
-    line-height:36px;
+    line-height: 36px;
     width: calc(350px - 240px);
     border: none;
     border-radius: 0 14px 14px 0;
@@ -84,17 +80,67 @@ const SearchForm = styled('form')`
     &:hover {
       ${p => (p && p.hasSearch ? 'cursor: pointer;' : 'cursor: default;')}
     }
-    &:active{
+    &:active {
       ${p => (p && p.hasSearch ? 'background:#eb8b8caa;' : '')}
     }
     img {
-      width:25px;
-      height:25px;
+      width: 25px;
+      height: 25px;
     }
   }
 `
+const SearchResult = styled('div')`
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
 
-const GlobalContainer = styled(`div`)`
+  position: absolute;
+  top: 50px;
+  width: 100%;
+  height: 60px;
+  border-radius: 14px;
+  padding: 10px 15px;
+  background-color: white;
+  ${mq.medium`
+    top:80px
+  `}
+`
+
+const NoData = styled('div')`
+  color: #888;
+`
+
+const StatusWrapper = styled('div')`
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  height: 100%;
+  span {
+    font-size: 16px;
+    margin-left: 10px;
+  }
+
+  &:hover {
+    border-radius: 14px;
+    background-color: #eee;
+  }
+`
+
+const TagWrapper = styled('div')`
+  display: flex;
+  align-items: center;
+`
+
+const TagStatus = styled('div')`
+  display: flex;
+  align-items: center;
+  padding: 2px 30px;
+  border-radius: 50px;
+  color: #fff;
+`
+
+const GlobalContainer = styled('div')`
   ${p =>
     p && !p.mediumBP && p.pathName === '/'
       ? `display:block; z-index:10;`
@@ -118,28 +164,141 @@ function Search({ history, className, style }) {
   const mediumBPMax = useMediaMax('medium')
   const { t } = useTranslation()
   const [inputValue, setInputValue] = useState(null)
-  const [foucsState, setFoucsState] = useState(false)
+  const [focusState, setFocusState] = useState(false)
+  const [loading, setLoading] = useState(false)
+  const [registerStatus, setRegisterStatus] = useState(null)
 
   const {
     data: { isENSReady }
   } = useQuery(SEARCH_QUERY)
   let input
+  const judgeHasKeySuffix = value => {
+    if (value.split('.').length === 2) {
+      return value
+    } else {
+      return `${value}.key`
+    }
+  }
+
+  const queryDomain = async value => {
+    const resp = await checkKeyName({ keyName: value })
+    if (resp && resp.data && resp.data.code === 200) {
+      setRegisterStatus(resp.data.data.registered)
+    }
+  }
+
   const handleParse = e => {
+    e.persist()
     setInputValue(
       e.target.value
         .split('.')
         .map(term => term.trim())
         .join('.')
     )
+    if (e.target.value.length >= 3) {
+      setLoading(true)
+      if (window.inputTimeout) clearTimeout(window.inputTimeout)
+      window.inputTimeout = setTimeout(async () => {
+        const value = judgeHasKeySuffix(e.target.value)
+        await queryDomain(value)
+        setLoading(false)
+      }, [800])
+    }
   }
 
-  const addressRegisteredFn = useCallback(async name => {
+  const addressRegisteredFn = async name => {
     const sns = await getSNS()
     const info = await sns.recordExists(name)
     return info
-  }, [])
+  }
 
   const hasSearch = inputValue && inputValue.length > 0 && isENSReady
+
+  const handleSubmit = async () => {
+    if (!hasSearch) return
+    const type = await parseSearchTerm(inputValue)
+    let searchTerm
+    if (input && input.value) {
+      // inputValue doesn't have potential whitespace
+      searchTerm = inputValue.toLowerCase()
+    }
+    if (!searchTerm || searchTerm.length < 1) {
+      return
+    }
+
+    if (type === 'address') {
+      history.push(`/address/${searchTerm}`)
+      return
+    }
+
+    let isRegister = false
+    if (searchTerm.split('.').length === 2) {
+      isRegister = await addressRegisteredFn(searchTerm)
+    } else {
+      isRegister = await addressRegisteredFn(`${searchTerm}.key`)
+    }
+    // input.value = ''
+    if (type === 'supported' || type === 'short') {
+      if (searchTerm.split('.')[0].length === 3 && !isRegister) {
+        history.push(`/ShortName/${searchTerm}`)
+        return
+      }
+      history.push(`/name/${searchTerm}`)
+      return
+    } else {
+      let suffix
+      if (searchTerm.split('.').length === 1) {
+        suffix = searchTerm + '.key'
+      } else {
+        suffix = searchTerm
+      }
+      suffix.length === 7 && !isRegister
+        ? history.push(`/ShortName/${suffix}`)
+        : history.push(`/name/${suffix}`)
+    }
+  }
+
+  const handlePopover = useCallback(() => {
+    if (loading) {
+      return (
+        <div style={{ color: '#888' }}>
+          <LoadingOutlined
+            style={{
+              color: '#ea6060',
+              fontSize: '16px',
+              fontWeight: 500,
+              marginRight: '10px'
+            }}
+          />{' '}
+          loading...
+        </div>
+      )
+    } else {
+      if (inputValue && inputValue.length < 3) {
+        return <NoData>{t('search.noData')}</NoData>
+      } else {
+        return (
+          <StatusWrapper
+            onClick={async () => {
+              await handleSubmit()
+            }}
+          >
+            <span>{judgeHasKeySuffix(inputValue)}</span>
+            <TagWrapper>
+              <TagStatus
+                style={{ backgroundColor: registerStatus ? '#bbb' : '#81B337' }}
+              >
+                {registerStatus
+                  ? t('search.registered')
+                  : t('search.unRegistered')}
+              </TagStatus>
+              {!registerStatus && <RightOutlined />}
+            </TagWrapper>
+          </StatusWrapper>
+        )
+      }
+    }
+  }, [inputValue, loading, registerStatus, t])
 
   return (
     <>
@@ -153,60 +312,24 @@ function Search({ history, className, style }) {
         mediumBPMax={mediumBPMax}
         onSubmit={async e => {
           e.preventDefault()
-          if (!hasSearch) return
-          const type = await parseSearchTerm(inputValue)
-          let searchTerm
-          if (input && input.value) {
-            // inputValue doesn't have potential whitespace
-            searchTerm = inputValue.toLowerCase()
-          }
-          if (!searchTerm || searchTerm.length < 1) {
-            return
-          }
-
-          if (type === 'address') {
-            history.push(`/address/${searchTerm}`)
-            return
-          }
-
-          let isRegister = false
-          if (searchTerm.split('.').length === 2) {
-            isRegister = await addressRegisteredFn(searchTerm)
-          } else {
-            isRegister = await addressRegisteredFn(`${searchTerm}.key`)
-          }
-          console.log('isRegister:', isRegister)
-
-          console.log('search input:', input)
-          input.value = ''
-          console.log('type:', type)
-          if (type === 'supported' || type === 'short') {
-            if (searchTerm.split('.')[0].length === 3 && !isRegister) {
-              history.push(`/ShortName/${searchTerm}`)
-              return
-            }
-            history.push(`/name/${searchTerm}`)
-            return
-          } else {
-            let suffix
-            if (searchTerm.split('.').length === 1) {
-              suffix = searchTerm + '.key'
-            } else {
-              suffix = searchTerm
-            }
-            suffix.length === 7 && !isRegister
-              ? history.push(`/ShortName/${suffix}`)
-              : history.push(`/name/${suffix}`)
-          }
+          await handleSubmit()
         }}
       >
         <input
           placeholder={t('search.placeholder')}
           ref={el => (input = el)}
           onChange={handleParse}
-          onFocus={() => setFoucsState(true)}
-          onBlur={() => setFoucsState(false)}
+          onFocus={() => setFocusState(true)}
+          onBlur={() =>
+            setTimeout(() => {
+              setFocusState(false)
+            }, [300])
+          }
         />
+
+        {focusState && inputValue && (
+          <SearchResult>{handlePopover()}</SearchResult>
+        )}
         <button
           disabled={!hasSearch}
           type="submit"
@@ -219,7 +342,7 @@ function Search({ history, className, style }) {
           )}
         </button>
       </SearchForm>
-      {foucsState && (
+      {focusState && (
         <GlobalContainer
           mediumBP={mediumBP}
           pathName={history.location.pathname}

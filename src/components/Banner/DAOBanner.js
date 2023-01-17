@@ -37,7 +37,6 @@ const ArrowSmall = styled(motion.img)`
 const BannerTitle = styled(`div`)`
   color: #0e0e0e;
   font-weight: bold;
-  font-size: 18px;
 `
 
 const BannerContent = styled(`div`)`

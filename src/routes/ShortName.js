@@ -5,7 +5,8 @@ import {
   Space,
   Steps,
   Typography,
-  Button as AntButton
+  Button as AntButton,
+  Input
 } from 'antd'
 import getSNS, { getSNSIERC20 } from 'apollo/mutations/sns'
 import MainContainer from 'components/Basic/MainContainer'
@@ -110,12 +111,20 @@ const Activity = ({
   const [snsInstance, setSNS] = useState({})
   const [IERC20Instance, setIERC20Instance] = useState({})
   const [stepCurrent, setCurrentStep] = useState(0)
+  const [inviteValue, setInviteValue] = useState(
+    localStorage.getItem('sns_invite')
+  )
 
   const history = useHistory()
+
+  const handleInviteInpChange = e => {
+    setInviteValue(e.target.value)
+  }
 
   const handleCloseFn = useCallback(() => {
     setRegisterVisible(false)
     setSelectCoins(1)
+    setInviteValue('')
   }, [])
 
   const queryAllowance = useCallback(async () => {
@@ -178,81 +187,95 @@ const Activity = ({
     )
   }, [snsInstance, registerInfo.keyPrice])
 
-  const keyRegisterFn = useCallback(async () => {
-    const isApprove = await approveFn()
-    if (isApprove === 'unApprove') {
-      setCurrentStep(2)
-      setTimeout(() => {
-        window.shortNameKeyTimer = setInterval(async () => {
-          const allowancePrice = await queryAllowance()
-          console.log('allowancePrice:', allowancePrice)
-          if (allowancePrice > 0) {
-            await handleKeyRegisterFn()
-          }
-        }, 2000)
-      }, 0)
-    }
-
-    if (isApprove === 'approve') {
-      setCurrentStep(2)
-      await handleKeyRegisterFn()
-    }
-  }, [approveFn, handleKeyRegisterFn, queryAllowance])
-
-  const maticRegisterFn = useCallback(async () => {
-    setCurrentStep(2)
-    console.log('maticPrice:', registerInfo.maticPrice)
-    snsInstance.shortNameMint(searchTerm, 1, registerInfo.maticPrice).then(
-      () => {
-        window.registerComTimer = setTimeout(() => {
-          setInterval(async () => {
-            const isSuccessRegister = await snsInstance.recordExists(searchTerm)
-            console.log('isSuccessRegister:', isSuccessRegister)
-            if (isSuccessRegister) {
-              clearInterval(window.registerComTimer)
-              setCurrentStep(3)
+  const keyRegisterFn = useCallback(
+    async inviteName => {
+      let inviteAdd = emptyAddress
+      if (inviteName) {
+        inviteAdd = await snsInstance.getResolverOwner(inviteName)
+      }
+      const isApprove = await approveFn()
+      if (isApprove === 'unApprove') {
+        setCurrentStep(2)
+        setTimeout(() => {
+          window.shortNameKeyTimer = setInterval(async () => {
+            const allowancePrice = await queryAllowance()
+            console.log('allowancePrice:', allowancePrice)
+            if (allowancePrice > 0) {
+              await handleKeyRegisterFn()
             }
           }, 2000)
         }, 0)
-      },
-      error => {
-        console.log('maticRegisterFnErr:', error)
-        if (error && error.data && error.data.message) {
-          messageMention({ type: 'error', content: error.data.message })
-        } else {
-          messageMention({ type: 'error', content: 'mint error' })
-        }
-        setCurrentStep(0)
       }
-    )
-  }, [registerInfo.maticPrice, searchTerm, snsInstance])
+
+      if (isApprove === 'approve') {
+        setCurrentStep(2)
+        await handleKeyRegisterFn()
+      }
+    },
+    [snsInstance, approveFn, handleKeyRegisterFn, queryAllowance]
+  )
+
+  const maticRegisterFn = useCallback(
+    async inviteName => {
+      setCurrentStep(2)
+      let inviteAdd = emptyAddress
+      if (inviteName) {
+        inviteAdd = await snsInstance.getResolverOwner(inviteName)
+      }
+      const price = await snsInstance.getInfo(emptyAddress, '', 0, inviteAdd)
+      const maticAmount = BNformatToWei(price.priceOfShort.maticPrice)
+      snsInstance.shortNameMint(searchTerm, 1, inviteAdd, maticAmount).then(
+        () => {
+          window.registerComTimer = setTimeout(() => {
+            setInterval(async () => {
+              const isSuccessRegister = await snsInstance.recordExists(
+                searchTerm
+              )
+              console.log('isSuccessRegister:', isSuccessRegister)
+              if (isSuccessRegister) {
+                clearInterval(window.registerComTimer)
+                setCurrentStep(3)
+              }
+            }, 2000)
+          }, 0)
+        },
+        error => {
+          console.log('maticRegisterFnErr:', error)
+          if (error && error.data && error.data.message) {
+            messageMention({ type: 'error', content: error.data.message })
+          } else {
+            messageMention({ type: 'error', content: 'mint error' })
+          }
+          setCurrentStep(0)
+        }
+      )
+    },
+    [searchTerm, snsInstance, emptyAddress]
+  )
 
   const handleRegisterFn = useCallback(async () => {
     console.log('selectCoins:', selectCoins)
+    console.log('inviteValue:', inviteValue)
     try {
       if (selectCoins === 1) {
-        await maticRegisterFn()
+        await maticRegisterFn(inviteValue)
       }
       if (selectCoins === 2) {
         console.log('key register')
-        await keyRegisterFn()
+        await keyRegisterFn(inviteValue)
       }
     } catch (error) {
       console.log('error')
     }
     handleCloseFn()
-  }, [selectCoins, maticRegisterFn, keyRegisterFn, handleCloseFn])
+  }, [selectCoins, inviteValue, maticRegisterFn, keyRegisterFn, handleCloseFn])
 
   const getRegisterPrice = useCallback(
     async sns => {
-      console.log('account:?', account)
-      const coinPrice = await sns.getInfo(account, '', 0)
-      console.log('coinPrice:', coinPrice)
+      const coinPrice = await sns.getInfo(account, '', 0, emptyAddress)
       if (coinPrice && coinPrice.priceOfShort) {
         const maticAmount = BNformatToWei(coinPrice.priceOfShort.maticPrice)
         const keyAmount = BNformatToWei(coinPrice.priceOfShort.keyPrice)
-        console.log('maticAmount:', weiFormatToEth(maticAmount))
-        console.log('keyAmount:', weiFormatToEth(keyAmount))
         const info = {
           keyPrice: keyAmount,
           maticPrice: maticAmount,
@@ -396,6 +419,13 @@ const Activity = ({
               {weiFormatToEth(registerInfo.keyPrice)} Key
             </Option> */}
           </SelectWrapper>
+          <Input
+            value={inviteValue}
+            size="middle"
+            status="error"
+            placeholder={t('invite.inp')}
+            onChange={handleInviteInpChange}
+          />
 
           <AntButton
             danger

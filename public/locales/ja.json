@@ -134,7 +134,9 @@
     "subdomainFavouriteTitle": "お気に入りサブドメイン"
   },
   "home": {
-    "announcements": {},
+    "announcements": {
+      "text":"OKX Walletに登録すると、エアドロップを追加で受け取ることができる"
+    },
     "howtouse": {
       "body": "SNSアプリは、非技術者向けのグラフィカル・ユーザー・インターフェースです。名前の検索、アドレスやリソースの管理、サブドメインの作成などが可能です。",
       "title": "SNSの使い方"
@@ -191,7 +193,8 @@
       "suspend": "登録の一時停止"
     },
     "favourite": "* ブラウザを閉じた時にアクセスしやすいよう名前をお気に入りに登録する",
-    "increaseRegistrationPeriod": "新規登録100件ごとに、登録料は0.\u200B\u200B3Maticまたは0.45KEYずつ増加します。",
+    "increaseRegistrationPeriod": "新規登録者100名につき登録料が0.3Maticまたは0.25USDC増加、毎週木・金曜日は登録料が50％OFFになります。",
+    
     "registerHint1": "",
     "registerHint2": "でFollow-NFT/Group-NFTの発行に登録し、Web3のソーシャルサークルへの旅を開始する。",
     "notifications": {
@@ -251,7 +254,10 @@
   },
   "search": {
     "button": "検索",
-    "placeholder": "名前またはアドレスで検索"
+    "placeholder": "名前またはアドレスで検索",
+    "noData":"データなし (最低3桁)",
+    "registered":"登録済み",
+    "unRegistered":"未登録"
   },
   "searchErrors": {
     "domainMalformed": {

@@ -42,4 +42,15 @@ function getAirdropData(params) {
   })
 }
 
-export { getAirdropData }
+const checkKeyName = async data => {
+  const res = await http({
+    url: '/api/v1/accountService/account/checkKeyName',
+    params: {
+      ...data
+    },
+    method: 'get'
+  })
+  return res
+}
+
+export { getAirdropData, checkKeyName }

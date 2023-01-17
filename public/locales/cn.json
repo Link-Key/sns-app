@@ -132,7 +132,9 @@
     "subdomainFavouriteTitle": "子域名收藏夹"
   },
   "home": {
-    "announcements": {},
+    "announcements": {
+      "text":"使用OKX钱包注册，将获得额外的空投"
+    },
     "howtouse": {
       "body": "SNS 管理器是一个面向非技术用户的图形化界面。您可以利用它查询域名，管理域名指向的地址或资源，还可以为域名创建子域名。",
       "title": "如何使用 SNS"
@@ -190,7 +192,7 @@
     },
     "notOpen": "暂未开放3位数一下的域名!",
     "favourite": "* 您可以收藏喜欢的域名，以便于浏览器关闭以后重新查看这个域名。",
-    "increaseRegistrationPeriod": "注册数量每新增100，注册费上调0.3Matic或0.45KEY。",
+    "increaseRegistrationPeriod": "每100个新注册者，注册费将增加0.3Matic或0.25USDC，每周四和周五的注册费将减半。",
     "registerHint1": "注册后前往",
     "registerHint2": "发行Follow-NFT/Group-NFT，即可开启Web3社交圈的旅行！",
     "notifications": {
@@ -250,7 +252,10 @@
   },
   "search": {
     "button": "查询",
-    "placeholder": "输入域名或地址"
+    "placeholder": "输入域名或地址",
+    "noData":"无数据 (至少3位字符)",
+    "registered":"已注册",
+    "unRegistered":"未注册"
   },
   "searchErrors": {
     "domainMalformed": {

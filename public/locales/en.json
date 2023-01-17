@@ -138,7 +138,9 @@
     "subdomainFavouriteTitle": "Favourite Subdomains"
   },
   "home": {
-    "announcements": {},
+    "announcements": {
+      "text":"Sign up with OKX Wallet to receive additional airdrops"
+    },
     "howtouse": {
       "body": "The SNS App is a Graphical User Interface for non-technical users. It allows you to search any name, manage their addresses or resources it points to and create subdomains for each name.",
       "title": "How to use SNS"
@@ -196,7 +198,7 @@
     },
     "notOpen": "Not open for 3-digit domains!",
     "favourite": "* Favorite the name for easy access in case you close out of your browser.",
-    "increaseRegistrationPeriod": "For every 100 new registrations, the registration fee will increase by 0.3Matic or 0.45KEY.",
+    "increaseRegistrationPeriod": "For every 100 new registrations, the registration fee will increase by 0.3Matic or 0.25USDC, 50% off registration fee every Thu & Fri.",
     "registerHint1": "After registration, you can release Follow-NFT/Group-NFT in ",
     "registerHint2": " to start your Web3 social circle journey!",
     "notifications": {
@@ -256,7 +258,10 @@
   },
   "search": {
     "button": "Search",
-    "placeholder": "Search names or addresses"
+    "placeholder": "Search names or addresses",
+    "noData":"No Data (At least 3 digits )",
+    "registered":"Registered",
+    "unRegistered":"Unregistered"
   },
   "searchErrors": {
     "domainMalformed": {

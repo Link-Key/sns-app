@@ -183,7 +183,10 @@ export default function ChildDomainItem({ name, owner, isMigrated, refetch }) {
     curBlockNumber: '-'
   })
   const [inviteCount, setInviteCount] = useState(0)
-  const [inviteIncome, setInviteIncome] = useState(0)
+  // return inviteKeyIncome 0:key 1:matic 2:usdc
+  const [inviteKeyIncome, setInviteKeyIncome] = useState(0)
+  const [inviteMaticIncome, setInviteMaticIncome] = useState(0)
+  const [inviteUsdcIncome, setInviteUsdcIncome] = useState(0)
   const [inviteOldTxs, setInviteOldTxs] = useState([])
   const [polygonUrl, setPolygonUrl] = useState([])
 
@@ -429,10 +432,16 @@ export default function ChildDomainItem({ name, owner, isMigrated, refetch }) {
     setPolygonUrl(`https://polygonscan.com/address/` + (await getAccount()))
   }
 
-  const getInviteIncomeFn = async inviteInstance => {
-    const resp = await inviteInstance.getInviterIncome()
-    const income = new EthVal(`${resp._hex || 0}`).toEth().toFixed(3)
-    setInviteIncome(income)
+  const getInviteKeyIncomeFn = async inviteInstance => {
+    const respKey = await inviteInstance.getInviterIncome(0)
+    const keyIncome = new EthVal(`${respKey._hex || 0}`).toEth().toFixed(3)
+    const respMatic = await inviteInstance.getInviterIncome(1)
+    const maticIncome = new EthVal(`${respMatic._hex || 0}`).toEth().toFixed(3)
+    const respUsdc = await inviteInstance.getInviterIncome(2)
+    const usdcIncome = new EthVal(`${respUsdc._hex || 0}`).toEth().toFixed(3)
+    setInviteKeyIncome(keyIncome)
+    setInviteMaticIncome(maticIncome)
+    setInviteUsdcIncome(usdcIncome)
   }
 
   let networkId = null
@@ -560,7 +569,7 @@ export default function ChildDomainItem({ name, owner, isMigrated, refetch }) {
       const inviteInstance = getSNSInvite()
       handleIsInviter(inviteInstance)
       getInviteCountFn(inviteInstance)
-      getInviteIncomeFn(inviteInstance)
+      getInviteKeyIncomeFn(inviteInstance)
       getPolygonscanUrl()
     }
   }, [isENSReady])
@@ -648,7 +657,13 @@ export default function ChildDomainItem({ name, owner, isMigrated, refetch }) {
             <InviteContainer bodyStyle={{ padding: '0 10px' }}>
               <div style={{ height: '175px' }}>
                 <BlockText>
-                  {t('invite.totalIncome')}(KEY):{inviteIncome}
+                  {t('invite.totalIncome')}(KEY):{inviteKeyIncome}
+                </BlockText>
+                <BlockText>
+                  {t('invite.totalIncome')}(MATIC):{inviteMaticIncome}
+                </BlockText>
+                <BlockText>
+                  {t('invite.totalIncome')}(USDC):{inviteUsdcIncome}
                 </BlockText>
                 <BlockText>
                   {t('invite.count')}:{inviteCount}
