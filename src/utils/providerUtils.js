@@ -12,7 +12,7 @@ export const connectProvider = () => {
 
 export const disconnectProvider = () => {
   disconnect()
-  isReadOnlyReactive(true)
+  // isReadOnlyReactive(true)
   reverseRecordReactive(null)
   accountsReactive(null)
 }
