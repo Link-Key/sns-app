@@ -150,15 +150,16 @@ const App = () => {
 
   const inviteCode = new URLSearchParams(window.location.search).get('invite')
 
-  if (globalError) {
-    return <NetworkError message={globalError} />
-  }
-
   useEffect(() => {
     if (inviteCode) {
       localStorage.setItem('sns_invite', inviteCode)
     }
   }, [])
+
+  if (globalError.network) {
+    console.log('globalError:', globalError.network)
+    return <NetworkError message={globalError.network} />
+  }
 
   return (
     <Router>

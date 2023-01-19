@@ -1,6 +1,4 @@
-import { setup as setupENS } from '../apollo/mutations/ens'
 import { setup as setupSNS } from '../apollo/mutations/sns'
-// import { setup as setupENS } from '../apollo/mutations/ens'
 import {
   isReadOnlyReactive,
   networkIdReactive,
@@ -9,6 +7,8 @@ import {
 } from '../apollo/reactiveVars'
 // import { getNetwork, getNetworkId, isReadOnly } from '@ensdomains/ui'
 import { getNetwork, getNetworkId, isReadOnly } from 'sns-app-contract-api'
+import { providers } from 'ethers'
+import OkxIconSvg from '../assets/okxWalletIcon.svg'
 
 const INFURA_ID =
   window.location.host === 'sns.chat'
@@ -22,13 +22,40 @@ const option = {
   network: 'mainnet', // optional
   cacheProvider: true, // optional
   providerOptions: {
-    // walletconnect: {
-    //   package: () => import('@walletconnect/web3-provider'),
-    //   packageFactory: true,
-    //   options: {
-    //     infuraId: INFURA_ID
-    //   }
-    // },
+    walletconnect: {
+      package: () => import('@walletconnect/web3-provider'),
+      packageFactory: true,
+      options: {
+        infuraId: INFURA_ID
+      }
+    },
+    'custom-okx': {
+      display: {
+        logo: OkxIconSvg,
+        name: 'OKX Wallet',
+        description: 'Connect to your OKX Wallet'
+      },
+      options: {
+        // infuraId: INFURA_ID
+        jsonRpcUrl: `https://polygon-mainnet.infura.io/v3/${INFURA_ID}`
+      },
+      package: () => import('@walletconnect/ethereum-provider'),
+      connector: async (ProviderPackage, options) => {
+        try {
+          const provider = window.okexchain
+          console.log('provider:', provider)
+          if (!window.okxwallet) {
+            alert('Please install okx wallet!')
+            return
+          }
+          await okxwallet.enable()
+          // await provider.enable()
+          return provider
+        } catch (error) {
+          console.log('connectorErr:', error)
+        }
+      }
+    }
     // walletlink: {
     //   package: () => import('walletlink'),
     //   packageFactory: true,
@@ -77,6 +104,7 @@ export const connect = async () => {
     if (e !== 'Modal closed by user') {
       throw e
     }
+    throw e
   }
 }
 

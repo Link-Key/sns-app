@@ -45,7 +45,6 @@ export async function setup({
   snsInvite = snsInviteInstance
 
   provider = providerObject
-
   isENSReadyReactive(true)
   return { sns, snsResolver, providerObject, snsWithdraw, snsInvite }
 }
