@@ -11,7 +11,6 @@ export const connectProvider = () => {
 }
 
 export const disconnectProvider = () => {
-  debugger
   disconnect()
   isReadOnlyReactive(true)
   reverseRecordReactive(null)
