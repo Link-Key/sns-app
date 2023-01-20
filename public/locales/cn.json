@@ -36,6 +36,7 @@
     "Resolver": "解析器",
     "about": "关于",
     "whitelist": "白名单",
+    "linkkey": "Linkkey",
     "addresses": "地址",
     "cancel": "取消",
     "cannotclaimDns": "您不能在本站收回 .{{ name }} 的域名",

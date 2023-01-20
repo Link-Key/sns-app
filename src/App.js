@@ -148,7 +148,8 @@ const App = () => {
     setupAnalytics()
   }, [])
 
-  const inviteCode = new URLSearchParams(window.location.search).get('invite')
+  const inviteCode =
+    new URLSearchParams(window.location.search).get('invite') ?? 'xns.key'
 
   useEffect(() => {
     if (inviteCode) {

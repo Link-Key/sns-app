@@ -1,19 +1,11 @@
+import moment from 'moment'
 import React, { Component } from 'react'
-import styled from '@emotion/styled/macro'
-import { modulate } from '../../utils/utils'
-import mq from 'mediaQuery'
-import * as PropTypes from 'prop-types'
-import Text from 'antd/es/typography/Text'
 
 class MetaTime extends Component {
   constructor(props) {
     super(props)
     this.state = {
-      time:
-        new Date().toUTCString().substring(0, 12) +
-        'Ω' +
-        (new Date().getFullYear() - 2021 + 1) +
-        new Date().toUTCString().substring(16)
+      time: moment().valueOf()
     }
   }
   componentDidMount() {
@@ -24,16 +16,18 @@ class MetaTime extends Component {
   }
   tick() {
     this.setState({
-      time:
-        new Date().toUTCString().substring(0, 12) +
-        'Ω' +
-        (new Date().getFullYear() - 2021 + 1) +
-        new Date().toUTCString().substring(16)
+      time: moment().valueOf()
     })
   }
   render() {
     // TODO Add metadverse time lable
-    return <span className="App-clock">{this.state.time}</span>
+    return (
+      <span className="App-clock">
+        {localStorage.getItem('language') === 'cn'
+          ? moment(this.state.time).format('YYYY年MM月DD日 HH时mm分ss秒')
+          : moment(this.state.time).format('YYYY-MM-DD HH:mm:ss')}
+      </span>
+    )
   }
 }
 

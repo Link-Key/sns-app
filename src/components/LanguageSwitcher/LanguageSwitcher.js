@@ -144,7 +144,7 @@ export default function LanguageSwitcher() {
   const dropdownRef = createRef()
   const togglerRef = createRef()
   const [languageSelected, setLanguageSelected] = useState(
-    getLang(getLanguageFromLocalStorage()) ?? getLang('en')
+    getLang(getLanguageFromLocalStorage()) ?? getLang('cn')
   )
   const [showDropdown, setShowDropdown] = useState(false)
   const { i18n } = useTranslation()

@@ -433,7 +433,7 @@ export default ({ match }) => {
             initial={animation.initial}
             animate={animation.animate}
           >
-            Everyone needs to register for the WEB3.0
+            web3 区块链域名服务商
           </PermanentRegistrarLogo>
           <Search />
           <SocialIconLarge>
