@@ -6,7 +6,7 @@ name: CI
 on:
   # Triggers the workflow on push or pull request events but only for the "sns-dev" branch
   push:
-    branches: ['sns-dev']
+    branches: ['xns']
   #   pull_request:
   #     branches: ['sns-dev']
 
@@ -45,11 +45,11 @@ jobs:
       - name: Deploy front-end
         uses: easingthemes/ssh-deploy@main
         env:
-          SSH_PRIVATE_KEY: ${{ secrets.ACCESS_TOKEN_107 }}
+          SSH_PRIVATE_KEY: ${{ secrets.XNS_SECRET }}
           ARGS: "-rltgoDzvO --delete"
           SOURCE: "build/"
-          REMOTE_HOST: '107.148.33.51'
+          REMOTE_HOST: '67.229.166.34'
           REMOTE_USER:  root
-          REMOTE_PORT: '53445'
-          TARGET: '/www/wwwroot/sns.chat/build'
+          REMOTE_PORT: '22'
+          TARGET: '/home/sns/sns-app'
           EXCLUDE: "/node_modules/"
