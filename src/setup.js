@@ -38,7 +38,7 @@ export const setSubDomainFavourites = () => {
   )
 }
 
-const handleUnsupportedNetwork = (provider = window.ethereum) => {
+export const handleUnsupportedNetwork = (provider = window.ethereum) => {
   try {
     if (provider) {
       provider.request({

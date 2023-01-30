@@ -10,6 +10,7 @@ import { getNetwork, getNetworkId, isReadOnly } from 'sns-app-contract-api'
 import { providers } from 'ethers'
 import OkxIconSvg from '../assets/okxWalletIcon.svg'
 import messageMention from 'utils/messageMention'
+import { handleUnsupportedNetwork, isSupportedNetwork } from 'setup'
 
 const INFURA_ID =
   window.location.host === 'sns.chat'
@@ -44,7 +45,6 @@ const option = {
       connector: async (ProviderPackage, options) => {
         try {
           const provider = window.okexchain
-          console.log('provider:', provider)
           if (!window.okxwallet) {
             messageMention({
               type: 'warn',
@@ -97,6 +97,11 @@ export const connect = async () => {
 
     web3Modal = new Web3Modal(option)
     provider = await web3Modal.connect()
+
+    if (!isSupportedNetwork(Number(provider.networkVersion))) {
+      handleUnsupportedNetwork()
+      return
+    }
 
     await setupSNS({
       customProvider: provider,
