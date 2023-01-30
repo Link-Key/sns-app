@@ -51,5 +51,5 @@ jobs:
           REMOTE_HOST: '67.229.166.34'
           REMOTE_USER:  root
           REMOTE_PORT: '22'
-          TARGET: '/home/sns/sns-app'
+          TARGET: '/home/sns/sns-app/build'
           EXCLUDE: "/node_modules/"
