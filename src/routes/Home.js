@@ -5,14 +5,9 @@ import styled from '@emotion/styled/macro'
 import { motion } from 'framer-motion'
 import { useTranslation } from 'react-i18next'
 import mq, { useMediaMin } from 'mediaQuery'
-
 import SearchDefault from '../components/SearchName/Search'
 import NoAccountsDefault from '../components/NoAccounts/NoAccountsModal'
 import bg from '../assets/homeBg.png'
-import TextBubbleDefault from '../components/Icons/TextBubble'
-import QuestionMarkDefault from '../components/Icons/QuestionMark'
-import HowToUseDefault from '../components/HowToUse/HowToUse'
-// import ENSLogo from '../components/HomePage/images/ENSLogo.svg'
 import ENSLogo from '../components/HomePage/images/logo.svg'
 import DiscordIcon from '../assets/D.png'
 import TelegramIcon from '../assets/tg.png'
@@ -23,16 +18,13 @@ import openseIcon from '../assets/opensea-white.svg'
 import { aboutPageURL, docsPageURL } from '../utils/utils'
 import { connectProvider, disconnectProvider } from '../utils/providerUtils'
 import { gql } from '@apollo/client'
-import {
-  MainPageBannerContainer,
-  DAOBannerContent,
-  MainPageMetaTimeBannerContainer
-} from '../components/Banner/DAOBanner'
+import { MainPageMetaTimeBannerContainer } from '../components/Banner/DAOBanner'
 import LanguageSwitcher from '../components/LanguageSwitcher'
 import MetaTime from '../components/HomePage/MetaTime'
 import Hamburger from 'components/Header/Hamburger'
 import SideNav from 'components/SideNav/SideNav'
 import OKXBanner from 'components/Banner/OKXBanner'
+import moment from 'moment'
 
 const HeroTop = styled('div')`
   display: flex;
@@ -455,7 +447,9 @@ export default ({ match }) => {
           </SocialIconLarge>
 
           <LinkkeyCopyRight>
-            <a href={LinkkeyUrl}>© 2022 Linkkey DAO</a>
+            <a href={LinkkeyUrl}>{`© 2021-${moment().format(
+              'YYYY'
+            )} Linkkey DAO`}</a>
           </LinkkeyCopyRight>
         </>
       </SearchContainer>

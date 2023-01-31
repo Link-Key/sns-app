@@ -193,7 +193,7 @@
     },
     "notOpen": "暂未开放3位数一下的域名!",
     "favourite": "* 您可以收藏喜欢的域名，以便于浏览器关闭以后重新查看这个域名。",
-    "increaseRegistrationPeriod": "每100个新注册者，注册费将增加0.3Matic或0.25USDC，每周四和周五的注册费将减半。",
+    "increaseRegistrationPeriod": "每100个新注册者，注册费将增加0.3Matic或0.25USDC，限时五折，截止时间：31/3/2023",
     "registerHint1": "注册后前往",
     "registerHint2": "发行Follow-NFT/Group-NFT，即可开启Web3社交圈的旅行！",
     "notifications": {
@@ -482,7 +482,7 @@
     "tip": "仅展示最近的数据，更多请访问",
     "details":"交易详情",
     "note":"注：用KEY支付时输入xxx.key邀请码，可享9折注册优惠（无效邀请码将无法享受折扣）",
-    "inp":"输入xxx.key (选填)"
+    "inp":"输入邀请码，例：xxx.key (选填)"
   }
 
 }
