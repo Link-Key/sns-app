@@ -9,9 +9,10 @@ import LogoTyped from '../assets/TypeLogo'
 
 const IconLogo = styled('img')`
   width: 60px;
+  padding: 0 5px;
   ${mq.medium`
     width: 100px
-  `}
+  `};
 `
 
 const LogoContainer = styled(Link)`
