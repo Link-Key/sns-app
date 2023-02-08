@@ -46,6 +46,7 @@ export const handleUnsupportedNetwork = (provider = window.ethereum) => {
         params: [{ chainId: '0x89' }]
       })
       provider.on('chainChanged', function(networkId) {
+        console.log('networkId:', networkId)
         window.location.reload()
       })
     }
