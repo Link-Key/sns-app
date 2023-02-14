@@ -680,6 +680,7 @@ export default function ChildDomainItem({ name, owner, isMigrated, refetch }) {
                 danger
                 shape="round"
                 type="primary"
+                disabled={true}
                 onClick={handleInvite}
               >
                 {isInvite ? `${t('invite.list')}` : `${t('invite.become')}`}
