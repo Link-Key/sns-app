@@ -677,6 +677,7 @@ export default function ChildDomainItem({ name, owner, isMigrated, refetch }) {
                 )}
               </div>
               <ButtonWrapper
+                disabled={true}
                 danger
                 shape="round"
                 type="primary"
