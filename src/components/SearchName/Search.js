@@ -184,6 +184,9 @@ function Search({ history, className, style }) {
     const resp = await checkKeyName({ keyName: value })
     if (resp && resp.data && resp.data.code === 200) {
       setRegisterStatus(resp.data.data.registered)
+    } else {
+      setRegisterStatus(null)
+      setFocusState(false)
     }
   }
 
