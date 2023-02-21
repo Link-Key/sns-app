@@ -44,14 +44,14 @@ const option = {
       package: () => import('@walletconnect/ethereum-provider'),
       connector: async (ProviderPackage, options) => {
         try {
-          const provider = window.ethereum
-          if (!window.okxwallet) {
+          if (!window.okexchain) {
             messageMention({
               type: 'warn',
               content: 'Please install OKX Wallet'
             })
             return
           }
+          const provider = window.okexchain
           await provider.enable()
           console.log('okxwallet:', provider)
           // await provider.enable()
@@ -61,33 +61,6 @@ const option = {
         }
       }
     }
-    // walletlink: {
-    //   package: () => import('walletlink'),
-    //   packageFactory: true,
-    //   options: {
-    //     appName: 'sns-app',
-    //     jsonRpcUrl: `https://polygon-mainnet.infura.io/v3/${INFURA_ID}`
-    //   }
-    // },
-    // mewconnect: {
-    //   package: () => import('@myetherwallet/mewconnect-web-client'),
-    //   packageFactory: true,
-    //   options: {
-    //     infuraId: INFURA_ID,
-    //     description: ' '
-    //   }
-    // },
-    // portis: {
-    //   package: () => import('@portis/web3'),
-    //   packageFactory: true,
-    //   options: {
-    //     id: PORTIS_ID
-    //   }
-    // },
-    // torus: {
-    //   package: () => import('@toruslabs/torus-embed'),
-    //   packageFactory: true
-    // }
   }
 }
 
@@ -100,7 +73,7 @@ export const connect = async () => {
     provider = await web3Modal.connect()
 
     if (!isSupportedNetwork(Number(provider.networkVersion))) {
-      handleUnsupportedNetwork()
+      handleUnsupportedNetwork(provider)
       return
     }
 
