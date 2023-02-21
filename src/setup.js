@@ -41,10 +41,6 @@ export const setSubDomainFavourites = () => {
 export const handleUnsupportedNetwork = (provider = window.ethereum) => {
   try {
     if (provider) {
-      provider.request({
-        method: 'wallet_switchEthereumChain',
-        params: [{ chainId: '0x89' }]
-      })
       provider.on('chainChanged', function(networkId) {
         console.log('networkId:', networkId)
         window.location.reload()
