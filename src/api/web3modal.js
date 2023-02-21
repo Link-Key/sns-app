@@ -44,7 +44,7 @@ const option = {
       package: () => import('@walletconnect/ethereum-provider'),
       connector: async (ProviderPackage, options) => {
         try {
-          const provider = window.okexchain
+          const provider = window.ethereum
           if (!window.okxwallet) {
             messageMention({
               type: 'warn',
@@ -52,8 +52,8 @@ const option = {
             })
             return
           }
-          await okxwallet.enable()
-          console.log('okxwallet:', okxwallet)
+          await provider.enable()
+          console.log('okxwallet:', provider)
           // await provider.enable()
           return provider
         } catch (error) {
