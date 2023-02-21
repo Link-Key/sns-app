@@ -155,7 +155,7 @@ const App = () => {
     if (inviteCode) {
       localStorage.setItem('sns_invite', inviteCode)
     }
-  }, [])
+  }, [inviteCode])
 
   if (globalError.network) {
     console.log('globalError:', globalError.network)

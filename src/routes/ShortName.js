@@ -124,7 +124,7 @@ const Activity = ({
   const handleCloseFn = useCallback(() => {
     setRegisterVisible(false)
     setSelectCoins(1)
-    setInviteValue('')
+    setInviteValue(localStorage.getItem('sns_invite'))
   }, [])
 
   const queryAllowance = useCallback(async () => {
