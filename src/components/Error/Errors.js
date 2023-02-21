@@ -29,16 +29,18 @@ const H2 = styled('h2')`
 
 const Message = styled('div')``
 
-export const NetworkError = ({ message }) => (
-  <ErrorContainer data-testid="network-error">
-    <Message>
-      <Warning src={warningImage} />
-      <H2>{message}</H2>
-      <br />
-      Please change your dapp browser to Matic(Polygon) Mainnet, Testnet
-    </Message>
-  </ErrorContainer>
-)
+export const NetworkError = ({ message }) => {
+  return (
+    <ErrorContainer data-testid="network-error">
+      <Message>
+        <Warning src={warningImage} />
+        <H2>{message}</H2>
+        <br />
+        Please change your dapp browser to Matic(Polygon) Mainnet, Testnet.
+      </Message>
+    </ErrorContainer>
+  )
+}
 
 export const Error404 = () => (
   <ErrorContainer>

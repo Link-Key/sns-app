@@ -53,6 +53,7 @@ const option = {
             return
           }
           await okxwallet.enable()
+          console.log('okxwallet:', okxwallet)
           // await provider.enable()
           return provider
         } catch (error) {

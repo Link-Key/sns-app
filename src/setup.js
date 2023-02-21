@@ -48,7 +48,9 @@ export const handleUnsupportedNetwork = (provider = window.ethereum) => {
     }
     globalErrorReactive({
       ...globalErrorReactive(),
-      network: 'Unsupported Network'
+      network: `Unsupported Network current networkID:${
+        provider.networkVersion
+      }`
     })
   } catch (error) {
     console.log('handleUnsupportedNetworkErr:', error)
