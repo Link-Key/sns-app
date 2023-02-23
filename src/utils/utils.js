@@ -494,7 +494,7 @@ export const BNformatToWei = value => {
 }
 
 export const matchInviteCode = () => {
-  const domain = window.location.host.replace('wwww.', '')
+  const domain = window.location.host.replace('www.', '')
   const inviteCode = domain.split('.')[0]
   if (domain.includes('localhost')) {
     return 'xns.key'
