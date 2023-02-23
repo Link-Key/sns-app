@@ -492,3 +492,12 @@ export const ethFormatToWei = value => {
 export const BNformatToWei = value => {
   return formatUnits(value, 'wei')
 }
+
+export const matchInviteCode = () => {
+  const domain = window.location.host.replace('wwww.', '')
+  const inviteCode = domain.split('.')[0]
+  if (domain.includes('localhost')) {
+    return 'xns.key'
+  }
+  return `${inviteCode}.key`
+}

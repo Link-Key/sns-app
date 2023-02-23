@@ -100,6 +100,7 @@ import DefaultLayout from './components/Layout/DefaultLayout'
 import { pageview, setupAnalytics } from './utils/analytics'
 import { gql } from '@apollo/client'
 import useReactiveVarListeners from './hooks/useReactiveVarListeners'
+import { matchInviteCode } from 'utils/utils'
 
 //If we are targeting an IPFS build we need to use HashRouter
 const Router =
@@ -149,7 +150,10 @@ const App = () => {
   }, [])
 
   const inviteCode =
-    new URLSearchParams(window.location.search).get('invite') ?? 'xns.key'
+    new URLSearchParams(window.location.search).get('invite') ??
+    matchInviteCode()
+
+  console.log('inviteCode:', inviteCode)
 
   useEffect(() => {
     if (inviteCode) {
