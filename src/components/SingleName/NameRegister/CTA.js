@@ -117,170 +117,170 @@ function getCTA({
 }) {
   const [coinForm] = Form.useForm()
 
-  const [keyPrice, setKeyPrice] = useState(async () => {
-    const sns = getSNS()
-    sns.getKeyCoinsPrice(emptyAddress).then(price => {
-      setKeyPrice(new EthVal(`${price || 0}`).toEth().toFixed(3))
-    })
-  })
+  // const [keyPrice, setKeyPrice] = useState(async () => {
+  //   const sns = getSNS()
+  //   sns.getKeyCoinsPrice(emptyAddress).then(price => {
+  //     setKeyPrice(new EthVal(`${price || 0}`).toEth().toFixed(3))
+  //   })
+  // })
 
-  const [lowbPrice, setLowbPrice] = useState(async () => {
-    const sns = getSNS()
-    sns.getLowbCoinsPrice(emptyAddress).then(price => {
-      setLowbPrice(new EthVal(`${price || 0}`).toEth().toFixed(3))
-    })
-  })
+  // const [lowbPrice, setLowbPrice] = useState(async () => {
+  //   const sns = getSNS()
+  //   sns.getLowbCoinsPrice(emptyAddress).then(price => {
+  //     setLowbPrice(new EthVal(`${price || 0}`).toEth().toFixed(3))
+  //   })
+  // })
 
   const [usdcPrice, setUsdcPrice] = useState(async () => {
     const sns = getSNS()
-    sns.getUsdcCoinsPrice(emptyAddress).then(price => {
-      let newprice = new EthVal(`${price || 0}`).scaleUp(6).toNumber()
-      setUsdcPrice(newprice)
+    sns.getPrice(account, label, emptyAddress).then(price => {
+      let newPrice = new EthVal(`${price.usdcPrice || 0}`).scaleUp(6).toNumber()
+      setUsdcPrice(newPrice)
     })
   })
 
   const maticPrice = new EthVal(`${price || 0}`).toEth().toFixed(3)
 
   // use key coins register operation
-  const getApproveOfKey = async (mutate, inviteName) => {
-    const sns = getSNS()
-    const keyAddress = await sns.getKeyCoinsAddress()
-    let inviteAdd = emptyAddress
-    if (inviteName) {
-      inviteAdd = await sns.getResolverOwner(inviteName)
-    }
-    setCoinsValue({ ...coinsValueObj, invite: inviteAdd })
-    const keyPrice = await sns.getKeyCoinsPrice(inviteAdd)
-    // get IERC20 contract instance object
-    const IERC20 = await getSNSIERC20(keyAddress)
+  // const getApproveOfKey = async (mutate, inviteName) => {
+  //   const sns = getSNS()
+  //   const keyAddress = await sns.getKeyCoinsAddress()
+  //   let inviteAdd = emptyAddress
+  //   if (inviteName) {
+  //     inviteAdd = await sns.getResolverOwner(inviteName)
+  //   }
+  //   setCoinsValue({ ...coinsValueObj, invite: inviteAdd })
+  //   const keyPrice = await sns.getPrice(account, label, inviteAdd)
+  //   // get IERC20 contract instance object
+  //   const IERC20 = await getSNSIERC20(keyAddress)
 
-    // get sns address
-    const snsAddress = await getSNSAddress()
+  //   // get sns address
+  //   const snsAddress = await getSNSAddress()
 
-    // Authorization to SNS
-    await IERC20.approve(snsAddress, keyPrice)
+  //   // Authorization to SNS
+  //   await IERC20.approve(snsAddress, keyPrice)
 
-    message.loading({
-      key: 1,
-      content: t('z.transferSending'),
-      duration: 0,
-      style: { marginTop: '20vh' }
-    })
+  //   message.loading({
+  //     key: 1,
+  //     content: t('z.transferSending'),
+  //     duration: 0,
+  //     style: { marginTop: '20vh' }
+  //   })
 
-    // Query if the authorization is successful
-    // Query every three seconds, query ten times
-    // handleQueryAllowance(IERC20, account, snsAddress, mutate)
-    setTimeout(async () => {
-      let timer,
-        count = 0,
-        allowancePrice
-      timer = setInterval(async () => {
-        try {
-          count += 1
-          // query authorization sns key price
-          allowancePrice = await IERC20.allowance(account, snsAddress)
-          const price = new EthVal(`${allowancePrice || 0}`).toEth().toFixed(3)
-          if (price > 0) {
-            clearInterval(timer)
-            // destroy message mention
-            message.destroy(1)
-            // mint nft of key
-            mutate()
-          }
-        } catch (e) {
-          console.log('allowance:', e)
-          clearInterval(timer)
-          message.error({
-            key: 2,
-            content: <UnknowErrMsgComponent />,
-            duration: 3,
-            style: { marginTop: '20vh' }
-          })
-          // destroy message mention
-          message.destroy(1)
-        }
-        if (count === 20) {
-          clearInterval(timer)
-          message.error({
-            key: 3,
-            content: t('z.transferBusy'),
-            duration: 3,
-            style: { marginTop: '20vh' }
-          })
-          // destroy message mention
-          message.destroy(1)
-        }
-      }, 3000)
-    }, 0)
-  }
+  //   // Query if the authorization is successful
+  //   // Query every three seconds, query ten times
+  //   // handleQueryAllowance(IERC20, account, snsAddress, mutate)
+  //   setTimeout(async () => {
+  //     let timer,
+  //       count = 0,
+  //       allowancePrice
+  //     timer = setInterval(async () => {
+  //       try {
+  //         count += 1
+  //         // query authorization sns key price
+  //         allowancePrice = await IERC20.allowance(account, snsAddress)
+  //         const price = new EthVal(`${allowancePrice || 0}`).toEth().toFixed(3)
+  //         if (price > 0) {
+  //           clearInterval(timer)
+  //           // destroy message mention
+  //           message.destroy(1)
+  //           // mint nft of key
+  //           mutate()
+  //         }
+  //       } catch (e) {
+  //         console.log('allowance:', e)
+  //         clearInterval(timer)
+  //         message.error({
+  //           key: 2,
+  //           content: <UnknowErrMsgComponent />,
+  //           duration: 3,
+  //           style: { marginTop: '20vh' }
+  //         })
+  //         // destroy message mention
+  //         message.destroy(1)
+  //       }
+  //       if (count === 20) {
+  //         clearInterval(timer)
+  //         message.error({
+  //           key: 3,
+  //           content: t('z.transferBusy'),
+  //           duration: 3,
+  //           style: { marginTop: '20vh' }
+  //         })
+  //         // destroy message mention
+  //         message.destroy(1)
+  //       }
+  //     }, 3000)
+  //   }, 0)
+  // }
 
   // use lowb coins register operation
-  const getApproveOfLowb = async mutate => {
-    const sns = getSNS()
-    const lowbAddress = await sns.getLowbCoinsAddress()
-    const lowbPrice = await sns.getLowbCoinsPrice()
+  // const getApproveOfLowb = async mutate => {
+  //   const sns = getSNS()
+  //   const lowbAddress = await sns.getLowbCoinsAddress()
+  //   const lowbPrice = await sns.getLowbCoinsPrice()
 
-    // get IERC20 contract instance object
-    const IERC20 = await getSNSIERC20(lowbAddress)
+  //   // get IERC20 contract instance object
+  //   const IERC20 = await getSNSIERC20(lowbAddress)
 
-    // get sns address
-    const snsAddress = await getSNSAddress()
+  //   // get sns address
+  //   const snsAddress = await getSNSAddress()
 
-    // Authorization to SNS
-    await IERC20.approve(snsAddress, lowbPrice)
+  //   // Authorization to SNS
+  //   await IERC20.approve(snsAddress, lowbPrice)
 
-    message.loading({
-      key: 1,
-      content: t('z.transferSending'),
-      duration: 0,
-      style: { marginTop: '20vh' }
-    })
+  //   message.loading({
+  //     key: 1,
+  //     content: t('z.transferSending'),
+  //     duration: 0,
+  //     style: { marginTop: '20vh' }
+  //   })
 
-    // Query if the authorization is successful
-    // Query every three seconds, query ten times
-    setTimeout(async () => {
-      let timer,
-        count = 0,
-        allowancePrice
-      timer = setInterval(async () => {
-        try {
-          count += 1
-          // query authorization sns key price
-          allowancePrice = await IERC20.allowance(account, snsAddress)
-          const price = new EthVal(`${allowancePrice || 0}`).toEth().toFixed(3)
-          if (price > 0) {
-            clearInterval(timer)
-            // destroy message mention
-            message.destroy(1)
-            // mint nft of key
-            mutate()
-          }
-        } catch (e) {
-          console.log('allowance:', e)
-          clearInterval(timer)
-          message.error({
-            key: 2,
-            content: <UnknowErrMsgComponent />,
-            duration: 3,
-            style: { marginTop: '20vh' }
-          })
-          // destroy message mention
-          message.destroy(1)
-        }
-        if (count === 20) {
-          clearInterval(timer)
-          message.error({
-            key: 3,
-            content: t('z.transferBusy'),
-            duration: 3,
-            style: { marginTop: '20vh' }
-          })
-          // destroy message mention
-          message.destroy(1)
-        }
-      }, 3000)
-    }, 0)
-  }
+  //   // Query if the authorization is successful
+  //   // Query every three seconds, query ten times
+  //   setTimeout(async () => {
+  //     let timer,
+  //       count = 0,
+  //       allowancePrice
+  //     timer = setInterval(async () => {
+  //       try {
+  //         count += 1
+  //         // query authorization sns key price
+  //         allowancePrice = await IERC20.allowance(account, snsAddress)
+  //         const price = new EthVal(`${allowancePrice || 0}`).toEth().toFixed(3)
+  //         if (price > 0) {
+  //           clearInterval(timer)
+  //           // destroy message mention
+  //           message.destroy(1)
+  //           // mint nft of key
+  //           mutate()
+  //         }
+  //       } catch (e) {
+  //         console.log('allowance:', e)
+  //         clearInterval(timer)
+  //         message.error({
+  //           key: 2,
+  //           content: <UnknowErrMsgComponent />,
+  //           duration: 3,
+  //           style: { marginTop: '20vh' }
+  //         })
+  //         // destroy message mention
+  //         message.destroy(1)
+  //       }
+  //       if (count === 20) {
+  //         clearInterval(timer)
+  //         message.error({
+  //           key: 3,
+  //           content: t('z.transferBusy'),
+  //           duration: 3,
+  //           style: { marginTop: '20vh' }
+  //         })
+  //         // destroy message mention
+  //         message.destroy(1)
+  //       }
+  //     }, 3000)
+  //   }, 0)
+  // }
 
   // use usdc coins register operation
   const getApproveOfUsdc = async (mutate, inviteName) => {
@@ -291,7 +291,7 @@ function getCTA({
     }
     setCoinsValue({ ...coinsValueObj, invite: inviteAdd })
     const usdcAddress = await sns.getUsdcCoinsAddress()
-    const usdcPrice = await sns.getUsdcCoinsPrice(inviteAdd)
+    const usdcPrice = await sns.getPrice(account, label, inviteAdd)
 
     // get IERC20 contract instance object
     const IERC20 = await getSNSIERC20(usdcAddress)
@@ -369,13 +369,13 @@ function getCTA({
 
   const handleSelectCoinsRegister = async mutate => {
     switch (coinForm.getFieldsValue().coinsType) {
-      case 'key':
-        try {
-          await getApproveOfKey(mutate, coinForm.getFieldsValue().inviteName)
-        } catch (error) {
-          console.log('getApproveOfKeyError:', error)
-        }
-        break
+      // case 'key':
+      //   try {
+      //     await getApproveOfKey(mutate, coinForm.getFieldsValue().inviteName)
+      //   } catch (error) {
+      //     console.log('getApproveOfKeyError:', error)
+      //   }
+      //   break
       case 'matic':
         console.log('maticCoinForm:', coinForm.getFieldsValue())
         console.log('coinsValueObj:', coinsValueObj)
@@ -388,13 +388,13 @@ function getCTA({
           console.log('getApproveOfUsdcError:', error)
         }
         break
-      case 'lowb':
-        try {
-          await getApproveOfLowb(mutate, coinForm.getFieldsValue().inviteName)
-        } catch (error) {
-          console.log('getApproveOfLowbError:', error)
-        }
-        break
+      // case 'lowb':
+      //   try {
+      //     await getApproveOfLowb(mutate, coinForm.getFieldsValue().inviteName)
+      //   } catch (error) {
+      //     console.log('getApproveOfLowbError:', error)
+      //   }
+      //   break
       default:
         try {
           await getApproveOfKey(mutate, coinForm.getFieldsValue().inviteName)

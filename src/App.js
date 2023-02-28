@@ -37,10 +37,10 @@ const SingleName = lazy(() =>
   )
 )
 
-const ShortName = lazy(() =>
+const MintName = lazy(() =>
   import(
-    /* webpackChunkName: "ShortName", webpackPrefetch:true */
-    './routes/ShortName'
+    /* webpackChunkName: "MintName", webpackPrefetch:true */
+    './routes/MintName'
   )
 )
 
@@ -81,7 +81,7 @@ const Shared = lazy(() =>
 
 const Upgrade = lazy(() =>
   import(
-    /* webpackChunkName: "ShortName", webpackPrefetch:true */
+    /* webpackChunkName: "Upgrade", webpackPrefetch:true */
     './routes/Upgrade'
   )
 )
@@ -177,7 +177,7 @@ const App = () => {
           <Route path="/how-it-works" component={SearchResults} />
           <Route path="/search/:searchTerm" component={SearchResults} />
           <Route path="/name/:name" component={SingleName} />
-          <Route path="/ShortName/:name" component={ShortName} />
+          <Route path="/mint/:name" component={MintName} />
           <Route path="/address/:address/:domainType" component={Address} />
           <Route path="/address/:address" component={Address} />
           <Route path="/renew" component={Renew} />

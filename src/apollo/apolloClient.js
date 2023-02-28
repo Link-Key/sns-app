@@ -73,7 +73,7 @@ function handleFromPromiseErrMsg(str) {
 }
 
 function fromPromise(promise, operation) {
-  console.log('operation1111:', operation)
+  console.log('fromPromise_operation:', operation)
   return new Observable(observer => {
     promise
       .then(value => {

@@ -27,6 +27,7 @@ import {
   emptyAddress,
   ethFormatToWei,
   hexToNumber,
+  removeSuffixOfKey,
   weiFormatToEth
 } from 'utils/utils'
 import { LoadingOutlined } from '@ant-design/icons'
@@ -89,7 +90,9 @@ const SEARCH_QUERY = gql`
 const { Step } = Steps
 const { Option } = Select
 
-const Activity = ({
+const exceedValue = 115792089237316195423570985008687907853269984665640564039457584007913129639935
+
+const MintName = ({
   match: {
     params: { name: searchTerm }
   },
@@ -102,14 +105,14 @@ const Activity = ({
   const { t } = useTranslation()
   const account = useAccount()
   const [registerVisible, setRegisterVisible] = useState(false)
-  const [selectCoins, setSelectCoins] = useState(1)
+  const [selectCoins, setSelectCoins] = useState(0)
   const [registerInfo, serRegisterInfo] = useState({
     keyPrice: 0,
     maticPrice: 0,
+    usdcPrice: 0,
     keyAddress: '-'
   })
   const [snsInstance, setSNS] = useState({})
-  const [IERC20Instance, setIERC20Instance] = useState({})
   const [stepCurrent, setCurrentStep] = useState(0)
   const [inviteValue, setInviteValue] = useState(
     localStorage.getItem('sns_invite')
@@ -127,160 +130,102 @@ const Activity = ({
     setInviteValue('')
   }, [])
 
-  const queryAllowance = useCallback(async () => {
-    try {
-      const value = await IERC20Instance.allowance(
-        account,
-        snsInstance.registryAddress
-      )
-      return hexToNumber(value)
-    } catch (error) {
-      console.log('queryAllowanceErr:', error)
-    }
-  }, [account, IERC20Instance, snsInstance])
+  // const maticRegisterFn = useCallback(
+  //   async inviteName => {
+  //     setCurrentStep(2)
+  //     let inviteAdd = emptyAddress
+  //     if (inviteName) {
+  //       inviteAdd = await snsInstance.getResolverOwner(inviteName)
+  //     }
+  //     const price = await snsInstance.getInfo(emptyAddress, '', 0, inviteAdd)
+  //     const maticAmount = BNformatToWei(price.priceOfShort.maticPrice)
+  //     snsInstance.shortNameMint(searchTerm, 1, inviteAdd, maticAmount).then(
+  //       () => {
+  //         window.registerComTimer = setTimeout(() => {
+  //           setInterval(async () => {
+  //             const isSuccessRegister = await snsInstance.recordExists(
+  //               searchTerm
+  //             )
+  //             console.log('isSuccessRegister:', isSuccessRegister)
+  //             if (isSuccessRegister) {
+  //               clearInterval(window.registerComTimer)
+  //               setCurrentStep(3)
+  //             }
+  //           }, 2000)
+  //         }, 0)
+  //       },
+  //       error => {
+  //         console.log('maticRegisterFnErr:', error)
+  //         if (error && error.data && error.data.message) {
+  //           messageMention({ type: 'error', content: error.data.message })
+  //         } else {
+  //           messageMention({ type: 'error', content: 'mint error' })
+  //         }
+  //         setCurrentStep(0)
+  //       }
+  //     )
+  //   },
+  //   [searchTerm, snsInstance, emptyAddress]
+  // )
 
-  const approveFn = useCallback(async () => {
-    const value = await queryAllowance()
-    console.log('queryAllowance:', value)
-    try {
-      if (value >= weiFormatToEth(registerInfo.keyPrice)) {
-        console.log('approve')
-        return 'approve'
-      } else {
-        const resp = await IERC20Instance.approve(
-          snsInstance.registryAddress,
-          registerInfo.keyPrice
-        )
-        console.log('approveResp:', resp)
-        return 'unApprove'
-      }
-    } catch (error) {
-      console.log('callApproveErr:', error)
-      return false
-    }
-  }, [queryAllowance, registerInfo.keyPrice, snsInstance, IERC20Instance])
-
-  const handleKeyRegisterFn = useCallback(async () => {
-    clearInterval(window.shortNameKeyTimer)
-    snsInstance.shortNameMint(searchTerm, 2, registerInfo.keyPrice).then(
-      () => {
-        window.registerComTimer = setTimeout(() => {
-          setInterval(async () => {
-            const isSuccessRegister = await snsInstance.recordExists(searchTerm)
-            console.log('isSuccessRegister:', isSuccessRegister)
-            if (isSuccessRegister) {
-              clearInterval(window.registerComTimer)
-              setCurrentStep(3)
-            }
-          }, 2000)
-        }, 0)
-      },
-      error => {
-        console.log('handleKeyRegisterFnErr:', error)
-        if (error && error.data && error.data.message) {
-          messageMention({ type: 'error', content: error.data.message })
-        } else {
-          messageMention({ type: 'error', content: 'mint error' })
-        }
-        setCurrentStep(0)
-      }
-    )
-  }, [snsInstance, registerInfo.keyPrice])
-
-  const keyRegisterFn = useCallback(
-    async inviteName => {
-      let inviteAdd = emptyAddress
-      if (inviteName) {
-        inviteAdd = await snsInstance.getResolverOwner(inviteName)
-      }
-      const isApprove = await approveFn()
-      if (isApprove === 'unApprove') {
-        setCurrentStep(2)
-        setTimeout(() => {
-          window.shortNameKeyTimer = setInterval(async () => {
-            const allowancePrice = await queryAllowance()
-            console.log('allowancePrice:', allowancePrice)
-            if (allowancePrice > 0) {
-              await handleKeyRegisterFn()
-            }
-          }, 2000)
-        }, 0)
-      }
-
-      if (isApprove === 'approve') {
-        setCurrentStep(2)
-        await handleKeyRegisterFn()
-      }
-    },
-    [snsInstance, approveFn, handleKeyRegisterFn, queryAllowance]
-  )
-
-  const maticRegisterFn = useCallback(
+  const handleRegisterFn = useCallback(
     async inviteName => {
       setCurrentStep(2)
       let inviteAdd = emptyAddress
       if (inviteName) {
         inviteAdd = await snsInstance.getResolverOwner(inviteName)
       }
-      const price = await snsInstance.getInfo(emptyAddress, '', 0, inviteAdd)
-      const maticAmount = BNformatToWei(price.priceOfShort.maticPrice)
-      snsInstance.shortNameMint(searchTerm, 1, inviteAdd, maticAmount).then(
-        () => {
-          window.registerComTimer = setTimeout(() => {
-            setInterval(async () => {
-              const isSuccessRegister = await snsInstance.recordExists(
-                searchTerm
-              )
-              console.log('isSuccessRegister:', isSuccessRegister)
-              if (isSuccessRegister) {
-                clearInterval(window.registerComTimer)
-                setCurrentStep(3)
-              }
-            }, 2000)
-          }, 0)
-        },
-        error => {
-          console.log('maticRegisterFnErr:', error)
-          if (error && error.data && error.data.message) {
-            messageMention({ type: 'error', content: error.data.message })
-          } else {
-            messageMention({ type: 'error', content: 'mint error' })
+      snsInstance
+        .mint(removeSuffixOfKey(searchTerm), selectCoins, inviteAdd)
+        .then(
+          () => {
+            window.registerComTimer = setTimeout(() => {
+              setInterval(async () => {
+                const isSuccessRegister = await snsInstance.recordExists(
+                  searchTerm
+                )
+                console.log('isSuccessRegister:', isSuccessRegister)
+                if (isSuccessRegister) {
+                  clearInterval(window.registerComTimer)
+                  setCurrentStep(3)
+                }
+              }, 2000)
+            }, 0)
+          },
+          error => {
+            console.log('handleRegisterFnErr:', error)
+            if (error && error.data && error.data.message) {
+              messageMention({ type: 'error', content: error.data.message })
+            } else {
+              messageMention({ type: 'error', content: 'mint error' })
+            }
+            setCurrentStep(0)
           }
-          setCurrentStep(0)
-        }
-      )
+        )
+      handleCloseFn()
     },
-    [searchTerm, snsInstance, emptyAddress]
+    [emptyAddress, snsInstance, handleCloseFn, removeSuffixOfKey, selectCoins]
   )
-
-  const handleRegisterFn = useCallback(async () => {
-    console.log('selectCoins:', selectCoins)
-    console.log('inviteValue:', inviteValue)
-    try {
-      if (selectCoins === 1) {
-        await maticRegisterFn(inviteValue)
-      }
-      if (selectCoins === 2) {
-        console.log('key register')
-        await keyRegisterFn(inviteValue)
-      }
-    } catch (error) {
-      console.log('error')
-    }
-    handleCloseFn()
-  }, [selectCoins, inviteValue, maticRegisterFn, keyRegisterFn, handleCloseFn])
 
   const getRegisterPrice = useCallback(
     async sns => {
-      const coinPrice = await sns.getInfo(account, '', 0, emptyAddress)
-      if (coinPrice && coinPrice.priceOfShort) {
-        const maticAmount = BNformatToWei(coinPrice.priceOfShort.maticPrice)
-        const keyAmount = BNformatToWei(coinPrice.priceOfShort.keyPrice)
+      const coinPrice = await sns.getPriceInfo(
+        account,
+        removeSuffixOfKey(searchTerm),
+        emptyAddress
+      )
+      console.log('searchTerm:', searchTerm)
+      console.log('coinPrice:', coinPrice)
+      if (coinPrice) {
+        const maticAmount = BNformatToWei(coinPrice.maticPrice)
+        const keyAmount = BNformatToWei(coinPrice.keyPrice)
+        const usdcAmount = BNformatToWei(coinPrice.usdcPrice)
         const info = {
-          keyPrice: keyAmount,
           maticPrice: maticAmount,
-          keyAddress: coinPrice.priceOfShort.keyAddress
+          keyPrice: keyAmount,
+          usdcPrice: usdcAmount
         }
+        console.log('info:', info)
         serRegisterInfo({
           ...info
         })
@@ -288,7 +233,7 @@ const Activity = ({
       }
       return {}
     },
-    [account]
+    [account, emptyAddress, removeSuffixOfKey]
   )
 
   const getSNSInstance = useCallback(async () => {
@@ -302,29 +247,15 @@ const Activity = ({
     }
   }, [])
 
-  const getIERC20Instance = useCallback(async address => {
-    try {
-      const IERC20 = await getSNSIERC20(address)
-      setIERC20Instance(IERC20)
-    } catch (error) {
-      console.log('getIERC20InstanceErr:', error)
-    }
-  }, [])
-
   useEffect(() => {
     if (isENSReady) {
       getSNSInstance().then(sns => {
-        console.log('registryAddress:', sns.registryAddress)
         if (sns && sns.registryAddress && account !== emptyAddress) {
-          getRegisterPrice(sns).then(info => {
-            if (info && info.keyAddress) {
-              getIERC20Instance(info.keyAddress)
-            }
-          })
+          getRegisterPrice(sns)
         }
       })
     }
-  }, [isENSReady, getSNSInstance, getRegisterPrice, getIERC20Instance, account])
+  }, [isENSReady, getSNSInstance, getRegisterPrice, account])
 
   return (
     <MainContainer state="Open">
@@ -381,7 +312,11 @@ const Activity = ({
         ) : (
           <Button
             onClick={() => {
-              setRegisterVisible(true)
+              if (removeSuffixOfKey(searchTerm).length >= 8) {
+                handleRegisterFn()
+              } else {
+                setRegisterVisible(true)
+              }
             }}
           >
             {t('register.buttons.request')}
@@ -412,12 +347,17 @@ const Activity = ({
               setSelectCoins(value)
             }}
           >
-            <Option value={1}>
+            <Option value={0}>
               {weiFormatToEth(registerInfo.maticPrice)} Matic
             </Option>
-            {/* <Option value={2}>
-              {weiFormatToEth(registerInfo.keyPrice)} Key
-            </Option> */}
+            {removeSuffixOfKey(searchTerm).length > 3 ||
+            weiFormatToEth(registerInfo.usdcPrice) > exceedValue ? (
+              <Option value={3}>
+                {weiFormatToEth(registerInfo.usdcPrice)} USDC
+              </Option>
+            ) : (
+              ''
+            )}
           </SelectWrapper>
           <Input
             value={inviteValue}
@@ -444,4 +384,4 @@ const Activity = ({
   )
 }
 
-export default memo(Activity)
+export default memo(MintName)
