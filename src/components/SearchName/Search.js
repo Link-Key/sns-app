@@ -184,6 +184,9 @@ function Search({ history, className, style }) {
     const resp = await checkKeyName({ keyName: value })
     if (resp && resp.data && resp.data.code === 200) {
       setRegisterStatus(resp.data.data.registered)
+    } else {
+      setRegisterStatus(null)
+      setFocusState(false)
     }
   }
 
@@ -239,11 +242,7 @@ function Search({ history, className, style }) {
     }
     // input.value = ''
     if (type === 'supported' || type === 'short') {
-      if (searchTerm.split('.')[0].length === 3 && !isRegister) {
-        history.push(`/ShortName/${searchTerm}`)
-        return
-      }
-      history.push(`/name/${searchTerm}`)
+      history.push(`/mint/${searchTerm}`)
       return
     } else {
       let suffix
@@ -252,9 +251,7 @@ function Search({ history, className, style }) {
       } else {
         suffix = searchTerm
       }
-      suffix.length === 7 && !isRegister
-        ? history.push(`/ShortName/${suffix}`)
-        : history.push(`/name/${suffix}`)
+      history.push(`/mint/${suffix}`)
     }
   }
 

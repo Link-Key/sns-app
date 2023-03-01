@@ -193,7 +193,7 @@
       "suspend": "登録の一時停止"
     },
     "favourite": "* ブラウザを閉じた時にアクセスしやすいよう名前をお気に入りに登録する",
-    "increaseRegistrationPeriod": "新規登録者100名につき登録料が0.3Maticまたは0.25USDC増加、毎週木・金曜日は登録料が50％OFFになります。",
+    "increaseRegistrationPeriod": "新規登録者100名につき登録料が0.3Maticまたは0.25USDC増加、期間限定50％オフ、2023年3月31日まで。",
     
     "registerHint1": "",
     "registerHint2": "でFollow-NFT/Group-NFTの発行に登録し、Web3のソーシャルサークルへの旅を開始する。",
@@ -483,6 +483,6 @@
     "tip": "最近のデータだけをお見せします",
     "details":"取引内容",
     "note":"注意：KEYで支払う際にxxx.keyの招待コードを入力すると、登録時に10％の割引が適用されます（招待コードが無効な場合は割引が適用されません）。",
-    "inp":"xxx.keyを入力（任意）"
+    "inp":"招待状のコードを入力してください。例：xxx.key（任意）"
   }
 }

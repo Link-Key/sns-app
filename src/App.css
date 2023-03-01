@@ -122,3 +122,8 @@
 
   background-color: rgba(50, 50, 50, 0.1);
 }
+
+#WEB3_CONNECT_MODAL_ID {
+  position: relative;
+  z-index: 999;
+}

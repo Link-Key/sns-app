@@ -1,6 +1,4 @@
-import { setup as setupENS } from '../apollo/mutations/ens'
 import { setup as setupSNS } from '../apollo/mutations/sns'
-// import { setup as setupENS } from '../apollo/mutations/ens'
 import {
   isReadOnlyReactive,
   networkIdReactive,
@@ -9,6 +7,10 @@ import {
 } from '../apollo/reactiveVars'
 // import { getNetwork, getNetworkId, isReadOnly } from '@ensdomains/ui'
 import { getNetwork, getNetworkId, isReadOnly } from 'sns-app-contract-api'
+import { providers } from 'ethers'
+import OkxIconSvg from '../assets/okxWalletIcon.svg'
+import messageMention from 'utils/messageMention'
+import { handleUnsupportedNetwork, isSupportedNetwork } from 'setup'
 
 const INFURA_ID =
   window.location.host === 'sns.chat'
@@ -22,40 +24,42 @@ const option = {
   network: 'mainnet', // optional
   cacheProvider: true, // optional
   providerOptions: {
-    // walletconnect: {
-    //   package: () => import('@walletconnect/web3-provider'),
-    //   packageFactory: true,
-    //   options: {
-    //     infuraId: INFURA_ID
-    //   }
-    // },
-    // walletlink: {
-    //   package: () => import('walletlink'),
-    //   packageFactory: true,
-    //   options: {
-    //     appName: 'sns-app',
-    //     jsonRpcUrl: `https://polygon-mainnet.infura.io/v3/${INFURA_ID}`
-    //   }
-    // },
-    // mewconnect: {
-    //   package: () => import('@myetherwallet/mewconnect-web-client'),
-    //   packageFactory: true,
-    //   options: {
-    //     infuraId: INFURA_ID,
-    //     description: ' '
-    //   }
-    // },
-    // portis: {
-    //   package: () => import('@portis/web3'),
-    //   packageFactory: true,
-    //   options: {
-    //     id: PORTIS_ID
-    //   }
-    // },
-    // torus: {
-    //   package: () => import('@toruslabs/torus-embed'),
-    //   packageFactory: true
-    // }
+    walletconnect: {
+      package: () => import('@walletconnect/web3-provider'),
+      packageFactory: true,
+      options: {
+        infuraId: INFURA_ID
+      }
+    },
+    'custom-okx': {
+      display: {
+        logo: OkxIconSvg,
+        name: 'OKX Wallet',
+        description: 'Connect to your OKX Wallet'
+      },
+      options: {
+        // infuraId: INFURA_ID
+        jsonRpcUrl: `https://polygon-mainnet.infura.io/v3/${INFURA_ID}`
+      },
+      package: () => import('@walletconnect/ethereum-provider'),
+      connector: async (ProviderPackage, options) => {
+        try {
+          const provider = window.okexchain
+          if (!window.okxwallet) {
+            messageMention({
+              type: 'warn',
+              content: 'Please install OKX Wallet'
+            })
+            return
+          }
+          await okxwallet.enable()
+          // await provider.enable()
+          return provider
+        } catch (error) {
+          console.log('connectorErr:', error)
+        }
+      }
+    }
   }
 }
 
@@ -67,6 +71,11 @@ export const connect = async () => {
     web3Modal = new Web3Modal(option)
     provider = await web3Modal.connect()
 
+    if (!isSupportedNetwork(Number(provider.networkVersion))) {
+      handleUnsupportedNetwork()
+      return
+    }
+
     await setupSNS({
       customProvider: provider,
       reloadOnAccountsChange: false,
@@ -77,6 +86,7 @@ export const connect = async () => {
     if (e !== 'Modal closed by user') {
       throw e
     }
+    throw e
   }
 }
 
