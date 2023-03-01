@@ -105,7 +105,7 @@ const MintName = ({
   const { t } = useTranslation()
   const account = useAccount()
   const [registerVisible, setRegisterVisible] = useState(false)
-  const [selectCoins, setSelectCoins] = useState(0)
+  const [selectCoins, setSelectCoins] = useState()
   const [registerInfo, serRegisterInfo] = useState({
     keyPrice: 0,
     maticPrice: 0,
@@ -126,47 +126,9 @@ const MintName = ({
 
   const handleCloseFn = useCallback(() => {
     setRegisterVisible(false)
-    setSelectCoins(1)
-    setInviteValue('')
+    setSelectCoins()
+    setInviteValue(localStorage.getItem('sns_invite'))
   }, [])
-
-  // const maticRegisterFn = useCallback(
-  //   async inviteName => {
-  //     setCurrentStep(2)
-  //     let inviteAdd = emptyAddress
-  //     if (inviteName) {
-  //       inviteAdd = await snsInstance.getResolverOwner(inviteName)
-  //     }
-  //     const price = await snsInstance.getInfo(emptyAddress, '', 0, inviteAdd)
-  //     const maticAmount = BNformatToWei(price.priceOfShort.maticPrice)
-  //     snsInstance.shortNameMint(searchTerm, 1, inviteAdd, maticAmount).then(
-  //       () => {
-  //         window.registerComTimer = setTimeout(() => {
-  //           setInterval(async () => {
-  //             const isSuccessRegister = await snsInstance.recordExists(
-  //               searchTerm
-  //             )
-  //             console.log('isSuccessRegister:', isSuccessRegister)
-  //             if (isSuccessRegister) {
-  //               clearInterval(window.registerComTimer)
-  //               setCurrentStep(3)
-  //             }
-  //           }, 2000)
-  //         }, 0)
-  //       },
-  //       error => {
-  //         console.log('maticRegisterFnErr:', error)
-  //         if (error && error.data && error.data.message) {
-  //           messageMention({ type: 'error', content: error.data.message })
-  //         } else {
-  //           messageMention({ type: 'error', content: 'mint error' })
-  //         }
-  //         setCurrentStep(0)
-  //       }
-  //     )
-  //   },
-  //   [searchTerm, snsInstance, emptyAddress]
-  // )
 
   const handleRegisterFn = useCallback(
     async inviteName => {
@@ -257,6 +219,9 @@ const MintName = ({
     }
   }, [isENSReady, getSNSInstance, getRegisterPrice, account])
 
+  console.log('maticPrice:', registerInfo.maticPrice)
+  console.log('exceedValue:', registerInfo.maticPrice > exceedValue)
+
   return (
     <MainContainer state="Open">
       <TopBar percentDone={100}>
@@ -342,16 +307,20 @@ const MintName = ({
             status="error"
             value={selectCoins}
             size="middle"
+            placeholder={t('c.selectCoins')}
             width="100%"
             onChange={value => {
               setSelectCoins(value)
             }}
           >
-            <Option value={0}>
-              {weiFormatToEth(registerInfo.maticPrice)} Matic
-            </Option>
-            {removeSuffixOfKey(searchTerm).length > 3 ||
-            weiFormatToEth(registerInfo.usdcPrice) > exceedValue ? (
+            {registerInfo.maticPrice < exceedValue ? (
+              <Option value={0}>
+                {weiFormatToEth(registerInfo.maticPrice)} Matic
+              </Option>
+            ) : (
+              ''
+            )}
+            {registerInfo.usdcPrice < exceedValue ? (
               <Option value={3}>
                 {weiFormatToEth(registerInfo.usdcPrice)} USDC
               </Option>
@@ -370,6 +339,7 @@ const MintName = ({
           <AntButton
             danger
             shape="round"
+            disabled={removeSuffixOfKey(searchTerm).length < 3}
             block
             type="primary"
             onClick={async () => {
