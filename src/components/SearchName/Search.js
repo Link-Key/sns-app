@@ -242,7 +242,9 @@ function Search({ history, className, style }) {
     }
     // input.value = ''
     if (type === 'supported' || type === 'short') {
-      history.push(`/mint/${searchTerm}`)
+      isRegister
+        ? history.push(`/name/${searchTerm}`)
+        : history.push(`/mint/${searchTerm}`)
       return
     } else {
       let suffix
@@ -251,7 +253,9 @@ function Search({ history, className, style }) {
       } else {
         suffix = searchTerm
       }
-      history.push(`/mint/${suffix}`)
+      isRegister
+        ? history.push(`/name/${suffix}`)
+        : history.push(`/mint/${suffix}`)
     }
   }
 
