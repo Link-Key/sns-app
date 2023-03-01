@@ -9,14 +9,12 @@ import { setup } from './apollo/mutations/sns'
 import { connect } from './api/web3modal'
 import {
   accountsReactive,
-  favouritesReactive,
   globalErrorReactive,
   isAppReadyReactive,
   isReadOnlyReactive,
   networkIdReactive,
   networkReactive,
   reverseRecordReactive,
-  subDomainFavouritesReactive,
   web3ProviderReactive,
   snsNameReactive
 } from './apollo/reactiveVars'
@@ -25,18 +23,6 @@ import { getReverseRecord } from './apollo/sideEffects'
 import { safeInfo, setupSafeApp } from './utils/safeApps'
 import getSNS from './apollo/mutations/sns'
 import messageMention from 'utils/messageMention'
-
-export const setFavourites = () => {
-  favouritesReactive(
-    JSON.parse(window.localStorage.getItem('ensFavourites')) || []
-  )
-}
-
-export const setSubDomainFavourites = () => {
-  subDomainFavouritesReactive(
-    JSON.parse(window.localStorage.getItem('ensSubDomainFavourites')) || []
-  )
-}
 
 export const handleUnsupportedNetwork = (provider = window.ethereum) => {
   try {
@@ -82,7 +68,8 @@ export const getProvider = async reconnect => {
     ) {
       const { providerObject } = await setup({
         reloadOnAccountsChange: false,
-        customProvider: 'http://localhost:8545',
+        // customProvider: 'http://localhost:8545',
+        customProvider: 'https://polygon-rpc.com/',
         ensAddress: process.env.REACT_APP_ENS_ADDRESS
       })
       provider = providerObject
@@ -152,8 +139,12 @@ export const setWeb3Provider = async provider => {
     accountsReactive(accounts)
     const account = accounts[0]
     const sns = getSNS()
-    const name = await sns.getNameOfOwner(account)
-    snsNameReactive(name)
+    try {
+      const name = await sns.getNameOfOwner(account)
+      snsNameReactive(name)
+    } catch (error) {
+      console.log('snsNameReactiveError:', error)
+    }
   }
 
   provider?.on('chainChanged', async _chainId => {
@@ -186,12 +177,11 @@ export const setWeb3Provider = async provider => {
 
 export default async reconnect => {
   try {
-    // setFavourites()
-    // setSubDomainFavourites()
-
     const provider = await getProvider(reconnect)
 
-    if (!provider) throw 'Please install a wallet'
+    console.log('chainId:', provider.chainId)
+
+    if (!provider.chainId) throw 'Please install a wallet'
 
     const networkId = await getNetworkId()
 
@@ -219,6 +209,5 @@ export default async reconnect => {
       type: 'warn',
       content: <Trans i18nKey={'warnings.wallerCon'} />
     })
-    console.error('setup error: ', e)
   }
 }

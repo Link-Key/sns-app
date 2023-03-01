@@ -492,3 +492,7 @@ export const ethFormatToWei = value => {
 export const BNformatToWei = value => {
   return formatUnits(value, 'wei')
 }
+
+export const removeSuffixOfKey = name => {
+  return name.split('.key')[0]
+}

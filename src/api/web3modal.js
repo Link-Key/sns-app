@@ -22,7 +22,7 @@ const PORTIS_ID = '57e5d6ca-e408-4925-99c4-e7da3bdb8bf5'
 let provider
 const option = {
   network: 'mainnet', // optional
-  cacheProvider: false, // optional
+  cacheProvider: true, // optional
   providerOptions: {
     walletconnect: {
       package: () => import('@walletconnect/web3-provider'),
@@ -60,33 +60,6 @@ const option = {
         }
       }
     }
-    // walletlink: {
-    //   package: () => import('walletlink'),
-    //   packageFactory: true,
-    //   options: {
-    //     appName: 'sns-app',
-    //     jsonRpcUrl: `https://polygon-mainnet.infura.io/v3/${INFURA_ID}`
-    //   }
-    // },
-    // mewconnect: {
-    //   package: () => import('@myetherwallet/mewconnect-web-client'),
-    //   packageFactory: true,
-    //   options: {
-    //     infuraId: INFURA_ID,
-    //     description: ' '
-    //   }
-    // },
-    // portis: {
-    //   package: () => import('@portis/web3'),
-    //   packageFactory: true,
-    //   options: {
-    //     id: PORTIS_ID
-    //   }
-    // },
-    // torus: {
-    //   package: () => import('@toruslabs/torus-embed'),
-    //   packageFactory: true
-    // }
   }
 }
 
