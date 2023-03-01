@@ -501,3 +501,7 @@ export const matchInviteCode = () => {
   }
   return `${inviteCode}.key`
 }
+
+export const removeSuffixOfKey = name => {
+  return name.split('.key')[0]
+}
