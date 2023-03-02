@@ -496,3 +496,11 @@ export const BNformatToWei = value => {
 export const removeSuffixOfKey = name => {
   return name.split('.key')[0]
 }
+
+export const handleContractError = msg => {
+  if (msg && msg.includes('---')) {
+    return msg.split('---')[1]
+  } else {
+    return msg
+  }
+}
