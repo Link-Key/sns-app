@@ -26,6 +26,7 @@ import {
   BNformatToWei,
   emptyAddress,
   ethFormatToWei,
+  handleContractError,
   hexToNumber,
   removeSuffixOfKey,
   weiFormatToEth
@@ -33,6 +34,7 @@ import {
 import { LoadingOutlined } from '@ant-design/icons'
 import messageMention from 'utils/messageMention'
 import { useHistory } from 'react-router'
+import { namesReactive } from '../apollo/reactiveVars'
 
 const NameWrapper = styled('div')`
   display: flex;
@@ -105,7 +107,7 @@ const MintName = ({
   const { t } = useTranslation()
   const account = useAccount()
   const [registerVisible, setRegisterVisible] = useState(false)
-  const [selectCoins, setSelectCoins] = useState()
+  const [selectCoins, setSelectCoins] = useState(0)
   const [registerInfo, serRegisterInfo] = useState({
     keyPrice: 0,
     maticPrice: 0,
@@ -126,7 +128,7 @@ const MintName = ({
 
   const handleCloseFn = useCallback(() => {
     setRegisterVisible(false)
-    setSelectCoins()
+    setSelectCoins(0)
     setInviteValue(localStorage.getItem('sns_invite'))
   }, [])
 
@@ -135,7 +137,11 @@ const MintName = ({
       setCurrentStep(2)
       let inviteAdd = emptyAddress
       if (inviteName) {
-        inviteAdd = await snsInstance.getResolverOwner(inviteName)
+        try {
+          inviteAdd = await snsInstance.getResolverOwner(inviteName)
+        } catch (error) {
+          throw error
+        }
       }
       snsInstance
         .mint(removeSuffixOfKey(searchTerm), selectCoins, inviteAdd)
@@ -157,7 +163,15 @@ const MintName = ({
           error => {
             console.log('handleRegisterFnErr:', error)
             if (error && error.data && error.data.message) {
-              messageMention({ type: 'error', content: error.data.message })
+              messageMention({
+                type: 'error',
+                content: handleContractError(error.data.message)
+              })
+            } else if (error && error.message) {
+              messageMention({
+                type: 'error',
+                content: handleContractError(error.message)
+              })
             } else {
               messageMention({ type: 'error', content: 'mint error' })
             }
@@ -171,29 +185,31 @@ const MintName = ({
 
   const getRegisterPrice = useCallback(
     async sns => {
-      const coinPrice = await sns.getPriceInfo(
-        account,
-        removeSuffixOfKey(searchTerm),
-        emptyAddress
-      )
-      console.log('searchTerm:', searchTerm)
-      console.log('coinPrice:', coinPrice)
-      if (coinPrice) {
-        const maticAmount = BNformatToWei(coinPrice.maticPrice)
-        const keyAmount = BNformatToWei(coinPrice.keyPrice)
-        const usdcAmount = BNformatToWei(coinPrice.usdcPrice)
-        const info = {
-          maticPrice: maticAmount,
-          keyPrice: keyAmount,
-          usdcPrice: usdcAmount
+      try {
+        const coinPrice = await sns.getPriceInfo(
+          account,
+          removeSuffixOfKey(searchTerm),
+          emptyAddress
+        )
+        if (coinPrice) {
+          const maticAmount = BNformatToWei(coinPrice.maticPrice)
+          const keyAmount = BNformatToWei(coinPrice.keyPrice)
+          const usdcAmount = BNformatToWei(coinPrice.usdcPrice)
+          const info = {
+            maticPrice: maticAmount,
+            keyPrice: keyAmount,
+            usdcPrice: usdcAmount
+          }
+          console.log('info:', info)
+          serRegisterInfo({
+            ...info
+          })
+          return info
         }
-        console.log('info:', info)
-        serRegisterInfo({
-          ...info
-        })
-        return info
+      } catch (error) {
+        console.log('getRegisterPriceErr:', error)
+        return {}
       }
-      return {}
     },
     [account, emptyAddress, removeSuffixOfKey]
   )
@@ -211,16 +227,17 @@ const MintName = ({
 
   useEffect(() => {
     if (isENSReady) {
-      getSNSInstance().then(sns => {
-        if (sns && sns.registryAddress && account !== emptyAddress) {
-          getRegisterPrice(sns)
-        }
-      })
+      getSNSInstance()
+        .then(sns => {
+          if (sns && sns.registryAddress && account !== emptyAddress) {
+            getRegisterPrice(sns)
+          }
+        })
+        .catch(e => {
+          console.log('getSNSInstanceError:', e)
+        })
     }
   }, [isENSReady, getSNSInstance, getRegisterPrice, account])
-
-  console.log('maticPrice:', registerInfo.maticPrice)
-  console.log('exceedValue:', registerInfo.maticPrice > exceedValue)
 
   return (
     <MainContainer state="Open">
@@ -278,7 +295,7 @@ const MintName = ({
           <Button
             onClick={() => {
               if (removeSuffixOfKey(searchTerm).length >= 8) {
-                handleRegisterFn()
+                handleRegisterFn(inviteValue)
               } else {
                 setRegisterVisible(true)
               }
@@ -307,26 +324,18 @@ const MintName = ({
             status="error"
             value={selectCoins}
             size="middle"
-            placeholder={t('c.selectCoins')}
             width="100%"
+            placeholder={t('c.selectCoins')}
             onChange={value => {
               setSelectCoins(value)
             }}
           >
-            {registerInfo.maticPrice < exceedValue ? (
-              <Option value={0}>
-                {weiFormatToEth(registerInfo.maticPrice)} Matic
-              </Option>
-            ) : (
-              ''
-            )}
-            {registerInfo.usdcPrice < exceedValue ? (
-              <Option value={3}>
-                {weiFormatToEth(registerInfo.usdcPrice)} USDC
-              </Option>
-            ) : (
-              ''
-            )}
+            <Option value={0} disabled={registerInfo.maticPrice >= exceedValue}>
+              {weiFormatToEth(registerInfo.maticPrice)} Matic
+            </Option>
+            <Option value={3} disabled={registerInfo.usdcPrice >= exceedValue}>
+              {weiFormatToEth(registerInfo.usdcPrice)} USDC
+            </Option>
           </SelectWrapper>
           <Input
             value={inviteValue}
@@ -339,11 +348,14 @@ const MintName = ({
           <AntButton
             danger
             shape="round"
-            disabled={removeSuffixOfKey(searchTerm).length < 3}
             block
             type="primary"
-            onClick={async () => {
-              await handleRegisterFn()
+            disabled={
+              registerInfo.usdcPrice >= exceedValue &&
+              registerInfo.maticPrice >= exceedValue
+            }
+            onClick={() => {
+              handleRegisterFn(inviteValue)
             }}
           >
             {t('c.register')}
