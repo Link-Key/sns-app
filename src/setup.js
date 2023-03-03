@@ -179,13 +179,11 @@ export default async reconnect => {
   try {
     const provider = await getProvider(reconnect)
 
-    console.log('chainId:', provider.chainId)
+    if (!provider) throw 'Please install a wallet'
 
-    if (!provider.chainId) throw 'Please install a wallet'
+    const chainIdHex = await provider.request({ method: 'eth_chainId' })
 
-    const networkId = await getNetworkId()
-
-    if (!isSupportedNetwork(networkId)) {
+    if (!isSupportedNetwork(parseInt(chainIdHex, 16))) {
       handleUnsupportedNetwork(provider)
       return
     }
