@@ -237,7 +237,7 @@ const MintName = ({
           console.log('getSNSInstanceError:', e)
         })
     }
-  }, [isENSReady, getSNSInstance, getRegisterPrice, account])
+  }, [isENSReady, getSNSInstance, getRegisterPrice, account, searchTerm])
 
   return (
     <MainContainer state="Open">

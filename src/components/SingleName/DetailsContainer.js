@@ -29,7 +29,7 @@ import DefaultButton from '../Forms/Button'
 import DefaultAddressLink from '../Links/AddressLink'
 
 import { ReactComponent as DefaultOrangeExclamation } from '../Icons/OrangeExclamation.svg'
-import { containZeroWidthStr } from '../../utils/utils'
+import { containZeroWidthStr, emptyAddress } from '../../utils/utils'
 import * as PropTypes from 'prop-types'
 
 const Details = styled('section')`
@@ -215,9 +215,11 @@ function DetailsContainer({
 
   const isExpired = false
   const domainOwner =
-    domain.available || domain.owner === '0x0' ? null : domain.owner
+    domain.available || domain.owner === emptyAddress ? null : domain.owner
   const registrant =
-    domain.available || domain.registrant === '0x0' ? null : domain.registrant
+    domain.available || domain.registrant === emptyAddress
+      ? null
+      : domain.registrant
   const domainParent =
     domain.name === '[root]' ? null : domain.parent ? domain.parent : '[root]'
 
