@@ -296,6 +296,11 @@ const MintName = ({
             onClick={() => {
               if (removeSuffixOfKey(searchTerm).length >= 8) {
                 handleRegisterFn(inviteValue)
+              } else if (removeSuffixOfKey(searchTerm).length < 3) {
+                messageMention({
+                  type: 'warn',
+                  content: t('searchErrors.tooShort.short2')
+                })
               } else {
                 setRegisterVisible(true)
               }
