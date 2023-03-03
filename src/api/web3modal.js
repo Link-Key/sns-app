@@ -71,11 +71,6 @@ export const connect = async () => {
     web3Modal = new Web3Modal(option)
     provider = await web3Modal.connect()
 
-    if (!isSupportedNetwork(Number(provider.networkVersion))) {
-      handleUnsupportedNetwork()
-      return
-    }
-
     await setupSNS({
       customProvider: provider,
       reloadOnAccountsChange: false,
