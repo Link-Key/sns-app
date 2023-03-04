@@ -4,7 +4,7 @@ import { useTranslation } from 'react-i18next'
 import { gql } from '@apollo/client'
 import { useQuery } from '@apollo/client'
 import { LoadingOutlined, RightOutlined } from '@ant-design/icons'
-import { parseSearchTerm } from '../../utils/utils'
+import { parseSearchTerm, removeLegalUnicodeChar } from '../../utils/utils'
 import '../../api/subDomainRegistrar'
 import { withRouter } from 'react-router'
 import searchIcon from '../../assets/search.png'
@@ -226,7 +226,7 @@ function Search({ history, className, style }) {
       searchTerm = inputValue.toLowerCase()
     }
     // remove empty str
-    searchTerm = searchTerm.replace(/\s*/g, '')
+    searchTerm = removeLegalUnicodeChar(searchTerm)
     if (!searchTerm || searchTerm.length < 1) {
       return
     }
