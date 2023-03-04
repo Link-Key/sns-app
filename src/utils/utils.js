@@ -513,3 +513,10 @@ export const handleContractError = msg => {
     return msg
   }
 }
+
+export const removeLegalUnicodeChar = name => {
+  return name.replace(
+    /[\u0000-\u0020\u007f-\u009f\u200b-\u200f\uFEFF\u202a-\u202e\ufff9-\uffff]/g,
+    ''
+  )
+}
