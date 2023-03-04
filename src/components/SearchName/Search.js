@@ -225,6 +225,8 @@ function Search({ history, className, style }) {
       // inputValue doesn't have potential whitespace
       searchTerm = inputValue.toLowerCase()
     }
+    // remove empty str
+    searchTerm = searchTerm.replace(/\s*/g, '')
     if (!searchTerm || searchTerm.length < 1) {
       return
     }

@@ -466,7 +466,7 @@
     "withdrawDes1": "提币申请已提交，你可点击",
     "withdrawDes2": "查看申请状态",
     "withdrawRuleContent": "经团队与社区研究，为防止代币过度释放造成抛压进而影响项目的可持续发展。设定如下提币规则：",
-    "withdrawRuleContent1": "1. 每账户可提取代币：最多10KEY/周，低于10KEY可在一个周期内提取。",
+    "withdrawRuleContent1": "1. 每账户可提取代币：最多2.5KEY/周，低于2.5KEY可在一个周期内提取。",
     "withdrawRuleContent2": "2. 可提取代币采用累积制，若干周期后可一次性提取。",
     "withdrawRuleContent3": "3. 点击提币申请将会收取小额手续费，具体金额会在发起交易时提示。"
   },
