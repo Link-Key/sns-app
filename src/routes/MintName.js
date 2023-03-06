@@ -34,7 +34,7 @@ import {
 import { LoadingOutlined } from '@ant-design/icons'
 import messageMention from 'utils/messageMention'
 import { useHistory } from 'react-router'
-import { namesReactive } from '../apollo/reactiveVars'
+import EthVal from 'ethval'
 
 const NameWrapper = styled('div')`
   display: flex;
@@ -194,13 +194,18 @@ const MintName = ({
         if (coinPrice) {
           const maticAmount = BNformatToWei(coinPrice.maticPrice)
           const keyAmount = BNformatToWei(coinPrice.keyPrice)
-          const usdcAmount = BNformatToWei(coinPrice.usdcPrice)
+          const usdcWeiValue = BNformatToWei(coinPrice.usdcPrice)
+          const usdcAmount =
+            usdcWeiValue >= exceedValue
+              ? usdcWeiValue
+              : new EthVal(`${coinPrice.usdcPrice || 0}`).scaleUp(6).toNumber()
           const info = {
             maticPrice: maticAmount,
             keyPrice: keyAmount,
             usdcPrice: usdcAmount
           }
           console.log('info:', info)
+          console.log('coinPrice:', coinPrice)
           serRegisterInfo({
             ...info
           })
@@ -338,9 +343,16 @@ const MintName = ({
             <Option value={0} disabled={registerInfo.maticPrice >= exceedValue}>
               {weiFormatToEth(registerInfo.maticPrice)} Matic
             </Option>
-            <Option value={3} disabled={registerInfo.usdcPrice >= exceedValue}>
-              {weiFormatToEth(registerInfo.usdcPrice)} USDC
-            </Option>
+            {registerInfo.usdcPrice >= exceedValue ? (
+              ''
+            ) : (
+              <Option
+                value={3}
+                // disabled={registerInfo.usdcPrice >= exceedValue}
+              >
+                {registerInfo.usdcPrice} USDC
+              </Option>
+            )}
           </SelectWrapper>
           <Input
             value={inviteValue}
