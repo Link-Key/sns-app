@@ -2,26 +2,25 @@ import React, { useEffect, useState } from 'react'
 import { useHistory } from 'react-router'
 import styled from '@emotion/styled/macro'
 import shareImg from '../assets/share/shareImg.png'
-import backImgItem from '../assets/share/backImgItem.png'
 import searchImg from '../assets/share/ShareSearch.png'
-import whiteLogo from '../assets/share/whiteLogo.png'
-import ploygonGrant from '../assets/share/ploygonGrant.png'
+import LogoJPG from '../assets/share/logo.png'
 import DiscordIcon from '../assets/D.png'
 import TelegramIcon from '../assets/tg.png'
 import TwitterIcon from '../assets/t.png'
-import QRCode from 'qrcode.react'
 import Loading from 'components/Loading/Loading'
 import { useTranslation } from 'react-i18next'
 import html2canvas from 'html2canvas'
+import QRCode from 'qrcode.react'
 import { Modal } from 'antd'
 import 'antd/es/modal/style/css'
 
 const Share = styled('div')`
   position: relative;
   display: block;
-  width: 100%;
-  height: 80%;
+  width: 350px;
+  margin: 0 auto;
   background-color: #ea6060;
+  border: 1px solid white;
 `
 
 const ShareImg = styled('img')`
@@ -39,105 +38,88 @@ const ShareImg = styled('img')`
   z-index: 999999999;
 `
 
-const InnerBackImg = styled('img')`
-  position: relative;
-  width: 100%;
-  height: 80%;
-  ${p => (p.smallBP ? `top:0;` : `top:-260px;`)}
-`
-
 const ShareTextContainer = styled('div')`
-  position: absolute;
-  width: 100%;
-  height: 500px;
+  height: 150px;
   text-align: center;
-  top: 7%;
+  background-color: #3d3a39;
 `
 
 const ShareTitle = styled('div')`
-  font-family: Overpass;
+  font-family: Impact;
   font-weight: 800;
-  font-size: 120px;
+  font-size: 70px;
   line-height: 75px;
-  color: #f7f8f8;
+  letter-spacing: 5px;
+  color: #fff;
+  padding-top: 30px;
 `
 
 const ShareSubTitle = styled('div')`
-  font-family: Overpass;
+  font-family: Impact;
   font-weight: 800;
-  font-size: 60px;
-  color: #3e3a39;
+  font-size: 30px;
+  color: #fff;
+`
+
+const ShareLogoDesContainer = styled('div')`
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding-bottom: 30px;
+`
+
+const LogoWrapper = styled('div')`
+  display: flex;
+  justify-content: center;
+  margin-top: 20px;
+  img {
+    height: 90px;
+  }
 `
 
 const ShareDes = styled('div')`
-  font-family: sans-serif;
+  font-family: Impact;
   font-weight: 600;
   font-size: 24px;
-  line-height: 5px;
   color: #f7f8f8;
 `
 
-const ShareSign = styled('div')`
-  font-family: sans-serif;
-  font-weight: 600;
-  font-size: 24px;
-  line-height: 5px;
-  color: #f7f8f8;
-  margin-top: 24px;
-`
-
-const LogoImg = styled('img')`
-  position: relative;
-  width: 15px;
-  height: 15px;
-  top: 1px;
-`
-
-const ShareSignText = styled('span')`
-  font-family: emoji;
-  font-size: 15px;
-  padding: 0px 6px;
-`
-
-const QRCodeContainer = styled('div')`
-  position: relative;
-  width: 100%;
-  background-color: #fff;
-  height: 350px;
-`
-
-const QRCodeConent = styled('div')`
-  //position: relative;
-  text-align: center;
-  background-color: #fff;
-  top: 18%;
+const WhiteContainer = styled('div')`
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+  min-height: 100px;
+  gap: 20px;
+  background-color: white;
 `
 
 const QRCodeItem = styled(QRCode)`
-  margin: 10px auto;
   border-radius: 8px;
-  margin-top: 10%;
+  margin-left: 20px;
+`
+const ShareKeyItem = styled('div')`
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: flex-start;
 `
 
 const ShareKeyName = styled('div')`
-  position: absolute;
-  width: 100%;
-  height: 50px;
-  span {
+  display: flex;
+  align-items: center;
+  div {
     font-family: sans-serif;
     font-size: 19px;
     font-weight: 700;
     border: 1px solid black;
     padding: 5px 20px;
     border-radius: 3px;
+    word-break: break-all;
   }
-  margin-top: 5%;
-  left: 50%;
-  transform: translateX(-50%);
 `
 
 const SearchIcon = styled('img')`
-  position: absolute;
   width: 38px;
   height: 38px;
   margin-left: 5px;
@@ -145,21 +127,9 @@ const SearchIcon = styled('img')`
   backgroud-color: #ea6060;
 `
 
-const WebSiteText = styled('div')`
-  position:absolute;
-  width:100%;
-  font-family: Overpass;
-  font-weight: 1000;
-  font-size:18px;
-  margin-top: 17%;
-}
-`
-
 const SharePolygonImg = styled('img')`
-  position: absolute;
-  bottom: 2%;
-  left: 50%;
-  transform: translateX(-50%) scale(0.23);
+  height: 15px;
+  margin: 0 auto;
 `
 
 const ShareFooter = styled('div')`
@@ -250,32 +220,48 @@ function SharedContainer(props) {
           sharedImg()
         }}
       />
-      <InnerBackImg src={backImgItem} smallBP={smallBP} />
       <ShareTextContainer>
-        <ShareTitle>WEB3</ShareTitle>
-        <ShareSubTitle>NAME CARD</ShareSubTitle>
-        <ShareDes>Control your own data</ShareDes>
-        <ShareSign>
-          <LogoImg src={whiteLogo} />
-          <ShareSignText>LINKKEY</ShareSignText>
-        </ShareSign>
+        <ShareTitle>W.E.B.3</ShareTitle>
+        <ShareSubTitle>DID CARD</ShareSubTitle>
       </ShareTextContainer>
-      <QRCodeContainer>
-        <QRCodeConent>
-          <QRCodeItem
-            value={`${protocol}//${hostName}/name/${domain.name}/details`}
-            size={110}
-            fgColor="#ea6060"
-            iconRadius={10}
-          />
+      <ShareLogoDesContainer>
+        <img style={{ height: '150px', paddingTop: '20px' }} src={LogoJPG} />
+        <span
+          style={{
+            fontWeight: 600,
+            fontSize: '18px',
+            color: 'white',
+            marginTop: '10px'
+          }}
+        >
+          BUILD SOCIAL CIRCLE ON WEB3
+        </span>
+        <span
+          style={{
+            fontWeight: 500,
+            fontSize: '13px',
+            color: 'white'
+            // marginTop: '10px'
+          }}
+        >
+          www.linkkey.io
+        </span>
+      </ShareLogoDesContainer>
+      <WhiteContainer>
+        <QRCodeItem
+          value={`${protocol}//${hostName}/name/${domain.name}/details`}
+          size={70}
+          fgColor="#ea6060"
+          iconRadius={10}
+        />
+        <ShareKeyItem>
           <ShareKeyName>
-            <span>{domain.name}</span>
+            <div>{domain.name}</div>
             <SearchIcon src={searchImg} />
           </ShareKeyName>
-          <WebSiteText>www.sns.chat</WebSiteText>
-        </QRCodeConent>
-      </QRCodeContainer>
-      <SharePolygonImg src={ploygonGrant} />
+          <span>www.sns.chat</span>
+        </ShareKeyItem>
+      </WhiteContainer>
       <ShareFooter>
         <ShareItem>
           <img src={DiscordIcon} />
