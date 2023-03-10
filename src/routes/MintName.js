@@ -204,7 +204,6 @@ const MintName = ({
             keyPrice: keyAmount,
             usdcPrice: usdcAmount
           }
-          console.log('info:', info)
           console.log('coinPrice:', coinPrice)
           serRegisterInfo({
             ...info
@@ -243,6 +242,8 @@ const MintName = ({
         })
     }
   }, [isENSReady, getSNSInstance, getRegisterPrice, account, searchTerm])
+
+  console.log('registerInfo:', registerInfo)
 
   return (
     <MainContainer state="Open">
@@ -299,7 +300,12 @@ const MintName = ({
         ) : (
           <Button
             onClick={() => {
-              if (removeSuffixOfKey(searchTerm).length < 3) {
+              if (
+                removeSuffixOfKey(searchTerm).length >= 8 &&
+                Number(registerInfo.maticPrice) === 0
+              ) {
+                handleRegisterFn(inviteValue)
+              } else if (removeSuffixOfKey(searchTerm).length < 3) {
                 messageMention({
                   type: 'warn',
                   content: t('searchErrors.tooShort.short2')
