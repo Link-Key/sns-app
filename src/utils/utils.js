@@ -219,7 +219,7 @@ export const docsPageURL = () => {
   // const lang = window.localStorage.getItem('language') || ''
 
   // return `https://ens.domains/${lang === 'en' ? '' : lang}`
-  return `https://docs.linkkey.tech`
+  return `https://docs.linkkey.io`
 }
 
 export function isRecordEmpty(value) {
