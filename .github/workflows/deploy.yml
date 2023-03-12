@@ -45,15 +45,16 @@ jobs:
       - name: Deploy front-end
         uses: easingthemes/ssh-deploy@main
         env:
-          SSH_PRIVATE_KEY: ${{ secrets.ACCESS_TOKEN_30 }}
-#           SSH_PRIVATE_KEY: ${{ secrets.ACCESS_TOKEN_107 }}
+#           SSH_PRIVATE_KEY: ${{ secrets.ACCESS_TOKEN_30 }}
+          SSH_PRIVATE_KEY: ${{ secrets.ACCESS_TOKEN_107 }}
           ARGS: "-rltgoDzvO --delete"
           SOURCE: "build/"
-#           REMOTE_HOST: '107.148.33.51'
-          REMOTE_HOST: '43.156.153.30'
-          REMOTE_USER:  ubuntu
-#           REMOTE_USER:  root
-          REMOTE_PORT: '22'
-#           REMOTE_PORT: '53445'
+          REMOTE_HOST: '107.148.33.51'
+#           REMOTE_HOST: '43.156.153.30'
+#           REMOTE_USER:  ubuntu
+          REMOTE_USER:  root
+#           REMOTE_PORT: '22'
+          REMOTE_PORT: '53445'
           TARGET: '/www/wwwroot/sns.chat/build'
+#           TARGET: '/home/ubuntu/sns-app/build'
           EXCLUDE: "/node_modules/"
