@@ -55,5 +55,6 @@ jobs:
           REMOTE_USER:  root
 #           REMOTE_PORT: '22'
           REMOTE_PORT: '53445'
+#           TARGET: '/www/wwwroot/sns.chat/build'
           TARGET: '/home/ubuntu/sns-app/build'
           EXCLUDE: "/node_modules/"
