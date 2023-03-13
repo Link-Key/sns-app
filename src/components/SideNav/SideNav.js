@@ -2,18 +2,11 @@ import React from 'react'
 import styled from '@emotion/styled/macro'
 import { useTranslation } from 'react-i18next'
 import { useQuery } from '@apollo/client'
-
 import NetworkInformation from '../NetworkInformation/NetworkInformation'
-import Heart from '../Icons/Heart'
-import File from '../Icons/File'
 import { aboutPageURL, hasNonAscii } from '../../utils/utils'
-import SpeechBubble from '../Icons/SpeechBubble'
-import { ReactComponent as FaqIcon } from '../../assets/faqIcon.svg'
-
 import mq from 'mediaQuery'
 import { Link, withRouter } from 'react-router-dom'
 import gql from 'graphql-tag'
-import Info from 'components/Icons/Info'
 
 const SideNavContainer = styled('nav')`
   display: ${p => (p.isMenuOpen ? 'block' : 'none')};
@@ -173,16 +166,6 @@ function SideNav({ match, isMenuOpen, toggleMenu }) {
             </NavLink>
           </li>
         ) : null}
-        {/*<li>*/}
-        {/*  <NavLink*/}
-        {/*    onClick={toggleMenu}*/}
-        {/*    active={url === '/faq' ? 1 : 0}*/}
-        {/*    to="/faq"*/}
-        {/*  >*/}
-        {/*    /!*<Heart active={url === '/faq'} />*!/*/}
-        {/*    <span>{t('c.faq')}</span>*/}
-        {/*  </NavLink>*/}
-        {/*</li>*/}
         <li>
           <NavLink
             onClick={toggleMenu}
@@ -194,11 +177,8 @@ function SideNav({ match, isMenuOpen, toggleMenu }) {
           </NavLink>
         </li>
         <li>
-          <NavLink>
-            <ThirdPartyLink href={aboutPageURL()}>
-              {/*<Info />*/}
-              <span>{t('c.linkkey')}</span>
-            </ThirdPartyLink>
+          <NavLink to="https://www.linkkey.io">
+            <span>{t('c.linkkey')}</span>
           </NavLink>
         </li>
       </ul>
