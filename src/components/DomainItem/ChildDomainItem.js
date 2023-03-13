@@ -216,37 +216,39 @@ export default function ChildDomainItem({ name, owner, isMigrated, refetch }) {
   // get block info
   const getBlockMsgFn = () => {
     setBlockMsgLoading(true)
-    axios
-      .get(
-        `/api/v1/accountService/account/queryAccount?KeyName=${label}&address=${owner}`
-      )
-      .then(resp => {
-        if (resp && resp.data && resp.data.code === 200) {
-          setBlockMsg(resp.data.data)
-        } else if (resp && resp.data && resp.data.code === 500) {
-          messageMention({
-            type: 'error',
-            content: `${t('serviceMsg.servErr')}`
-          })
-        } else if (resp && resp.data && resp.data.code === 10001) {
-          messageMention({
-            type: 'warn',
-            content: `${t('serviceMsg.paramsIsNull')}`
-          })
-        } else {
+    if (label && owner) {
+      axios
+        .get(
+          `/api/v1/accountService/account/queryAccount?KeyName=${label}&address=${owner}`
+        )
+        .then(resp => {
+          if (resp && resp.data && resp.data.code === 200 && resp.data.data) {
+            setBlockMsg(resp.data.data)
+          } else if (resp && resp.data && resp.data.code === 500) {
+            messageMention({
+              type: 'error',
+              content: `${t('serviceMsg.servErr')}`
+            })
+          } else if (resp && resp.data && resp.data.code === 10001) {
+            messageMention({
+              type: 'warn',
+              content: `${t('serviceMsg.paramsIsNull')}`
+            })
+          } else {
+            messageMention({
+              type: 'error',
+              content: `${t('serviceMsg.recordIsNull')}`
+            })
+          }
+          setBlockMsgLoading(false)
+        })
+        .catch(() => {
           messageMention({
             type: 'error',
             content: `${t('serviceMsg.unkonwErr')}`
           })
-        }
-        setBlockMsgLoading(false)
-      })
-      .catch(() => {
-        messageMention({
-          type: 'error',
-          content: `${t('serviceMsg.unkonwErr')}`
         })
-      })
+    }
   }
 
   // Tips for success after clicking the button
@@ -423,9 +425,14 @@ export default function ChildDomainItem({ name, owner, isMigrated, refetch }) {
   }, [])
 
   const getInviteCountFn = async inviteInstance => {
-    const resp = await inviteInstance.getInviteCount()
-    const count = parseInt(resp._hex, 16)
-    setInviteCount(count)
+    try {
+      const resp = await inviteInstance.getInviteCount()
+      const count = parseInt(resp._hex, 16)
+      setInviteCount(count)
+    } catch (error) {
+      console.log('getInviteCountFnErr:', error)
+      setInviteCount('-')
+    }
   }
 
   const getPolygonscanUrl = async () => {
@@ -433,15 +440,24 @@ export default function ChildDomainItem({ name, owner, isMigrated, refetch }) {
   }
 
   const getInviteKeyIncomeFn = async inviteInstance => {
-    const respKey = await inviteInstance.getInviterIncome(0)
-    const keyIncome = new EthVal(`${respKey._hex || 0}`).toEth().toFixed(3)
-    const respMatic = await inviteInstance.getInviterIncome(1)
-    const maticIncome = new EthVal(`${respMatic._hex || 0}`).toEth().toFixed(3)
-    const respUsdc = await inviteInstance.getInviterIncome(2)
-    const usdcIncome = new EthVal(`${respUsdc._hex || 0}`).toEth().toFixed(3)
-    setInviteKeyIncome(keyIncome)
-    setInviteMaticIncome(maticIncome)
-    setInviteUsdcIncome(usdcIncome)
+    try {
+      const respKey = await inviteInstance.getInviterIncome(0)
+      const keyIncome = new EthVal(`${respKey._hex || 0}`).toEth().toFixed(3)
+      const respMatic = await inviteInstance.getInviterIncome(1)
+      const maticIncome = new EthVal(`${respMatic._hex || 0}`)
+        .toEth()
+        .toFixed(3)
+      const respUsdc = await inviteInstance.getInviterIncome(2)
+      const usdcIncome = new EthVal(`${respUsdc._hex || 0}`).toEth().toFixed(3)
+      setInviteKeyIncome(keyIncome)
+      setInviteMaticIncome(maticIncome)
+      setInviteUsdcIncome(usdcIncome)
+    } catch (error) {
+      setInviteKeyIncome('-')
+      setInviteMaticIncome('-')
+      setInviteUsdcIncome('-')
+      console.log('getInviteKeyIncomeFnErr:', error)
+    }
   }
 
   let networkId = null
@@ -567,9 +583,12 @@ export default function ChildDomainItem({ name, owner, isMigrated, refetch }) {
   useEffect(() => {
     if (isENSReady) {
       const inviteInstance = getSNSInvite()
-      handleIsInviter(inviteInstance)
-      getInviteCountFn(inviteInstance)
-      getInviteKeyIncomeFn(inviteInstance)
+      console.log('inviteInstance:', inviteInstance)
+      if (inviteInstance && inviteInstance.registryAddress) {
+        handleIsInviter(inviteInstance)
+        getInviteCountFn(inviteInstance)
+        getInviteKeyIncomeFn(inviteInstance)
+      }
       getPolygonscanUrl()
     }
   }, [isENSReady])
@@ -677,10 +696,10 @@ export default function ChildDomainItem({ name, owner, isMigrated, refetch }) {
                 )}
               </div>
               <ButtonWrapper
-                disabled={true}
                 danger
                 shape="round"
                 type="primary"
+                disabled={true}
                 onClick={handleInvite}
               >
                 {isInvite ? `${t('invite.list')}` : `${t('invite.become')}`}

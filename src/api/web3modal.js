@@ -72,6 +72,15 @@ export const connect = async () => {
     web3Modal = new Web3Modal(option)
     provider = await web3Modal.connect()
 
+    if (!provider) throw 'Please install a wallet!'
+
+    const chainIdHex = await provider.request({ method: 'eth_chainId' })
+
+    if (!isSupportedNetwork(parseInt(chainIdHex, 16))) {
+      handleUnsupportedNetwork(provider)
+      return
+    }
+
     await setupSNS({
       customProvider: provider,
       reloadOnAccountsChange: false,

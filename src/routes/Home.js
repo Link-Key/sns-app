@@ -288,6 +288,7 @@ const SideNavDropDownContainer = styled(`div`)`
   position: absolute;
   top: 90px;
   width: 100%;
+  z-index: 9999;
 `
 
 const HamburgerContainer = styled(`div`)`
