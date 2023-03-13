@@ -54,7 +54,7 @@ const Account = styled('div')`
 
 const AccountContainer = styled('div')`
   padding: 10px 10px 10px 16px;
-  text-align:center
+  text-align: center;
   position: relative;
   ${mq.medium`
     width: 225px;
