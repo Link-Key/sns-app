@@ -34,7 +34,7 @@ import EthVal from 'ethval'
 import { getAccount, getNetworkId } from 'sns-app-contract-api'
 import { address } from '@myetherwallet/mewconnect-web-client/src/connectProvider/web3Provider/helpers/solidityTypes'
 
-const { Text, Paragraph } = Typography
+const { Text, Paragraph, Title } = Typography
 
 const ChildDomainItemContainer = styled('div')`
   ${mq.small`
@@ -729,6 +729,7 @@ export default function ChildDomainItem({ name, owner, isMigrated, refetch }) {
         <Paragraph>{t('blockMsg.withdrawRuleContent1')}</Paragraph>
         <Paragraph>{t('blockMsg.withdrawRuleContent2')}</Paragraph>
         <Paragraph>{t('blockMsg.withdrawRuleContent3')}</Paragraph>
+        <Title level={5}>{t('blockMsg.withdrawNote')}</Title>
       </ModalWrapper>
       <ModalWrapper
         title={t('invite.modalTitle')}
