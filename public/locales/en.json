@@ -463,7 +463,7 @@
     "totalFrozenSupply": "Frozen KEYs(Network)",
     "blockDate": "Block Date",
     "blockHeight": "Block height for data sync",
-    "EstimatedTimeOfAirdrop": "Airdrop is expected to begin in mid-March 2022",
+    "EstimatedTimeOfAirdrop": "Token airdrop will be closed on December 24, 2024",
     "becomeInviteeNote": "Note: Become an inviter need to pay 150KEY",
     "withdraw": "Withdraw",
     "withdrawRule": "Withdraw rules",
@@ -471,9 +471,10 @@
     "withdrawDes1": "Withdrawal application has been submitted, you can click ",
     "withdrawDes2": " to check the application status",
     "withdrawRuleContent": "After the team and community research, in order to prevent the excessive release of tokens from causing dumping pressure and thus affecting the sustainable development of the project. The following withdrawal rules are set:",
-    "withdrawRuleContent1": "1. Tokens can be withdrawn per account: up to 2.5 KEY/week, below 2.5 KEY can be withdrawn in one cycle.",
-    "withdrawRuleContent2": "2. Tokens can be withdrawn in a cumulative system, and can be withdrawn at once after several cycles. ",
-    "withdrawRuleContent3": "3. A small withdrawal fee will be charged when you click on the token withdrawal request, and the exact amount will be indicated when you initiate the transaction."
+    "withdrawRuleContent1": "1. Tokens can be withdrawn per account: up to 0.25 KEY/day.",
+    "withdrawRuleContent2": "2. Tokens can be withdrawn in a cumulative system, and you can accumulate a one-time withdrawal.",
+    "withdrawRuleContent3": "3. A small withdrawal fee will be charged when you click on the token withdrawal request, and the exact amount will be indicated when you initiate the transaction.",
+    "withdrawNote":"Note: Withdrawal transactions are executed using estimated gas prices, which may cause delays in transaction confirmation (generally within 48h) due to excessive fluctuations in the gas price of the Polygon network."
   },
   "invite":{
     "totalIncome":"Total Invitees Earnings",
