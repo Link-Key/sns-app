@@ -31,6 +31,9 @@ const option = {
         infuraId: INFURA_ID
       }
     },
+    bitkeep: {
+      package: true
+    },
     'custom-okx': {
       display: {
         logo: OkxIconSvg,
@@ -45,11 +48,7 @@ const option = {
       connector: async (ProviderPackage, options) => {
         try {
           if (!window.okexchain) {
-            messageMention({
-              type: 'warn',
-              content: 'Please install OKX Wallet'
-            })
-            return
+            throw 'Please install OKX Wallet'
           }
           const provider = window.okexchain
           await provider.enable()
@@ -67,7 +66,7 @@ const option = {
 let web3Modal
 export const connect = async () => {
   try {
-    const Web3Modal = (await import('@ensdomains/web3modal')).default
+    const Web3Modal = (await import('bitkeep-web3modal')).default
 
     web3Modal = new Web3Modal(option)
     provider = await web3Modal.connect()
