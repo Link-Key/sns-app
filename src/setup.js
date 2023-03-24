@@ -203,9 +203,6 @@ export default async reconnect => {
 
     isAppReadyReactive(true)
   } catch (e) {
-    messageMention({
-      type: 'warn',
-      content: <Trans i18nKey={'warnings.wallerCon'} />
-    })
+    console.error('setup error: ', e)
   }
 }
