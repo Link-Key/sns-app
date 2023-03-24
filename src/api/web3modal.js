@@ -9,6 +9,7 @@ import {
 import { getNetwork, getNetworkId, isReadOnly } from 'sns-app-contract-api'
 import { providers } from 'ethers'
 import OkxIconSvg from '../assets/okxWalletIcon.svg'
+import BitkeepImage from '../assets/wallet/bitkeep.svg'
 import messageMention from 'utils/messageMention'
 import { handleUnsupportedNetwork, isSupportedNetwork } from 'setup'
 
@@ -31,8 +32,35 @@ const option = {
         infuraId: INFURA_ID
       }
     },
-    bitkeep: {
-      package: true
+    'custom-bitkeep': {
+      display: {
+        logo: BitkeepImage,
+        name: 'Bitkeep Wallet',
+        description: 'Connect to your Bitkeep Wallet'
+      },
+      options: {
+        // infuraId: INFURA_ID
+        jsonRpcUrl: `https://polygon-mainnet.infura.io/v3/${INFURA_ID}`
+      },
+      package: () => import('@walletconnect/ethereum-provider'),
+      connector: async () => {
+        try {
+          const provider = window.bitkeep && window.bitkeep.ethereum
+
+          console.log('bitkeep:', provider)
+          if (!provider) {
+            messageMention({
+              type: 'warn',
+              content: 'Please install Bitkeep Wallet'
+            })
+            return {}
+          }
+          return provider
+        } catch (error) {
+          console.log('bitkeepErr:', error)
+          throw error
+        }
+      }
     },
     'custom-okx': {
       display: {
@@ -47,16 +75,20 @@ const option = {
       package: () => import('@walletconnect/ethereum-provider'),
       connector: async (ProviderPackage, options) => {
         try {
-          if (!window.okexchain) {
-            throw 'Please install OKX Wallet'
-          }
           const provider = window.okexchain
-          await provider.enable()
-          console.log('okxwallet:', provider)
+          if (!window.okxwallet) {
+            messageMention({
+              type: 'warn',
+              content: 'Please install OKX Wallet'
+            })
+            return {}
+          }
+          await okxwallet.enable()
           // await provider.enable()
           return provider
         } catch (error) {
-          console.log('connectorErr:', error)
+          console.log('okxErr:', error)
+          throw error
         }
       }
     }
@@ -66,7 +98,8 @@ const option = {
 let web3Modal
 export const connect = async () => {
   try {
-    const Web3Modal = (await import('bitkeep-web3modal')).default
+    // const Web3Modal = (await import('bitkeep-web3modal')).default
+    const Web3Modal = (await import('@ensdomains/web3modal')).default
 
     web3Modal = new Web3Modal(option)
     provider = await web3Modal.connect()
@@ -87,6 +120,7 @@ export const connect = async () => {
     })
     return provider
   } catch (e) {
+    web3Modal.clearCachedProvider()
     if (e !== 'Modal closed by user') {
       throw e
     }
