@@ -26,13 +26,43 @@ const option = {
   network: 'mainnet', // optional
   cacheProvider: true, // optional
   providerOptions: {
-    walletconnect: {
-      package: () => import('@walletconnect/web3-provider'),
-      packageFactory: true,
+    'custom-tp': {
+      display: {
+        logo: tpImage,
+        name: 'TokenPocket',
+        description: 'Connect to your TokenPocket Wallet'
+      },
       options: {
-        infuraId: INFURA_ID
+        // infuraId: INFURA_ID
+        jsonRpcUrl: `https://polygon-mainnet.infura.io/v3/${INFURA_ID}`
+      },
+      package: () => import('@walletconnect/ethereum-provider'),
+      connector: async (ProviderPackage, options) => {
+        try {
+          console.log('isTokenPocket:', typeof window.ethereum?.isTokenPocket)
+          if (typeof window.ethereum.isTokenPocket === 'undefined') {
+            messageMention({
+              type: 'warn',
+              content: 'Please install TokenPocket Wallet'
+            })
+            return {}
+          }
+          const provider = window.ethereum
+          // await provider.enable()
+          return provider
+        } catch (error) {
+          console.log('tpErr:', error)
+          throw error
+        }
       }
     },
+    // walletconnect: {
+    //   package: () => import('@walletconnect/web3-provider'),
+    //   packageFactory: true,
+    //   options: {
+    //     infuraId: INFURA_ID
+    //   }
+    // },
     'custom-bitkeep': {
       display: {
         logo: BitkeepImage,
@@ -89,36 +119,6 @@ const option = {
           return provider
         } catch (error) {
           console.log('okxErr:', error)
-          throw error
-        }
-      }
-    },
-    'custom-tp': {
-      display: {
-        logo: tpImage,
-        name: 'TokenPocket',
-        description: 'Connect to your TokenPocket Wallet'
-      },
-      options: {
-        // infuraId: INFURA_ID
-        jsonRpcUrl: `https://polygon-mainnet.infura.io/v3/${INFURA_ID}`
-      },
-      package: () => import('@walletconnect/ethereum-provider'),
-      connector: async (ProviderPackage, options) => {
-        try {
-          console.log('isTokenPocket:', typeof window.ethereum?.isTokenPocket)
-          if (typeof window.ethereum.isTokenPocket === 'undefined') {
-            messageMention({
-              type: 'warn',
-              content: 'Please install TokenPocket Wallet'
-            })
-            return {}
-          }
-          const provider = window.ethereum
-          // await provider.enable()
-          return provider
-        } catch (error) {
-          console.log('tpErr:', error)
           throw error
         }
       }
