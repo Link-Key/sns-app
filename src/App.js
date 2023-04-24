@@ -131,10 +131,10 @@ export const APP_DATA = gql`
   }
 `
 
-const upgradeMode = false
+const upgradeMode = true
 
 export const upgradeTIme = () => {
-  const date = new Date('2023-04-02 18:00:00').toUTCString()
+  const date = new Date('2023-04-25 00:00:00').toUTCString()
   return date
 }
 
