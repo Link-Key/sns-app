@@ -25,9 +25,7 @@ import { useTranslation } from 'react-i18next'
 import {
   BNformatToWei,
   emptyAddress,
-  ethFormatToWei,
   handleContractError,
-  hexToNumber,
   removeSuffixOfKey,
   weiFormatToEth
 } from 'utils/utils'
@@ -35,6 +33,11 @@ import { LoadingOutlined } from '@ant-design/icons'
 import messageMention from 'utils/messageMention'
 import { useHistory } from 'react-router'
 import EthVal from 'ethval'
+import * as XLSX from 'xlsx'
+import whiteList from '../assets/excel/whiteList.xlsx'
+// import demo from '../assets/excel/demo.xlsx'
+import { MerkleTree } from 'merkletreejs'
+import keccak256 from 'keccak256'
 
 const NameWrapper = styled('div')`
   display: flex;
@@ -120,6 +123,8 @@ const MintName = ({
     localStorage.getItem('sns_invite')
   )
 
+  const [proofState, setProofState] = useState([])
+
   const history = useHistory()
 
   const handleInviteInpChange = e => {
@@ -183,14 +188,55 @@ const MintName = ({
     [emptyAddress, snsInstance, handleCloseFn, removeSuffixOfKey, selectCoins]
   )
 
+  const readExcelData = useCallback(async () => {
+    const buffer = await fetch(whiteList).then(res => res.arrayBuffer())
+    console.log('buffer:', buffer)
+
+    const workbook = XLSX.read(buffer, { type: 'buffer' }) // 读取excel文件
+
+    const sheetNames = workbook.SheetNames // 获取所有sheet的名字
+
+    const domainNameNoKey = removeSuffixOfKey(searchTerm)
+
+    const domainLength =
+      domainNameNoKey.length < 4 ? 0 : domainNameNoKey.length < 8 ? 1 : 2
+
+    console.log('sheetNames:', sheetNames[domainLength])
+    const worksheet = workbook.Sheets[sheetNames[domainLength]] // 获取第一个sheet
+
+    const data = XLSX.utils.sheet_to_json(worksheet) // 将sheet转换为json数据
+
+    const list = []
+    Object.values(data).map(item => {
+      list.push(item.address)
+    })
+    return list
+  }, [searchTerm])
+
+  const getMerkleTreeRoot = useCallback(async () => {
+    const whiteAddresses = await readExcelData()
+    const leafNodes = whiteAddresses.map(address => keccak256(address))
+    const tree = new MerkleTree(leafNodes, keccak256, { sortPairs: true })
+
+    const root = tree.getRoot()
+    console.log('Root hash is: ', root.toString('hex'))
+
+    const leaf = keccak256(account)
+    const proof = tree.getHexProof(leaf)
+    console.log('proof:', proof)
+    setProofState(proof)
+  }, [account, readExcelData])
+
   const getRegisterPrice = useCallback(
     async sns => {
       try {
         const coinPrice = await sns.getPriceInfo(
           account,
           removeSuffixOfKey(searchTerm),
-          emptyAddress
+          emptyAddress,
+          proofState
         )
+        console.log('proofState:', proofState)
         if (coinPrice) {
           const maticAmount = BNformatToWei(coinPrice.maticPrice)
           const keyAmount = BNformatToWei(coinPrice.keyPrice)
@@ -215,7 +261,7 @@ const MintName = ({
         return {}
       }
     },
-    [account, emptyAddress, removeSuffixOfKey]
+    [account, emptyAddress, removeSuffixOfKey, proofState]
   )
 
   const getSNSInstance = useCallback(async () => {
@@ -243,7 +289,9 @@ const MintName = ({
     }
   }, [isENSReady, getSNSInstance, getRegisterPrice, account, searchTerm])
 
-  console.log('registerInfo:', registerInfo)
+  useEffect(() => {
+    getMerkleTreeRoot()
+  }, [getMerkleTreeRoot])
 
   return (
     <MainContainer state="Open">
