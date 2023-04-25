@@ -110,7 +110,7 @@ const MintName = ({
   const { t } = useTranslation()
   const account = useAccount()
   const [registerVisible, setRegisterVisible] = useState(false)
-  const [selectCoins, setSelectCoins] = useState(0)
+  const [selectCoins, setSelectCoins] = useState(3)
   const [registerInfo, serRegisterInfo] = useState({
     keyPrice: 0,
     maticPrice: 0,
@@ -293,6 +293,8 @@ const MintName = ({
     getMerkleTreeRoot()
   }, [getMerkleTreeRoot])
 
+  console.log('matic:', weiFormatToEth(registerInfo.maticPrice))
+
   return (
     <MainContainer state="Open">
       <TopBar percentDone={100}>
@@ -392,9 +394,17 @@ const MintName = ({
               setSelectCoins(value)
             }}
           >
-            <Option value={0} disabled={registerInfo.maticPrice >= exceedValue}>
-              {weiFormatToEth(registerInfo.maticPrice)} Matic
-            </Option>
+            {weiFormatToEth(registerInfo.maticPrice) !== 0 ? (
+              <Option
+                value={0}
+                disabled={registerInfo.maticPrice >= exceedValue}
+              >
+                {weiFormatToEth(registerInfo.maticPrice)} Matic
+              </Option>
+            ) : (
+              ''
+            )}
+
             {registerInfo.usdcPrice >= exceedValue ? (
               ''
             ) : (
