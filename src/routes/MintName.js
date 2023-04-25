@@ -149,7 +149,7 @@ const MintName = ({
         }
       }
       snsInstance
-        .mint(removeSuffixOfKey(searchTerm), selectCoins, inviteAdd)
+        .mint(removeSuffixOfKey(searchTerm), selectCoins, inviteAdd, proofState)
         .then(
           () => {
             window.registerComTimer = setTimeout(() => {
@@ -218,8 +218,8 @@ const MintName = ({
     const leafNodes = whiteAddresses.map(address => keccak256(address))
     const tree = new MerkleTree(leafNodes, keccak256, { sortPairs: true })
 
-    const root = tree.getRoot()
-    console.log('Root hash is: ', root.toString('hex'))
+    // const root = tree.getRoot()
+    // console.log('Root hash is: ', root.toString('hex'))
 
     const leaf = keccak256(account)
     const proof = tree.getHexProof(leaf)
