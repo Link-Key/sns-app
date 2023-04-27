@@ -123,8 +123,6 @@ const MintName = ({
     localStorage.getItem('sns_invite')
   )
 
-  const [proofState, setProofState] = useState([])
-
   const history = useHistory()
 
   const handleInviteInpChange = e => {
@@ -148,8 +146,11 @@ const MintName = ({
           throw error
         }
       }
+
+      const proof = await getMerkleTreeRoot()
+      console.log('register:', proof)
       snsInstance
-        .mint(removeSuffixOfKey(searchTerm), selectCoins, inviteAdd, proofState)
+        .mint(removeSuffixOfKey(searchTerm), selectCoins, inviteAdd, proof)
         .then(
           () => {
             window.registerComTimer = setTimeout(() => {
@@ -190,8 +191,6 @@ const MintName = ({
 
   const readExcelData = useCallback(async () => {
     const buffer = await fetch(whiteList).then(res => res.arrayBuffer())
-    console.log('buffer:', buffer)
-
     const workbook = XLSX.read(buffer, { type: 'buffer' }) // 读取excel文件
 
     const sheetNames = workbook.SheetNames // 获取所有sheet的名字
@@ -200,6 +199,8 @@ const MintName = ({
 
     const domainLength =
       domainNameNoKey.length < 4 ? 0 : domainNameNoKey.length < 8 ? 1 : 2
+
+    console.log('domainLength:', domainLength)
 
     console.log('sheetNames:', sheetNames[domainLength])
     const worksheet = workbook.Sheets[sheetNames[domainLength]] // 获取第一个sheet
@@ -223,20 +224,20 @@ const MintName = ({
 
     const leaf = keccak256(account)
     const proof = tree.getHexProof(leaf)
-    console.log('proof:', proof)
-    setProofState(proof)
-  }, [account, readExcelData])
+    return proof
+  }, [account])
 
   const getRegisterPrice = useCallback(
     async sns => {
       try {
+        const proof = await getMerkleTreeRoot()
+        console.log('getPriceProof:', proof)
         const coinPrice = await sns.getPriceInfo(
           account,
           removeSuffixOfKey(searchTerm),
           emptyAddress,
-          proofState
+          proof
         )
-        console.log('proofState:', proofState)
         if (coinPrice) {
           const maticAmount = BNformatToWei(coinPrice.maticPrice)
           const keyAmount = BNformatToWei(coinPrice.keyPrice)
@@ -250,7 +251,12 @@ const MintName = ({
             keyPrice: keyAmount,
             usdcPrice: usdcAmount
           }
-          console.log('coinPrice:', coinPrice)
+          console.log(
+            'coinPrice-account-searchTearm:',
+            info,
+            account,
+            removeSuffixOfKey(searchTerm)
+          )
           serRegisterInfo({
             ...info
           })
@@ -261,7 +267,7 @@ const MintName = ({
         return {}
       }
     },
-    [account, emptyAddress, removeSuffixOfKey, proofState]
+    [account, emptyAddress, removeSuffixOfKey]
   )
 
   const getSNSInstance = useCallback(async () => {
@@ -292,8 +298,6 @@ const MintName = ({
   useEffect(() => {
     getMerkleTreeRoot()
   }, [getMerkleTreeRoot])
-
-  console.log('matic:', weiFormatToEth(registerInfo.maticPrice))
 
   return (
     <MainContainer state="Open">
