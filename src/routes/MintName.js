@@ -8,7 +8,7 @@ import {
   Button as AntButton,
   Input
 } from 'antd'
-import getSNS, { getSNSIERC20 } from 'apollo/mutations/sns'
+import getSNS from 'apollo/mutations/sns'
 import MainContainer from 'components/Basic/MainContainer'
 import TopBar from 'components/Basic/TopBar'
 import Copy from 'components/CopyToClipboard/CopyToClipboard'
@@ -186,7 +186,14 @@ const MintName = ({
         )
       handleCloseFn()
     },
-    [emptyAddress, snsInstance, handleCloseFn, removeSuffixOfKey, selectCoins]
+    [
+      emptyAddress,
+      snsInstance,
+      handleCloseFn,
+      removeSuffixOfKey,
+      selectCoins,
+      searchTerm
+    ]
   )
 
   const readExcelData = useCallback(async () => {
@@ -219,13 +226,13 @@ const MintName = ({
     const leafNodes = whiteAddresses.map(address => keccak256(address))
     const tree = new MerkleTree(leafNodes, keccak256, { sortPairs: true })
 
-    // const root = tree.getRoot()
-    // console.log('Root hash is: ', root.toString('hex'))
+    const root = tree.getRoot()
+    console.log('Root hash is: ', root.toString('hex'))
 
     const leaf = keccak256(account)
     const proof = tree.getHexProof(leaf)
     return proof
-  }, [account])
+  }, [account, readExcelData])
 
   const getRegisterPrice = useCallback(
     async sns => {
@@ -267,7 +274,7 @@ const MintName = ({
         return {}
       }
     },
-    [account, emptyAddress, removeSuffixOfKey]
+    [account, emptyAddress, removeSuffixOfKey, searchTerm]
   )
 
   const getSNSInstance = useCallback(async () => {
