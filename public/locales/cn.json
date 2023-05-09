@@ -60,6 +60,7 @@
     "readonly": "只读状态",
     "refresh": "刷新",
     "register": "注册",
+    "registerText":"点击注册需要检查白名单并生成merkle证明，预计需要10s左右",
     "registrant": "注册人",
     "registrationDate": "注册时间",
     "renew": "续费",

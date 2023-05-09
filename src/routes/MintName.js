@@ -58,6 +58,11 @@ const StepsWrapper = styled(Steps)`
 `
 
 const ButtonWrapper = styled('div')`
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  justify-content: center;
+  gap: 10px;
   padding: 20px 40px;
   text-align: right;
 `
@@ -84,6 +89,13 @@ const ModalContent = styled('div')`
   button: {
     width: 100px !important;
   }
+`
+const Text = styled('div')`
+  width: 350px;
+  font-size: 12px;
+  font-weight: 500;
+  text-align: left;
+  margin-right: 0;
 `
 
 const SEARCH_QUERY = gql`
@@ -380,6 +392,8 @@ const MintName = ({
             {t('register.buttons.request')}
           </Button>
         )}
+
+        <Text>{t('c.registerText')}</Text>
       </ButtonWrapper>
 
       <Modal
