@@ -218,6 +218,7 @@ const MintName = ({
     Object.values(data).map(item => {
       list.push(item.address)
     })
+    console.log('list:', list)
     return list
   }, [searchTerm])
 
