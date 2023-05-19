@@ -63,7 +63,7 @@
     "readonly": "Read only",
     "refresh": "Refresh",
     "register": "Register",
-    "registerText":"Clicking on registration requires checking the whitelist and generating a Merkle proof, which is expected to take around 10 seconds.",
+    "registerText":"Check whitelist and generate merekle proof, please wait 10-15 seconds.",
     "registrant": "Registrant",
     "registrationDate": "Registration Date",
     "renew": "Extend",

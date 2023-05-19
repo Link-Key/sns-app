@@ -91,10 +91,10 @@ const ModalContent = styled('div')`
   }
 `
 const Text = styled('div')`
-  width: 350px;
+  max-width: 400px;
   font-size: 12px;
   font-weight: 500;
-  text-align: left;
+  text-align: right;
   margin-right: 0;
 `
 
