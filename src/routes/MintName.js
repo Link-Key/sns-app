@@ -33,11 +33,7 @@ import { LoadingOutlined } from '@ant-design/icons'
 import messageMention from 'utils/messageMention'
 import { useHistory } from 'react-router'
 import EthVal from 'ethval'
-import * as XLSX from 'xlsx'
-import whiteList from '../assets/excel/whiteList.xlsx'
-// import demo from '../assets/excel/demo.xlsx'
-import { MerkleTree } from 'merkletreejs'
-import keccak256 from 'keccak256'
+import { getMerkleProof } from 'api/reqList'
 
 const NameWrapper = styled('div')`
   display: flex;
@@ -209,44 +205,13 @@ const MintName = ({
     ]
   )
 
-  const readExcelData = useCallback(async () => {
-    const buffer = await fetch(whiteList).then(res => res.arrayBuffer())
-    const workbook = XLSX.read(buffer, { type: 'buffer' }) // 读取excel文件
-
-    const sheetNames = workbook.SheetNames // 获取所有sheet的名字
-
-    const domainNameNoKey = removeSuffixOfKey(searchTerm)
-
-    const domainLength =
-      domainNameNoKey.length < 4 ? 0 : domainNameNoKey.length < 8 ? 1 : 2
-
-    console.log('domainLength:', domainLength)
-
-    console.log('sheetNames:', sheetNames[domainLength])
-    const worksheet = workbook.Sheets[sheetNames[domainLength]] // 获取第一个sheet
-
-    const data = XLSX.utils.sheet_to_json(worksheet) // 将sheet转换为json数据
-
-    const list = []
-    Object.values(data).map(item => {
-      list.push(item.address)
-    })
-    console.log('list:', list)
-    return list
-  }, [searchTerm])
-
   const getMerkleTreeRoot = useCallback(async () => {
-    const whiteAddresses = await readExcelData()
-    const leafNodes = whiteAddresses.map(address => keccak256(address))
-    const tree = new MerkleTree(leafNodes, keccak256, { sortPairs: true })
-
-    const root = tree.getRoot()
-    console.log('Root hash is: ', root.toString('hex'))
-
-    const leaf = keccak256(account)
-    const proof = tree.getHexProof(leaf)
-    return proof
-  }, [account, readExcelData])
+    const resp = await getMerkleProof({ address: account, keyName: searchTerm })
+    if (resp?.data?.code === 200) {
+      return resp.data.data.merkleProof
+    }
+    return []
+  }, [account, searchTerm])
 
   const getRegisterPrice = useCallback(
     async sns => {
@@ -316,9 +281,9 @@ const MintName = ({
     }
   }, [isENSReady, getSNSInstance, getRegisterPrice, account, searchTerm])
 
-  useEffect(() => {
-    getMerkleTreeRoot()
-  }, [getMerkleTreeRoot])
+  // useEffect(() => {
+  //   getMerkleTreeRoot()
+  // }, [])
 
   return (
     <MainContainer state="Open">
