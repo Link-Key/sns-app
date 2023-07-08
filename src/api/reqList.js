@@ -52,5 +52,15 @@ const checkKeyName = async data => {
   })
   return res
 }
+const getMerkleProof = async data => {
+  const res = await http({
+    url: '/api/v1/accountService/account/generateMerkleTree',
+    params: {
+      ...data
+    },
+    method: 'get'
+  })
+  return res
+}
 
-export { getAirdropData, checkKeyName }
+export { getAirdropData, checkKeyName, getMerkleProof }
