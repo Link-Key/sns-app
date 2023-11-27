@@ -35,7 +35,6 @@ import { useHistory } from 'react-router'
 import EthVal from 'ethval'
 import * as XLSX from 'xlsx'
 import whiteList from '../assets/excel/whiteList.xlsx'
-// import demo from '../assets/excel/demo.xlsx'
 import { MerkleTree } from 'merkletreejs'
 import keccak256 from 'keccak256'
 
@@ -239,11 +238,14 @@ const MintName = ({
     const leafNodes = whiteAddresses.map(address => keccak256(address))
     const tree = new MerkleTree(leafNodes, keccak256, { sortPairs: true })
 
+    console.log('tree:', tree)
+
     const root = tree.getRoot()
     console.log('Root hash is: ', root.toString('hex'))
 
     const leaf = keccak256(account)
     const proof = tree.getHexProof(leaf)
+    console.log('proof:', proof)
     return proof
   }, [account, readExcelData])
 
